@@ -38,6 +38,7 @@ def generate(profile, targetdir, revisionfile):
     apiRequire = profile["apiIdentifier"]
     multiContextBinding = profile["multiContext"]
     booleanWidth = profile["booleanWidth"]
+    bindingNamespace = profile["bindingNamespace"]
 
     # preparing
 
@@ -156,13 +157,13 @@ def generate(profile, targetdir, revisionfile):
     print("GENERATING")
     generateBegin = time.time()
 
-    includedir = pjoin(targetdir, "include/{api}binding/")
+    includedir = pjoin(targetdir, pjoin(bindingNamespace, "include/"+bindingNamespace+"/"))
     includedir_api = pjoin(includedir, "{api}{memberSet}/")
-    includedir_aux = pjoin(targetdir+"-aux", "include/{api}binding-aux/")
-    sourcedir  = pjoin(targetdir, "source/")
+    includedir_aux = pjoin(targetdir, pjoin(bindingNamespace+"-aux", "include/"+bindingNamespace+"-aux/"))
+    sourcedir  = pjoin(targetdir, pjoin(bindingNamespace, "source/"))
     sourcedir_api  = pjoin(sourcedir, "{api}/")
-    sourcedir_aux  = pjoin(targetdir+"-aux", "source/")
-    testdir    = pjoin(targetdir, "../tests/{api}binding-test/")
+    sourcedir_aux  = pjoin(targetdir, pjoin(bindingNamespace+"-aux", "source/"))
+    testdir    = pjoin(targetdir, "tests/"+bindingNamespace+"-test/")
 
     context = Context(api, multiContextBinding, booleanWidth == 8, revision, features, extensions, enums, bitfGroups, types, commands)
     generalContext = context.general()
