@@ -27,6 +27,42 @@ python3 scripts/update.py -p profiles/gl.json
 python3 scripts/generate.py -p profiles/gl.json -d glbinding
 ```
 
+## Profile Documentation
+
+A profile file is a JSON file with a flat layout, although semantic groups are intended.
+The currently supported tags are:
+
+* API specification
+  * `sourceUrl`: The url to download the API specification
+  * `sourceFile`: The intermediate file name to store the API specification
+  * `patchFile`: A local file for patching the downloaded specification (optional)
+  * `apiIdentifier`: For multi-API specification files, specifies the one API to select
+* Code Generation
+  * `bindingNamespace`: The identifier for the subdirectories and C++ binding namespace
+  * `baseNamespace`: The C++ namespace for the generated API
+  * `multiContext`: Set to true if the API supports multiple contexts
+  * `booleanWidth`: The width of a boolean in this API (may be either 8 or 32)
+
+More options are subject to future development. Ideas and requirements are welcomed.
+
+### Example profile gl.json
+
+```json
+{
+  "": "API specification",
+  "apiIdentifier": "gl",
+  "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/master/xml/gl.xml",
+  "sourceFile": "gl.xml",
+  "patchFile": "glpatch.xml",
+
+  "": "Code Generation",
+  "bindingNamespace": "glbinding",
+  "baseNamespace": "gl",
+  "multiContext": true,
+  "booleanWidth": 8
+}
+```
+
 ## Dependencies
 
 * Python (either 2.7 or 3)
