@@ -203,9 +203,13 @@ def generate(profile, targetdir, revisionfile):
     if multiContextBinding:
         Generator.generate(generalContext, pjoin(includedir, "Binding.h"), "khrbinding/MultiContextBinding.h")
         Generator.generate(generalContext, pjoin(sourcedir, "Binding.cpp"), "khrbinding/MultiContextBinding.cpp")
+        Generator.generate(generalContext, pjoin(includedir, bindingNamespace+".h"), "khrbinding/multicontextinterface.h")
+        Generator.generate(generalContext, pjoin(sourcedir, bindingNamespace+".cpp"), "khrbinding/multicontextinterface.cpp")
     else:
         Generator.generate(generalContext, pjoin(includedir, "Binding.h"), "khrbinding/SingleContextBinding.h")
         Generator.generate(generalContext, pjoin(sourcedir, "Binding.cpp"), "khrbinding/SingleContextBinding.cpp")
+        Generator.generate(generalContext, pjoin(includedir, bindingNamespace+".h"), "khrbinding/singlecontextinterface.h")
+        Generator.generate(generalContext, pjoin(sourcedir, bindingNamespace+".cpp"), "khrbinding/singlecontextinterface.cpp")
 
     Generator.generate(generalContext, pjoin(sourcedir, "Binding_list.cpp"))
 
