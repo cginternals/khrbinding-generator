@@ -219,8 +219,6 @@ def generate(profile, targetdir, revisionfile):
     Generator.generate(generalContext, pjoin(includedir, "AbstractFunction.h"), "khrbinding/AbstractFunction.h")
     Generator.generate(generalContext, pjoin(includedir, "AbstractState.h"), "khrbinding/AbstractState.h")
     Generator.generate(generalContext, pjoin(includedir, "AbstractValue.h"), "khrbinding/AbstractValue.h")
-    Generator.generate(generalContext, pjoin(includedir, "AbstractVersion.h"), "khrbinding/AbstractVersion.h")
-    Generator.generate(generalContext, pjoin(includedir, "AbstractVersion.inl"), "khrbinding/AbstractVersion.inl")
     Generator.generate(generalContext, pjoin(includedir, "CallbackMask.h"), "khrbinding/CallbackMask.h")
     Generator.generate(generalContext, pjoin(includedir, "CallbackMask.inl"), "khrbinding/CallbackMask.inl")
     Generator.generate(generalContext, pjoin(includedir, "ContextHandle.h"), "khrbinding/ContextHandle.h")

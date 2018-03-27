@@ -28,7 +28,7 @@ namespace {{binding}}
 {
 
 
-class AbstractVersion;
+class Version;
 
 
 template <typename T>
@@ -85,7 +85,7 @@ template <>
 *  @brief
 *    The operator to allow Versions to be printed onto a std::ostream
 */
-{{ucbinding}}_AUX_API std::ostream & operator<<(std::ostream & stream, const AbstractVersion & version);
+{{ucbinding}}_AUX_API std::ostream & operator<<(std::ostream & stream, const Version & version);
 
 {{ucbinding}}_AUX_API std::ostream & operator<<(std::ostream & stream, const AbstractValue * value);
 

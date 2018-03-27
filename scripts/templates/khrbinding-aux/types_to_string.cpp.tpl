@@ -5,7 +5,7 @@
 #include <bitset>
 #include <sstream>
 
-#include <{{binding}}/AbstractVersion.h>
+#include <{{binding}}/Version.h>
 #include <{{api}}binding-aux/Meta.h>
 
 #include "types_to_string_private.h"
@@ -85,7 +85,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::GLuint_arr
 }
 {{/glapi}}
 
-std::ostream & operator<<(std::ostream & stream, const AbstractVersion & version)
+std::ostream & operator<<(std::ostream & stream, const Version & version)
 {
     stream << version.toString();
 
