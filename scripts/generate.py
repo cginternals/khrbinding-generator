@@ -46,11 +46,14 @@ def generate(profile, targetdir, revisionfile):
 
     # api     = "gl" # ToDo: other apis are untested yet
 
-    print("checking revision")
-    file = open(revisionfile, "r")
-    revision = int(file.readline())
-    file.close()
-    print(" revision is " + str(revision))
+    if revisionfile is not None and os.path.isfile(revisionfile):
+        print("checking revision")
+        file = open(revisionfile, "r")
+        revision = int(file.readline())
+        file.close()
+        print(" revision is " + str(revision))
+    else:
+        revision = 0
 
     print("loading " + inputfile)
     tree       = ET.parse(inputfile)
@@ -85,7 +88,7 @@ def generate(profile, targetdir, revisionfile):
     groups     = parseGroups(registry, enums, api, apiRequire)
     print(" # " + str(len(groups)) + " enum groups parsed")
 
-    if patchfile is not None: # patching
+    if patchfile is not None and os.path.isfile(patchfile): # patching
         print("")
         print("PATCHING")
 
@@ -297,7 +300,7 @@ def main(argv):
 
     Status.targetdir = targetdir
 
-    generate(json.load(open(profile)), targetdir, 0)
+    generate(json.load(open(profile)), targetdir, None)
 
 if __name__ == "__main__":
     main(sys.argv)
