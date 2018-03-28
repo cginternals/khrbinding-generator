@@ -9,7 +9,7 @@ namespace {{binding}}
 {
 
 
-class State : public AbstractState
+class {{ucbinding}}_API State : public AbstractState
 {
 public:
     State() = default;

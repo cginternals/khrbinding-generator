@@ -30,7 +30,7 @@ namespace {{binding}}
 *  }
 *  \endcode
 */
-class Version
+class {{ucbinding}}_API Version
 {
 public:
     /**
