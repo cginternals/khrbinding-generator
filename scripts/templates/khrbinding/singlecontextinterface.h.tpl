@@ -9,7 +9,6 @@
 #include <{{binding}}/{{binding}}_api.h>
 #include <{{binding}}/{{binding}}_features.h>
 
-#include <{{binding}}/ContextHandle.h>
 #include <{{binding}}/CallbackMask.h>
 #include <{{binding}}/ProcAddress.h>
 

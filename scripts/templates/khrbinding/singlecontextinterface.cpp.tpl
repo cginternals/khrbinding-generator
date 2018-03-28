@@ -30,11 +30,6 @@ void resolveFunctions()
     Binding::resolveFunctions();
 }
 
-void addContextSwitchCallback(ContextSwitchCallback callback)
-{
-    Binding::addContextSwitchCallback(callback);
-}
-
 void setCallbackMask(CallbackMask mask)
 {
     Binding::setCallbackMask(mask);
