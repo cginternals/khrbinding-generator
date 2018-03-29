@@ -96,24 +96,21 @@ std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
 {
     if (typeid(*value) == typeid(AbstractValue))
     {
-        stream << reinterpret_cast<const void*>(value);
+        return stream << reinterpret_cast<const void*>(value);
     }
 
 {{#glapi}}
-    else if (typeid(*value) == typeid(Value<{{api}}::GLvoid *>))
+    if (typeid(*value) == typeid(Value<{{api}}::GLvoid *>))
     {
-        stream << *reinterpret_cast<const Value<{{api}}::GLvoid *>*>(value);
+        return stream << *reinterpret_cast<const Value<{{api}}::GLvoid *>*>(value);
     }
 {{/glapi}}
 
 {{#types.items}}
 {{#item}}{{>partials/types_value_output.cpp}}{{/item}}
-{{/types.items}}    else // expect an AbstractValue with a pointer in first member
-    {
-        stream << *reinterpret_cast<const Value<void *>*>(value);
-    }
-
-    return stream;
+{{/types.items}}
+    // expect an AbstractValue with a pointer in first member
+    return stream << *reinterpret_cast<const Value<void *>*>(value);
 }
 
 

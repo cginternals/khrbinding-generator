@@ -30,7 +30,7 @@ namespace {{binding}}
 *  }
 *  \endcode
 */
-class {{ucbinding}}_API Version
+class {{ucbinding}}_TEMPLATE_API Version
 {
 public:
     /**
@@ -111,7 +111,7 @@ public:
     *  @return
     *    The version as string, "-.-" iff the string is invalid
     */
-    {{ucbinding}}_API inline std::string toString() const;
+    inline std::string toString() const;
 
     /**
     *  @brief
