@@ -14,6 +14,7 @@
 	"baseNamespace": "gl",
 	"generateFeatures": true,
 	"generateProfiles": true,
+	"coreProfileSince": "3.2",
 	"multiContext": true,
 	"featureBlacklist": [],
 	"extensionBlacklist": [],
@@ -41,4 +42,3 @@
 
 	"": "File patterns"
 }
-

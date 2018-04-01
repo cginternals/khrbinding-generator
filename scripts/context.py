@@ -103,17 +103,16 @@ class Context:
         return context
 
     @staticmethod
-    def _listApiMemberSets(features):
+    def _listApiMemberSets(minCoreVersion, features):
         apiMemberSetList = []
         for f in features:
             apiMemberSetList.append( (f, False, False) )
-            if f.api == "gl": # ToDo: probably seperate for all apis
-                if f.major > 3 or (f.major == 3 and f.minor >= 2):
+            apiMemberSetList.append( (f, False, True) )
+            if minCoreVersion and (f.major > minCoreVersion[0] or (f.major == minCoreVersion[0] and f.minor >= minCoreVersion[1])):
                     apiMemberSetList.append( (f, True, False) )
-                apiMemberSetList.append( (f, False, True) )
         return apiMemberSetList
 
-    def __init__(self, api, multiContextBinding, boolean8, revision, features, extensions, enums, bitfGroups, types, commands):
+    def __init__(self, api, multiContextBinding, minCoreVersion, boolean8, revision, features, extensions, enums, bitfGroups, types, commands):
         self.api = api
         self.multiContextBinding = multiContextBinding
         self.boolean8 = boolean8
@@ -125,7 +124,7 @@ class Context:
         self.types = types
         self.commands = commands
 
-        self.apiMemberSetList = self._listApiMemberSets(features)
+        self.apiMemberSetList = self._listApiMemberSets(minCoreVersion, features)
 
         import gen_extensions
         import gen_booleans
