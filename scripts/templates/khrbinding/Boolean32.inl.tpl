@@ -100,3 +100,20 @@ Boolean32 & Boolean32::operator=(const Boolean32 & other)
 
 
 } // namespace {{binding}}
+
+
+namespace std
+{
+
+
+template<>
+struct hash<{{binding}}::Boolean32>
+{
+    hash<int>::result_type operator()(const {{binding}}::Boolean32 & boolean) const
+    {
+        return hash<{{binding}}::Boolean32::underlying_type>()(static_cast<{{binding}}::Boolean32::underlying_type>(boolean));
+    }
+};
+
+
+} // namespace std
