@@ -5,6 +5,9 @@
 	"sourceFile": "egl.xml",
 	"patchFile": null,
 
+    "": "Parser configuration",
+    "parser": "egl",
+
 	"": "Identifier parsing",
 	"lowercasePrefix": "egl",
 	"uppercasePrefix": "EGL_",

@@ -5,6 +5,9 @@
 	"sourceFile": "gl.xml",
 	"patchFile": "glpatch.xml",
 
+    "": "Parser configuration",
+    "parser": "gl",
+
 	"": "Identifier parsing",
 	"lowercasePrefix": "gl",
 	"uppercasePrefix": "GL_",
