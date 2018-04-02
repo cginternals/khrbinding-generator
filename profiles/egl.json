@@ -14,6 +14,7 @@
 	"baseNamespace": "egl",
 	"generateFeatures": true,
 	"generateProfiles": false,
+	"coreProfileSince": false,
 	"multiContext": false,
 	"featureBlacklist": [],
 	"extensionBlacklist": [],

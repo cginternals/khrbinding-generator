@@ -40,6 +40,7 @@ The currently supported tags are:
 * Code Generation
   * `bindingNamespace`: The identifier for the subdirectories and C++ binding namespace
   * `baseNamespace`: The C++ namespace for the generated API
+  * `coreProfileSince`: The version of core profile introduction (e.g., 3.2 for OpenGL)
   * `multiContext`: Set to true if the API supports multiple contexts
   * `booleanWidth`: The width of a boolean in this API (may be either 8 or 32)
 
@@ -58,6 +59,7 @@ More options are subject to future development. Ideas and requirements are welco
   "": "Code Generation",
   "bindingNamespace": "glbinding",
   "baseNamespace": "gl",
+  "coreProfileSince": "3.2",
   "multiContext": true,
   "booleanWidth": 8
 }

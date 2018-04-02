@@ -20,16 +20,6 @@ from binding import *
 from context import Context
 
 
-def listApiMemberSets(features):
-    apiMemberSetList = []
-    for f in features:
-        apiMemberSetList.append( (f, False, False) )
-        if f.api == "gl": # ToDo: probably seperate for all apis
-            if f.major > 3 or (f.major == 3 and f.minor >= 2):
-                apiMemberSetList.append( (f, True, False) )
-            apiMemberSetList.append( (f, False, True) )
-    return apiMemberSetList
-
 def generate(profile, targetdir, revisionfile):
 
     api = profile["baseNamespace"]
@@ -39,6 +29,7 @@ def generate(profile, targetdir, revisionfile):
     multiContextBinding = profile["multiContext"]
     booleanWidth = profile["booleanWidth"]
     bindingNamespace = profile["bindingNamespace"]
+    minCoreVersion = [ int(number) for number in profile["coreProfileSince"].split(".") ] if profile["coreProfileSince"] else False
 
     # preparing
 
@@ -165,7 +156,7 @@ def generate(profile, targetdir, revisionfile):
     sourcedir_aux  = pjoin(targetdir, pjoin(bindingNamespace+"-aux", "source/"))
     testdir    = pjoin(targetdir, "tests/"+bindingNamespace+"-test/")
 
-    context = Context(api, multiContextBinding, booleanWidth == 8, revision, features, extensions, enums, bitfGroups, types, commands)
+    context = Context(api, multiContextBinding, minCoreVersion, booleanWidth == 8, revision, features, extensions, enums, bitfGroups, types, commands)
     generalContext = context.general()
 
     # Generate files with common context

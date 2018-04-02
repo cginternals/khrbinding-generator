@@ -100,3 +100,20 @@ Boolean8 & Boolean8::operator=(const Boolean8 & other)
 
 
 } // namespace {{binding}}
+
+
+namespace std
+{
+
+
+template<>
+struct hash<{{binding}}::Boolean8>
+{
+    hash<char>::result_type operator()(const {{binding}}::Boolean8 & boolean) const
+    {
+        return hash<{{binding}}::Boolean8::underlying_type>()(static_cast<{{binding}}::Boolean8::underlying_type>(boolean));
+    }
+};
+
+
+} // namespace std
