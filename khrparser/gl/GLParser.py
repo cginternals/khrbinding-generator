@@ -1,0 +1,3 @@
+
+class GLParser:
+    pass

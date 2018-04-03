@@ -1,0 +1,3 @@
+
+class CPPGenerator:
+    pass

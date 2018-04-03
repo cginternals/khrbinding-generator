@@ -13,6 +13,7 @@
 	"uppercasePrefix": "EGL_",
 
 	"": "Meta Feature management",
+    "generator": "cpp",
 	"bindingNamespace": "eglbinding",
 	"baseNamespace": "egl",
 	"generateFeatures": true,

@@ -13,6 +13,7 @@
 	"uppercasePrefix": "VK_",
 
 	"": "Meta Feature management",
+    "generator": "cpp",
 	"bindingNamespace": "vkbinding",
 	"baseNamespace": "vl",
 	"generateFeatures": true,

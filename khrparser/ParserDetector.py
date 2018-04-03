@@ -1,0 +1,3 @@
+
+class ParserDetector:
+    pass
