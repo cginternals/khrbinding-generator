@@ -1,3 +1,5 @@
 
 class Parameter(object):
-    pass
+    def __init__(self):
+        self.name = ""
+        self.type = None

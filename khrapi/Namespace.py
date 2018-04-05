@@ -1,3 +1,4 @@
 
 class Namespace(object):
-    pass
+    def __init__(self, identifier):
+        self.identifier = ""

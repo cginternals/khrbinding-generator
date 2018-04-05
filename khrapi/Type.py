@@ -1,3 +1,5 @@
 
 class Type(object):
-    pass
+    def __init__(self):
+        self.identifier = ""
+        self.namespace = None

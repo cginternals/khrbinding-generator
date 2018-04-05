@@ -1,3 +1,0 @@
-
-class Dependency(object):
-    pass

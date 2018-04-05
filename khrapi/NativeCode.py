@@ -1,3 +1,4 @@
 
 class NativeCode(object):
-    pass
+    def __init__(self):
+        self.code = ""

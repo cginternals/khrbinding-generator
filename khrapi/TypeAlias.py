@@ -1,8 +1,7 @@
 
 from .Type import Type
 
-class Function(Type):
+class TypeAlias(Type):
     def __init__(self, identifier):
         super(Type, self).__init__(identifier)
-        self.returnType = None
-        self.parameters = []
+        self.type = None

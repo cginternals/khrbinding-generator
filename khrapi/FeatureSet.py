@@ -1,3 +1,6 @@
 
 class FeatureSet(object):
-    pass
+    def __init__(self):
+        self.requiredExtensions = []
+        self.requiredFunctions = []
+        self.requiredConstants = []

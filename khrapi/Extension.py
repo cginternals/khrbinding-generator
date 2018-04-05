@@ -1,3 +1,5 @@
 
-class Extension(object):
+from .FeatureSet import FeatureSet
+
+class Extension(FeatureSet):
     pass
