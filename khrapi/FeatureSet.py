@@ -1,0 +1,3 @@
+
+class FeatureSet(object):
+    pass

@@ -1,0 +1,3 @@
+
+class Enumerator(object):
+    pass

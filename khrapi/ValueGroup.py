@@ -1,0 +1,3 @@
+
+class ValueGroup(object):
+    pass

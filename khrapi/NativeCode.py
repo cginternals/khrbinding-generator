@@ -1,0 +1,3 @@
+
+class NativeCode(object):
+    pass

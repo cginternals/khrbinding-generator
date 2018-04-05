@@ -1,0 +1,3 @@
+
+class Function(object):
+    pass

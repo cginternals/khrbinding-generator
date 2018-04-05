@@ -1,0 +1,3 @@
+
+class NativeType(object):
+    pass

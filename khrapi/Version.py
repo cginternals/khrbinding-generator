@@ -1,0 +1,3 @@
+
+class Version(object):
+    pass

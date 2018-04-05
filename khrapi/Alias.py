@@ -1,0 +1,3 @@
+
+class Alias(object):
+    pass

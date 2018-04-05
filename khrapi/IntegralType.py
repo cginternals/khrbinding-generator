@@ -1,0 +1,3 @@
+
+class IntegralType(object):
+    pass
