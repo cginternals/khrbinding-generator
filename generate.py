@@ -61,8 +61,10 @@ def main(argv):
         print("Generator " + profile.generatorIdentifier + " not registered")
         sys.exit(1)
 
-    # api = khrParser.parse(profile)
+    api = khrParser.parse(profile)
     # khrGenerator.generate(profile, api)
+    
+    # print(api.identifier)
 
 if __name__ == "__main__":
     main(sys.argv)
