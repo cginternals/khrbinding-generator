@@ -3,7 +3,7 @@
 	"apiIdentifier": "egl",
 	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/master/api/egl.xml",
 	"sourceFile": "egl.xml",
-	"patchFile": null,
+	"patchFile": "eglpatch.xml",
 
     "": "Parser configuration",
     "parser": "egl",

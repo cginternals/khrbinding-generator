@@ -160,6 +160,8 @@ def patchCommands(commands, patches):
                 param.groupString = patchedParam.groupString
                 param.type = patchedParam.type
 
+        if patch.returntype is not None:
+            command.returntype = patch.returntype
 
 def verifyCommands(commands, bitfGroups):
 
