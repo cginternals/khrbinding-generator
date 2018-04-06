@@ -1,3 +1,4 @@
 
 class CPPGenerator:
-    pass
+    def generate(profile, api):
+        pass

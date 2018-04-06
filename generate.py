@@ -62,9 +62,20 @@ def main(argv):
         sys.exit(1)
 
     api = khrParser.parse(profile)
-    # khrGenerator.generate(profile, api)
     
-    # print(api.identifier)
+    #print(api.identifier)
+    #for version in api.versions:
+    #    print(version.identifier)
+    #for extension in api.extensions:
+    #    print(extension.identifier)
+    #for type in api.types:
+    #    print(type.identifier + " " + (type.declaration if hasattr(type, "declaration") else ""))
+    #    if hasattr(type, "values"):
+    #        print(" ".join([ value.identifier + "(" + value.value + ")" for value in type.values ]))
+    #for function in api.functions:
+    #    print(function.returnType.identifier + " " + function.identifier + "(" + ", ".join([ param.type.identifier + " " + param.name for param in function.parameters ]) + ")")
+
+    khrGenerator.generate(profile, api)
 
 if __name__ == "__main__":
     main(sys.argv)

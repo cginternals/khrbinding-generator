@@ -16,4 +16,10 @@ class API(object):
         return next((c for c in self.constants if c.identifier == identifier), None)
 
     def functionByIdentifier(self, identifier):
-        return next((f for f in self.functions if c.identifier == identifier), None)
+        return next((f for f in self.functions if f.identifier == identifier), None)
+
+    def typeByIdentifier(self, identifier):
+        return next((t for t in self.types if t.identifier == identifier), None)
+
+    def functionByIdentifier(self, identifier):
+        return next((f for f in self.functions if f.identifier == identifier), None)
