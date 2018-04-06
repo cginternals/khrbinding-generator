@@ -204,6 +204,9 @@ class GLParser:
                     requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Promoted from "), comment).group(1).strip()
                     version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
 
+                if comment.startswith("Not used by the API"):
+                    continue
+
                 for child in require:
                     if child.tag == "enum":
                         version.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
