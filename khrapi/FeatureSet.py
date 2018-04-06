@@ -6,3 +6,4 @@ class FeatureSet(object):
         self.requiredExtensions = []
         self.requiredFunctions = []
         self.requiredConstants = []
+        self.requiredTypes = []

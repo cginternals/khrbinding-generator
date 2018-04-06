@@ -25,62 +25,10 @@ class GLParser:
         registry = tree.getroot()
         
         api = API(profile.api)
-        
-        # Versions
-        for feature in registry.iter("feature"):
-            if "api" in feature.attrib and feature.attrib["api"] != apiRequire:
-                continue
-            
-            version = Version(api, feature.attrib["name"], feature.attrib["number"])
-            
-            for require in feature.findall("require"):
-                if "api" in require.attrib and require.attrib["api"] != apiRequire:
-                    continue
-                
-                for child in require:
-                    if child.tag == "enum":
-                        version.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
-                    elif child.tag == "command":
-                        version.requiredFunctions.append(api.functionByIdentifier(child.attrib["name"]))
-            
-            for remove in feature.findall("remove"):
-                if "api" in require.attrib and require.attrib["api"] != apiRequire:
-                    continue
-                
-                for child in remove:
-                    if child.tag == "enum":
-                        version.removedConstants.append(api.constantByIdentifier(child.attrib["name"]))
-                    elif child.tag == "command":
-                        version.removedFunctions.append(api.functionByIdentifier(child.attrib["name"]))
-
-            api.versions.append(version)
-        
-        # Extensions
-        for E in registry.iter("extensions"):
-            for xmlExtension in E.findall("extension"):
-                if "supported" in xmlExtension.attrib and apiRequire not in xmlExtension.attrib["supported"].split("|"):
-                    continue
-
-                extension = Extension(api, xmlExtension.attrib["name"])
-                    
-                for require in xmlExtension.findall("require"):
-                    if "api" in require.attrib and require.attrib["api"] != apiRequire:
-                        continue
-                    
-                    for child in require:
-                        if child.tag == "enum":
-                            extension.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
-                        elif child.tag == "command":
-                            extension.requiredFunctions.append(api.functionByIdentifier(child.attrib["name"]))
-                
-                api.extensions.append(extension)
 
         # Types
         for T in registry.iter("types"):
             for type in T.findall("type"):
-                if "api" in type.attrib and type.attrib["api"] != apiRequire:
-                    continue
-
                 apiEntryTag = type.find("apientry")
                 nameTag = type.find("name")
                 text = type.text
@@ -161,9 +109,6 @@ class GLParser:
             for enum in E.findall("enum"):
                 name = enum.attrib["name"]
 
-                if "api" in enum.attrib and enum.attrib["api"] != apiRequire:
-                    continue
-
                 constant = Constant(api, name, enum.attrib["value"])
 
                 groupNames = groupNamesByConstantName[name] if name in groupNamesByConstantName else []
@@ -186,9 +131,6 @@ class GLParser:
         # Functions
         for C in registry.iter("commands"):
             for command in C.iter("command"):
-                if "api" in command.attrib and command.attrib["api"] != apiRequire:
-                    continue
-
                 protoTag = command.find("proto")
                 returnTypeTag = protoTag.find("ptype")
                 if returnTypeTag:
@@ -204,22 +146,81 @@ class GLParser:
                 function.returnType = returnType
 
                 for param in command.findall("param"):
-                    groupName = param.attrib.get("group", None)
+                    groupName = None # param.attrib.get("group", None) # Ignore group names for now
                     typeTag = param.find("ptype")
-                    typeName = param.text if param.text else ""
-                    if typeTag is not None:
-                        if typeTag.text:
-                            typeName += typeTag.text
-                        if typeTag.tail:
-                            typeName += typeTag.tail
-                    typeName = typeName.strip()
+                    if groupName is not None:
+                        typeName = groupName
+                    else:
+                        typeName = param.text if param.text else ""
+                        if typeTag is not None:
+                            if typeTag.text:
+                                typeName += typeTag.text
+                            if typeTag.tail:
+                                typeName += typeTag.tail
+                        typeName = typeName.strip()
                     name = param.find("name").text
-                    type = api.typeByIdentifier(groupName if groupName else typeName)
+                    type = api.typeByIdentifier(typeName)
                     if type is None:
                         type = NativeType(api, typeName, typeName)
                         api.types.append(type)
+
                     function.parameters.append(Parameter(function, name, type))
 
                 api.functions.append(function)
+
+        # Extensions
+        for E in registry.iter("extensions"):
+            for xmlExtension in E.findall("extension"):
+                extension = Extension(api, xmlExtension.attrib["name"])
+
+                for require in xmlExtension.findall("require"):
+                    for child in require:
+                        if child.tag == "enum":
+                            extension.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
+                        elif child.tag == "command":
+                            extension.requiredFunctions.append(api.functionByIdentifier(child.attrib["name"]))
+                        elif child.tag == "type":
+                            extension.requiredTypes.append(api.typeByIdentifier(child.attrib["name"]))
+
+                api.extensions.append(extension)
+
+        # Versions
+        for feature in registry.iter("feature"):
+
+            version = Version(api, feature.attrib["name"], feature.attrib["number"])
+
+            for require in feature.findall("require"):
+                comment = require.attrib.get("comment", "")
+                if comment.startswith("Reuse tokens from "):
+                    requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse tokens from "), comment).group(1).strip()
+                    version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+                elif comment.startswith("Reuse commands from "):
+                    requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse commands from "), comment).group(1).strip()
+                    version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+                elif comment.startswith("Reuse "):
+                    requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse "), comment).group(1).strip()
+                    version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+                elif comment.startswith("Promoted from "):
+                    requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Promoted from "), comment).group(1).strip()
+                    version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+
+                for child in require:
+                    if child.tag == "enum":
+                        version.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
+                    elif child.tag == "command":
+                        version.requiredFunctions.append(api.functionByIdentifier(child.attrib["name"]))
+                    elif child.tag == "type":
+                        version.requiredTypes.append(api.typeByIdentifier(child.attrib["name"]))
+
+            for remove in feature.findall("remove"):
+                for child in remove:
+                    if child.tag == "enum":
+                        version.removedConstants.append(api.constantByIdentifier(child.attrib["name"]))
+                    elif child.tag == "command":
+                        version.removedFunctions.append(api.functionByIdentifier(child.attrib["name"]))
+                    elif child.tag == "type":
+                        version.removedTypes.append(api.typeByIdentifier(child.attrib["name"]))
+
+            api.versions.append(version)
 
         return api

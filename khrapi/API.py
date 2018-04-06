@@ -23,3 +23,6 @@ class API(object):
 
     def functionByIdentifier(self, identifier):
         return next((f for f in self.functions if f.identifier == identifier), None)
+
+    def extensionByIdentifier(self, identifier):
+        return next((e for e in self.extensions if e.identifier.endswith(identifier)), None)

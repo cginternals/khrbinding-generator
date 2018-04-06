@@ -9,5 +9,7 @@ class Version(FeatureSet):
         self.pathVersion = 0
         self.deprecatedFunctions = []
         self.deprecatedConstants = []
+        self.deprecatedTypes = []
         self.removedFunctions = []
         self.removedConstants = []
+        self.removedTypes = []
