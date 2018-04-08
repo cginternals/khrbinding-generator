@@ -64,14 +64,18 @@ def main(argv):
     api = khrParser.parse(profile)
     
     #print(api.identifier)
+    #print("")
 
     #for type in api.types:
-    #    print(type.identifier + " " + (type.declaration if hasattr(type, "declaration") else ""))
+    #    print(type.identifier + (" ("+type.declaration+")" if hasattr(type, "declaration") else "") \
+    #        + (" => " + type.aliasedType.identifier if hasattr(type, "aliasedType") else ""))
     #    if hasattr(type, "values"):
     #        print(" ".join([ value.identifier + "(" + value.value + ")" for value in type.values ]))
+    #print("")
 
     #for function in api.functions:
     #    print(function.returnType.identifier + " " + function.identifier + "(" + ", ".join([ param.type.identifier + " " + param.name for param in function.parameters ]) + ")")
+    #print("")
 
     #for version in api.versions:
     #    print(version.identifier)
@@ -80,6 +84,7 @@ def main(argv):
     #    print("Constants " + ", ".join([value.identifier for value in version.requiredConstants]))
     #    print("Types " + ", ".join([type.identifier for type in version.requiredTypes]))
     #    print("")
+    #print("")
 
     #for extension in api.extensions:
     #    print(extension.identifier)
@@ -87,6 +92,7 @@ def main(argv):
     #    print("Constants " + ", ".join([ value.identifier for value in extension.requiredConstants]))
     #    print("Types " + ", ".join([type.identifier for type in extension.requiredTypes]))
     #    print("")
+    #print("")
 
     khrGenerator.generate(profile, api)
 
