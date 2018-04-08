@@ -26,7 +26,7 @@ class VKParser:
         tree     = ET.parse(xmlFile)
         registry = tree.getroot()
         
-        api = API(profile.api)
+        api = API(profile.api, 0)
 
         # Types
         for T in registry.iter("types"):

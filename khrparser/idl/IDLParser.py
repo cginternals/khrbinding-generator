@@ -3,7 +3,7 @@ from khrapi.API import API
 
 class IDLParser:
     def parse(profile):
-        api = API(profile.api)
+        api = API(profile.api, 0)
 
         return api
 

@@ -3,8 +3,9 @@
 # from .Extension import Extension;
 
 class API(object):
-    def __init__(self, identifier):
+    def __init__(self, identifier, revision):
         self.identifier = identifier
+        self.revision = revision
         self.versions = []
         self.extensions = []
         self.types = []
