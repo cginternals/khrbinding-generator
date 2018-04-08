@@ -1,7 +1,7 @@
 {
 	"": "API specification",
 	"apiIdentifier": "vk",
-	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/master/src/spec/vk.xml",
+	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/master/xml/vk.xml",
 	"sourceFile": "vk.xml",
 	"patchFile": null,
     

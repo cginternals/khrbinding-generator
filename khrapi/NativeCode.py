@@ -1,4 +1,5 @@
 
 class NativeCode(object):
-    def __init__(self):
-        self.code = ""
+    def __init__(self, identifier, code):
+        self.identifier = identifier
+        self.code = code

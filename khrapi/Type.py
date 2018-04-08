@@ -4,3 +4,4 @@ class Type(object):
         self.api = api
         self.identifier = identifier
         self.namespace = None
+        self.require = None

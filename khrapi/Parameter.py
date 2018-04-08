@@ -1,6 +1,6 @@
 
 class Parameter(object):
-    def __init__(self, function, name, type):
-        self.function = function
+    def __init__(self, parent, name, type):
+        self.parent = parent
         self.name = name
         self.type = type

@@ -10,6 +10,7 @@ class API(object):
         self.types = []
         self.functions = []
         self.constants = []
+        self.declarations = []
         self.dependencies = []
 
     def constantByIdentifier(self, identifier):
