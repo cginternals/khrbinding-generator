@@ -62,6 +62,8 @@ def main(argv):
         sys.exit(1)
 
     api = khrParser.parse(profile)
+
+    api = khrParser.patch(profile, api)
     
     #print(api.identifier)
     #print("")

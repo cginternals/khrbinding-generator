@@ -218,3 +218,6 @@ class EGLParser:
             api.versions.append(version)
 
         return api
+
+    def patch(self, profile, api):
+        return api
