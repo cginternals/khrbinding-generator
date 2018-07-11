@@ -4,7 +4,7 @@
     <types>
         <type comment="fix for bad parameter signature">typedef std::array&lt;GLuint, 2&gt; <name>GLuint_array_2</name>;</type>
         <type comment="fix to defer dependency on khrplatform.h">typedef ptrdiff_t <name>GLintptr</name>;</type>
-        <type comment="fix to defer dependency on khrplatform.h">typedef ptrdiff_t <name>GLsizeiptr</name>;</type>
+        <type comment="fix to defer dependency on khrplatform.h">typedef size_t <name>GLsizeiptr</name>;</type>
     </types>
 
     <!-- non-standard bitfield group for not used mask parameters -->
