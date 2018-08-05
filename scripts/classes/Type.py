@@ -66,7 +66,16 @@ def patchTypes(types, patches):
     # currently only adding types is supported
 
     for patch in patches:
-        types.append(patch)
+        inTypes = False
+        for type in types:
+            if type.name == patch.name:
+                inTypes = True
+                type.value = patch.value
+                type.typevalue = patch.typevalue
+                break
+        
+        if not inTypes:
+            types.append(patch)
 
 # returns the type of a typedef, e.g., 
 # "typedef unsigned int" returns "unsigned int"
