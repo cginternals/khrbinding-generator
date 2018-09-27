@@ -47,7 +47,7 @@ class Extension:
 			for child in require:
 				if   child.tag == "enum":
 					self.reqEnumStrings.append(child.attrib["name"])
-				elif child.tag == "command":
+				elif child.tag == "command" and child.attrib["name"] not in self.reqCommandStrings:
 					self.reqCommandStrings.append(child.attrib["name"])
 
 	def __str__(self):
