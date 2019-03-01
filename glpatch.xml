@@ -88,7 +88,7 @@
         </command>
         <command>
             <proto>void *<name>glMapTexture2DINTEL</name></proto>
-            <param group="MapBufferUsageMask"><ptype>GLbitfield</ptype> <name>access</name></param>
+            <param group="BufferAccessMask"><ptype>GLbitfield</ptype> <name>access</name></param>
         </command>
         <command>
             <proto>void <name>glMemoryBarrier</name></proto>
