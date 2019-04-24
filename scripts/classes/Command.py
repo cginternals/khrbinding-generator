@@ -73,7 +73,7 @@ class Command:
 
         for extension in extensions:
             if extension.api == api and self.name in extension.reqCommandStrings:
-                self.reqExtensions.append(extensions)
+                self.reqExtensions.append(extension)
         
     def __str__(self):
 

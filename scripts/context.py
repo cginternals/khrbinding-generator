@@ -253,10 +253,7 @@ class Context:
         return context
 
     def additionalTypeIncludes(self):
-        if self.api == "gl":
-            return ""
-        else:
-            return "#include <KHR/khrplatform.h>"
+        return "#include <KHR/khrplatform.h>"
 
     def additionalTypes(self):
         if self.api == "gl":
