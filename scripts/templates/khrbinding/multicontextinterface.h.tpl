@@ -3,6 +3,7 @@
 
 
 #include <set>
+#include <string>
 #include <vector>
 #include <functional>
 
@@ -32,7 +33,8 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *    Initializes the binding for the current active OpenGL context
 *
 *  @param[in] functionPointerResolver
-*    A function pointer to resolve binding functions for this context
+*    A function pointer to resolve binding functions for this context.
+*    If `nullptr` is passed, `glbinding::getProcAddress` is used for convenience.
 *  @param[in] resolveFunctions (optional)
 *    Whether to resolve function pointers lazily (\a resolveFunctions = `false`) or immediately
 *
@@ -42,6 +44,14 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    A functionPointerResolver with value 'nullptr' will get initialized with the function
 *    pointer from the initial thread.
+*
+*  @remark
+*    Using glbinding::getProcAddress is provided for convenience only. Please don't use this in new code.
+*    Instead, use an external function resolution callback, e.g.,
+*     * wglGetProcAddress
+*     * glxGetProcAddress
+*     * glfwGetProcAddress
+*     * QOpenGlContext::getProcAddress
 */
 {{ucbinding}}_API void initialize({{binding}}::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
 

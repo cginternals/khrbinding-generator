@@ -43,6 +43,8 @@ public:
     *  @brief
     *    Returns the revision of the parsed gl.xml file
     *
+    *  @deprecated
+    *
     *  @return
     *    The revision of the parsed gl.xml file
     */

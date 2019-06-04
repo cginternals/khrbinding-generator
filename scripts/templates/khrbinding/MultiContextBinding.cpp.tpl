@@ -6,6 +6,7 @@
 
 #include <{{binding}}/State.h>
 #include <{{binding}}/AbstractFunction.h>
+#include <{{binding}}/getProcAddress.h>
 
 
 namespace {{binding}}
@@ -170,7 +171,9 @@ void Binding::initialize(
 
         if (s_firstGetProcAddress() == nullptr)
         {
-            s_firstGetProcAddress() = functionPointerResolver;
+            s_firstGetProcAddress() = functionPointerResolver == nullptr
+                ? {{binding}}::getProcAddress
+                : functionPointerResolver;
         }
 
         s_getProcAddress() = functionPointerResolver == nullptr ? s_firstGetProcAddress() : functionPointerResolver;
