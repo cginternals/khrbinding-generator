@@ -9,7 +9,7 @@
 #include <functional>
 #include <unordered_map>
 
-#ifdef GLBINDING_USE_BOOST_THREAD
+#ifdef {{ucbinding}}_USE_BOOST_THREAD
 #include <boost/thread.hpp>
 namespace std_boost = boost;
 #else
@@ -92,7 +92,7 @@ public:
     *    pointer from the initial thread.
     *
     *  @remark
-    *    Using glbinding::getProcAddress is provided for convenience only. Please don't use this in new code.
+    *    Using {{binding}}::getProcAddress is provided for convenience only. Please don't use this in new code.
     *    Instead, use an external function resolution callback, e.g.,
     *     * wglGetProcAddress
     *     * glxGetProcAddress
@@ -146,7 +146,7 @@ public:
 
     /**
     *  @brief
-    *    Update the current context state in glbinding
+    *    Update the current context state in {{binding}}
     *
     *  @remark
     *    This function queries the driver for the current OpenGL context
@@ -155,7 +155,7 @@ public:
 
     /**
     *  @brief
-    *    Update the current context state in glbinding
+    *    Update the current context state in {{binding}}
     *
     *  @param[in] context
     *    The context handle of the context to set current
@@ -164,7 +164,7 @@ public:
 
     /**
     *  @brief
-    *    Removes the current context from the state of glbinding
+    *    Removes the current context from the state of {{binding}}
     *
     *  @remark
     *    This function queries the driver for the current OpenGL context
@@ -173,7 +173,7 @@ public:
 
     /**
     *  @brief
-    *    Removes the current context from the state of glbinding
+    *    Removes the current context from the state of {{binding}}
     *
     *  @param[in] context
     *    The context handle of the context to remove
@@ -490,10 +490,10 @@ protected:
     static FunctionLogCallback & s_logCallback();                           ///< Callback for logging a function call
     static int & s_pos();                                                   ///< Position of current State
     static ContextHandle & s_context();                                     ///< Handle of current context
-    static glbinding::GetProcAddress & s_getProcAddress();                  ///< Current address of function resolution method
+    static {{binding}}::GetProcAddress & s_getProcAddress();                  ///< Current address of function resolution method
     static std_boost::recursive_mutex & s_mutex();                          ///< Mutex
     static std::unordered_map<ContextHandle, int> & s_bindings();           ///< Map (handle->position) of initialized contexts
-    static glbinding::GetProcAddress & s_firstGetProcAddress();             ///< First address of function resolution method
+    static {{binding}}::GetProcAddress & s_firstGetProcAddress();             ///< First address of function resolution method
 };
 
 
