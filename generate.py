@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, sys, getopt, json
+import os, sys, getopt, json, time
 
 from khrparser.Profile import Profile
 
@@ -57,13 +57,23 @@ def main(argv):
         print("Generator " + profile.generatorIdentifier + " not registered")
         sys.exit(1)
 
+    parseBegin = time.time()
+
     api = khrParser.parse(profile)
 
     api = khrParser.patch(profile, api)
-    
-    api.printSummary()
 
-    # khrGenerator.generate(profile, api)
+    parseEnd = time.time()
+    print("parsing took {:.3f} seconds".format(parseEnd - parseBegin))
+    
+    # api.printSummary()
+
+    generateBegin = time.time()
+
+    khrGenerator.generate(profile, api)
+
+    generateEnd = time.time()
+    print("generation took {:.3f} seconds".format(generateEnd - generateBegin))
 
 if __name__ == "__main__":
     main(sys.argv)

@@ -2,6 +2,7 @@
 import xml.etree.ElementTree
 import os.path
 import datetime
+import re
 
 from khrapi.API import API
 
@@ -13,7 +14,7 @@ class XMLParser:
         apiRequire = profile.apiRequire
 
         revision_date = datetime.datetime.fromtimestamp(os.path.getmtime(xmlFile))
-        revision_string = revision_date.isoformat(timespec='seconds')
+        revision_string = revision_date.strftime('%Y%m%d')
         
         api = API(profile.api, revision_string)
         
