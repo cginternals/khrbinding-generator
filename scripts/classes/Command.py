@@ -51,6 +51,9 @@ class Command:
 
         proto = xml.find("proto")
 
+        if not proto:
+            print(xml)
+
         self.name       = proto.find("name").text
         self.returntype = " ".join([t.strip() for t in proto.itertext()][:-1]).strip()
 
@@ -122,7 +125,8 @@ def parseCommands(xml, features, extensions, api, apiRequire):
         for command in C.iter("command"):
 
             proto = command.find("proto")
-            name = proto.find("name").text
+
+            name = proto.find("name").text if proto is not None else "ERROR_NO_PROTO"
 
             # enforce constraint (1)
             if not any(name in feature.reqCommandStrings \
