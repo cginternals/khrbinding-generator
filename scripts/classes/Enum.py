@@ -29,27 +29,25 @@ def find_le(a, x):
 
 class Enum:
 
-    def __init__(self, xml, features, extensions, groupString, groupType, api):
+    def __init__(self, xml, features, extensions, groupString, groupType, api, enums):
 
         self.api   = api
 
         self.name  = xml.attrib["name"]
-        self.value = xml.attrib["value"]
+        self.value = xml.attrib["value"] if "value" in xml.attrib else None
         self.type  = "None"
 
-        if self.value.startswith("EGL_CAST"):
+        if self.value is not None and self.value.startswith("EGL_CAST"):
             self.value = self.value[self.value.find(",")+1:]
             self.value = self.value[0:self.value.find(")")]
-
-        self.aliasString = ""
-        self.alias = None
 
         # an enum group is, if defined, defined specifically for an enum
         # but the enum itself might be reused by other groups as well.
         self.groups = set()
-        self.groupString = None # ToDo: only supported for GLbitfield for now
+        self.groupString = None # ToDo: only supported for bitfields for now
 
         self.aliasString = xml.attrib.get("alias", None)
+        self.alias = next((e for e in enums if e.name == self.aliasString), None)
 
         if self.name.startswith("EGL") and groupType == "bitmask":
             self.type = "EGLbitfield"
@@ -80,15 +78,17 @@ class Enum:
             if extension.api == api and self.name in extension.reqEnumStrings:
                 self.reqExtensions.append(extensions)
 
+    def getValue(self):
+        return self.alias.getValue() if self.alias is not None else self.value
 
     def __str__(self):
         
-        return "Enum(%s, %s)" % (self.name, self.value)
+        return "Enum(%s, %s)" % (self.name, self.getValue())
         
 
     def __lt__(self, other):
 
-        return self.value < other.value or (self.value == other.value and self.name < other.name)
+        return self.getValue() < other.getValue() or (self.getValue() == other.getValue() and self.name < other.name)
 
 
     # this compares the given feature with the lowest requiring feature
@@ -285,7 +285,7 @@ def parseEnums(xml, features, extensions, commands, api, apiRequire):
             if "api" in enum.attrib and enum.attrib["api"] != apiRequire:
                 continue
 
-            enums.add(Enum(enum, features, extensions, groupString, groupType, api))
+            enums.add(Enum(enum, features, extensions, groupString, groupType, api, enums))
 
     return sorted(enums)
 
@@ -383,6 +383,6 @@ def groupEnumsByGroup(enums):
             d[g.name].append(e)
 
     for key in d.keys():
-        d[key] = sorted(d[key], key = lambda e: e.value)
+        d[key] = sorted(d[key], key = lambda e: e.getValue())
 
     return d    

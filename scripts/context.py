@@ -223,7 +223,6 @@ class Context:
                                                        groupSortKey = lambda k: k,
                                                        itemSortKey = lambda f: f["identifier"])
         context["features"] = self.listContext(self.featureContexts)
-        print(context["features"]["items"])
         context["latestFeature"] = context["features"]["items"][-1]["item"]
 
         return context

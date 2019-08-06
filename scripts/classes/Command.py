@@ -59,7 +59,7 @@ class Command:
 
         self.params = []
 
-        for param in xml.iter("param"):
+        for param in xml.findall("param"): # don't parse children recursively
             self.params.append(Parameter(param))
 
         self.reqFeatures   = []
