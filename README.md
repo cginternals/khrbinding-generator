@@ -18,21 +18,21 @@ Currently available profiles for loading and generating (in subdirectory `profil
 ### Load XML from Khronos repository
 
 ```bash
-python3 scripts/update.py -p "profiles/gl.json"
-python3 scripts/update.py -p "profiles/gles.json"
-python3 scripts/update.py -p "profiles/glsc.json"
-python3 scripts/update.py -p "profiles/egl.json"
-python3 scripts/update.py -p "profiles/vk.json"
+python3 update.py -p "profiles/gl.json"
+python3 update.py -p "profiles/gles.json"
+python3 update.py -p "profiles/glsc.json"
+python3 update.py -p "profiles/egl.json"
+python3 update.py -p "profiles/vk.json"
 ```
 
 ### Generate C++ API binding from XML
 
 ```bash
-python3 scripts/generate.py -p "profiles/gl.json" -d "../glbinding/source"
-python3 scripts/generate.py -p "profiles/gles.json" -d "../glesbinding/source"
-python3 scripts/generate.py -p "profiles/glsc.json" -d "../glscbinding/source"
-python3 scripts/generate.py -p "profiles/egl.json" -d "../eglbinding/source"
-python3 scripts/generate.py -p "profiles/vk.json" -d "../vkbinding/source"
+python3 generate.py -p "profiles/gl.json" -d "../glbinding/source"
+python3 generate.py -p "profiles/gles.json" -d "../glesbinding/source"
+python3 generate.py -p "profiles/glsc.json" -d "../glscbinding/source"
+python3 generate.py -p "profiles/egl.json" -d "../eglbinding/source"
+python3 generate.py -p "profiles/vk.json" -d "../vkbinding/source"
 ```
 
 ## Profile Documentation

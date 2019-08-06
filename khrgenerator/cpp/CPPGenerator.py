@@ -680,7 +680,7 @@ def alphabeticalGroupKeys():
 
 
 def alphabeticalGroupKey(identifier, prefix):
-    # derives an key from an identifier with "GL_" prefix
+    # derives an key from an identifier with prefix
 
     index = identifier.find(prefix)
     if index < 0:
@@ -698,8 +698,7 @@ def alphabeticalGroupKey(identifier, prefix):
 class CPPGenerator:
     def generate(profile, api):
         profile.baseNamespace
-        apiRequire = profile.apiIdentifier
-        multiContextBinding = profile.multiContext
+        multiContextBinding = profile.multiContextBinding
         booleanWidth = profile.booleanWidth
         bindingNamespace = profile.bindingNamespace
         minCoreVersion = profile.minCoreVersion
@@ -713,8 +712,8 @@ class CPPGenerator:
         sourcedir_aux = pjoin(targetdir, pjoin(bindingNamespace + "-aux", "source/"))
         testdir = pjoin(targetdir, "tests/" + bindingNamespace + "-test/")
 
-        context = Context(profile.baseNamespace, multiContextBinding, minCoreVersion, booleanWidth == 8, api.revision, features, extensions,
-                          enums, bitfGroups, types, commands)
+        context = Context(profile.baseNamespace, multiContextBinding, minCoreVersion, booleanWidth == 8, api.revision, api.versions, api.extensions,
+                          api.constants, None, api.types, api.functions)
         generalContext = context.general()
 
         generateBegin = time.time()

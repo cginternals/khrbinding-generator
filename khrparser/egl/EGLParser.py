@@ -1,8 +1,8 @@
 
-import xml.etree.ElementTree as ET
 import re
 
-from khrapi.API import API
+from khrparser.XMLParser import XMLParser
+
 from khrapi.Version import Version
 from khrapi.Extension import Extension
 
@@ -16,16 +16,10 @@ from khrapi.Constant import Constant
 from khrapi.Function import Function
 from khrapi.Parameter import Parameter
 
-class EGLParser:
-    def parse(profile):
-        xmlFile = profile.inputfile
-        apiRequire = profile.apiRequire
-        
-        tree     = ET.parse(xmlFile)
-        registry = tree.getroot()
-        
-        api = API(profile.api, 0)
+class EGLParser(XMLParser):
 
+    @classmethod
+    def parseXML(cls, api, registry):
         # Types
         for T in registry.iter("types"):
             for type in T.findall("type"):
@@ -217,7 +211,6 @@ class EGLParser:
 
             api.versions.append(version)
 
-        return api
-
-    def patch(self, profile, api):
+    @classmethod
+    def patch(cls, profile, api):
         return api

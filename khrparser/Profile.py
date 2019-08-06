@@ -8,6 +8,7 @@ class Profile:
         self.generatorIdentifier = jsonObject["generator"]
 
         self.api = jsonObject["baseNamespace"]
+        self.baseNamespace = jsonObject["baseNamespace"]
         self.inputfile = jsonObject["sourceFile"]
         self.patchfile = jsonObject["patchFile"]
         self.apiRequire = jsonObject["apiIdentifier"]

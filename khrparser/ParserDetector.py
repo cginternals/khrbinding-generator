@@ -1,3 +1,0 @@
-
-class ParserDetector:
-    pass
