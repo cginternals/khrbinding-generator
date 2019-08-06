@@ -34,7 +34,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *
 *  @param[in] functionPointerResolver
 *    A function pointer to resolve binding functions for this context.
-*    If `nullptr` is passed, `glbinding::getProcAddress` is used for convenience.
+*    If `nullptr` is passed, `{{binding}}::getProcAddress` is used for convenience.
 *  @param[in] resolveFunctions (optional)
 *    Whether to resolve function pointers lazily (\a resolveFunctions = `false`) or immediately
 *
@@ -46,7 +46,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *    pointer from the initial thread.
 *
 *  @remark
-*    Using glbinding::getProcAddress is provided for convenience only. Please don't use this in new code.
+*    Using {{binding}}::getProcAddress is provided for convenience only. Please don't use this in new code.
 *    Instead, use an external function resolution callback, e.g.,
 *     * wglGetProcAddress
 *     * glxGetProcAddress
@@ -280,7 +280,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 
 /**
 *  @brief
-*    Update the current context state in glbinding
+*    Update the current context state in {{binding}}
 *
 *  @remark
 *    This function queries the driver for the current OpenGL context
@@ -289,7 +289,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 
 /**
 *  @brief
-*    Update the current context state in glbinding
+*    Update the current context state in {{binding}}
 *
 *  @param[in] context
 *    The context handle of the context to set current
@@ -298,7 +298,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 
 /**
 *  @brief
-*    Removes the current context from the state of glbinding
+*    Removes the current context from the state of {{binding}}
 *
 *  @remark
 *    This function queries the driver for the current OpenGL context
@@ -307,7 +307,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 
 /**
 *  @brief
-*    Removes the current context from the state of glbinding
+*    Removes the current context from the state of {{binding}}
 *
 *  @param[in] context
 *    The context handle of the context to remove
