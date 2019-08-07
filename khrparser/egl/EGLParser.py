@@ -216,6 +216,7 @@ class EGLParser(XMLParser):
         return api
 
     @classmethod
-    def deriveBinding(cls, api, profile, binding):
+    def deriveBinding(cls, api, profile):
+        binding = super(cls, EGLParser).deriveBinding(api, profile)
+
         return binding
-    

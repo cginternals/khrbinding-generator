@@ -281,26 +281,37 @@ class GLParser(XMLParser):
         return api
 
     @classmethod
-    def deriveBinding(cls, api, profile, binding):
+    def deriveBinding(cls, api, profile):
+        binding = super(cls, GLParser).deriveBinding(api, profile)
+
         binding.baseNamespace = profile.baseNamespace
+        
         binding.multiContextBinding = profile.multiContextBinding
-        binding.booleanWidth = profile.booleanWidth
         binding.minCoreVersion = profile.minCoreVersion
+        
         binding.identifier = api.identifier+"binding"
         binding.namespace = api.identifier+"binding"
         binding.auxIdentifier = "aux"
         binding.auxNamespace = "aux"
         binding.bindingAuxIdentifier = binding.identifier + "-" + binding.auxIdentifier
         binding.bindingAuxNamespace = binding.namespace + "::" + binding.auxNamespace
-        binding.apiExport = binding.identifier.upper + "_API"
-        binding.apiTemplateExport = binding.identifier.upper + "_TEMPLATE_API"
-        binding.auxApiExport = binding.bindingAuxIdentifier.upper + "_API"
-        binding.auxApiTemplateExport = binding.bindingAuxIdentifier.upper + "_TEMPLATE_API"
-        binding.constexpr = binding.identifier.upper + "_CONSTEXPR"
-        binding.threadlocal = binding.identifier.upper + "_THREAD_LOCAL"
-        binding.useboostthread = binding.identifier.upper + "_USE_BOOST_THREAD"
+        binding.apiExport = binding.identifier.upper() + "_API"
+        binding.apiTemplateExport = binding.identifier.upper() + "_TEMPLATE_API"
+        binding.auxApiExport = binding.bindingAuxIdentifier.upper() + "_API"
+        binding.auxApiTemplateExport = binding.bindingAuxIdentifier.upper() + "_TEMPLATE_API"
+        binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
+        binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
+        binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
+        
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement
+
+        binding.extensionType = profile.extensionType
+        binding.booleanType = profile.booleanType
+        binding.booleanWidth = profile.booleanWidth
+        binding.enumType = profile.enumType
+        binding.bitfieldType = profile.bitfieldType
+        binding.noneBitfieldValue = profile.noneBitfieldValue
 
         return binding
 

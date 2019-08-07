@@ -8,8 +8,6 @@ from khrparser.gl.GLParser import GLParser
 from khrparser.egl.EGLParser import EGLParser
 from khrparser.vk.VKParser import VKParser
 
-from khrbinding.Binding import Binding
-
 from khrgenerator.cpp.CPPGenerator import CPPGenerator
 
 
@@ -58,6 +56,8 @@ def main(argv):
     else:
         print("Generator " + profile.generatorIdentifier + " not registered")
         sys.exit(1)
+    
+    begin = time.time()
 
     print("Start parsing")
 
@@ -72,18 +72,20 @@ def main(argv):
     
     # api.printSummary()
 
-    binding = Binding(api)
+    binding = khrParser.deriveBinding(api, profile)
 
-    binding = khrParser.deriveBinding(binding)
-
-    print("Start generation")
+    print("Start template rendering")
 
     generateBegin = time.time()
 
     khrGenerator.generate(profile, api, binding)
 
     generateEnd = time.time()
-    print("Generation took {:.3f} seconds".format(generateEnd - generateBegin))
+    print("Rendering took {:.3f} seconds".format(generateEnd - generateBegin))
+
+    end = time.time()
+
+    print("Generation took {:.3f} seconds".format(end - begin))
 
 if __name__ == "__main__":
     main(sys.argv)

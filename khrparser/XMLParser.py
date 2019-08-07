@@ -5,6 +5,7 @@ import datetime
 import re
 
 from khrapi.API import API
+from khrbinding.Binding import Binding
 
 class XMLParser:
 
@@ -25,13 +26,13 @@ class XMLParser:
         return api
 
     @classmethod
-    def parseXML(cls, api, profile, registry)
+    def parseXML(cls, api, profile, registry):
         pass
     
     @classmethod
-    def patch(cls, api, profile0)
+    def patch(cls, api, profile):
         pass
     
     @classmethod
-    def deriveBinding(cls, api, profile, binding):
-        return binding
+    def deriveBinding(cls, api, profile):
+        return Binding(api)

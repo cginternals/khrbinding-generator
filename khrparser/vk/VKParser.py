@@ -62,7 +62,9 @@ class VKParser(XMLParser):
         return api
 
     @classmethod
-    def deriveBinding(cls, api, profile, binding):
+    def deriveBinding(cls, api, profile):
+        binding = super(cls, VKParser).deriveBinding(api, profile)
+
         return binding
 
     @classmethod

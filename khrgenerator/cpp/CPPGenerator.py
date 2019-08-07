@@ -64,7 +64,6 @@ class CPPGenerator:
             functions=[ function for function in api.functions ]
         )
         cls.render(template_engine, "entrypoint.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding)
-        cls.render(template_engine, "exclusion.h", includedir_api+"no{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding)
 
         cls.render(template_engine, "AllVersions_test.cpp", testdir+"AllVersions_test.cpp", api=api, profile=profile, binding=binding,
             versions=api.versions
@@ -120,6 +119,8 @@ class CPPGenerator:
         )
 
         ## KHR binding
+
+        cls.render(template_engine, "exclusion.h", includedir+"no{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding)
 
         if binding.multiContextBinding:
         #    cls.render(template_engine, "khrbinding/MultiContextBinding.h", includedir+"Binding.h", api=api, profile=profile, binding=binding,
