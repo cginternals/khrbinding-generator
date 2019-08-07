@@ -5,3 +5,6 @@ class Type(object):
         self.identifier = identifier
         self.namespace = None
         self.require = None
+
+    def __lt__(self, other):
+        return self.identifier < other.identifier

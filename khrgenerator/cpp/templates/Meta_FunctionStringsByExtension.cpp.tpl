@@ -1,21 +1,22 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api}}binding/{{api}}/extension.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/extension.h>
 
 
-using namespace {{api}};
+using namespace {{api.identifier}};
 
 
-namespace {{api}}binding { namespace aux
+namespace {{api.identifier}}binding { namespace aux
 {
 
 
-const std::unordered_map<{{extensionType}}, std::set<std::string>> Meta_FunctionStringsByExtension =
+const std::unordered_map<{{profile.extensionType}}, std::set<std::string>> Meta_FunctionStringsByExtension =
 {
-{{#extensions.items}}{{^item.reqCommands.empty}}    { {{extensionType}}::{{item.identifier}}, { {{#item.reqCommands.items}}"{{item.name}}"{{^last}}, {{/last}}{{/item.reqCommands.items}} } }{{^last}},{{/last}}
-{{/item.reqCommands.empty}}{{/extensions.items}}
+{%- for extension in extensions|sort(attribute='identifier') %}{% if extension.requiredFunctions|length > 0 %}
+    { {{profile.extensionType}}::{{extension.identifier}}, { {% for function in extension.requiredFunctions|sort(attribute='identifier') %}"{{function.identifier}}"{{ ", " if not loop.last }}{% endfor %} } }{{ "," if not loop.last }}
+{%- endif %}{% endfor %}
 };
 
 
-} } // namespace {{api}}binding::aux
+} } // namespace {{api.identifier}}binding::aux

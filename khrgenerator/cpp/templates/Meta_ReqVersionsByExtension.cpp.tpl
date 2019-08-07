@@ -1,21 +1,23 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api}}binding/{{api}}/extension.h>
-#include <{{api}}binding/Version.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/extension.h>
+#include <{{api.identifier}}binding/Version.h>
 
 
-using namespace {{api}};
+using namespace {{api.identifier}};
 
 
-namespace {{api}}binding { namespace aux
+namespace {{api.identifier}}binding { namespace aux
 {
 
 
-const std::unordered_map<{{extensionType}}, Version> Meta_ReqVersionsByExtension =
+const std::unordered_map<{{profile.extensionType}}, Version> Meta_ReqVersionsByExtension =
 {
-{{#extensionsIncore.items}}{{#item.incore}}    { {{extensionType}}::{{item.identifier}}, { {{item.incoreMajor}}, {{item.incoreMinor}} } }{{^last}},{{/last}}
-{{/item.incore}}{{/extensionsIncore.items}}};
+{%- for extension, version in extensionsInCore|dictsort %}
+    { {{profile.extensionType}}::{{extension.identifier}}, { {{version.majorVersion}}, {{version.minorVersion}} } }{{ "," if not loop.last }}
+{%- endfor %}
+};
 
 
-} } // namespace {{api}}binding::aux
+} } // namespace {{api.identifier}}binding::aux

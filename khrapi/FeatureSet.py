@@ -7,3 +7,6 @@ class FeatureSet(object):
         self.requiredFunctions = []
         self.requiredConstants = []
         self.requiredTypes = []
+
+    def __lt__(self, other):
+        return self.identifier < other.identifier

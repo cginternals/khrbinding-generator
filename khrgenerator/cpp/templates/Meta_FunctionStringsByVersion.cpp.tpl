@@ -1,10 +1,13 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api}}binding/Version.h>
+#include <{{api.identifier}}binding/Version.h>
 
 
-namespace {{api}}binding { namespace aux
+using namespace {{api.identifier}};
+
+
+namespace {{api.identifier}}binding { namespace aux
 {
 
 
@@ -12,9 +15,10 @@ namespace {{api}}binding { namespace aux
 
 const std::map<Version, std::set<std::string>> Meta_FunctionStringsByVersion =
 {
-{{#features.items}}    { { {{item.major}}, {{item.minor}} }, { {{#item.reqCommandStrings.items}}"{{item.identifier}}"{{^last}}, {{/last}}{{/item.reqCommandStrings.items}} } }{{^last}},{{/last}}
-{{/features.items}}
+{%- for version in versions|sort %}
+    { { {{version.majorVersion}}, {{version.minorVersion}} }, { {% for function in version.requiredFunctions|sort(attribute='identifier') %}"{{function.identifier}}"{{ ", " if not loop.last }}{% endfor %} } }{{ "," if not loop.last }}
+{%- endfor %}
 };
 
 
-} } // namespace {{api}}binding::aux
+} } // namespace {{api.identifier}}binding::aux

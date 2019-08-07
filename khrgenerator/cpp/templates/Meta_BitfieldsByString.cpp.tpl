@@ -22,7 +22,7 @@ const std::unordered_map<std::string, {{profile.bitfieldType}}> Meta_BitfieldsBy
 };
 {%- endif %}
 {% endfor %}
-const std::array<std::unordered_map<std::string, {{profile.bitfieldType}}>, {{groups|length}}> Meta_BitfieldsByStringMaps =
+const std::array<std::unordered_map<std::string, {{api.identifier}}::{{profile.bitfieldType}}>, {{groups|length}}> Meta_BitfieldsByStringMaps =
 { {
 {%- for groupname, constants in groups|dictsort %}
     Meta_BitfieldsByString_{{groupname}}{% if not loop.last %},{% endif %}

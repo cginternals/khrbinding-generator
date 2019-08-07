@@ -7,3 +7,6 @@ class Constant(object):
         self.groups = []
         self.type = None
         self.generic = False
+
+    def __lt__(self, other):
+        return self.identifier < other.identifier

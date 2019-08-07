@@ -98,19 +98,33 @@ class CPPGenerator:
         # cls.render(template_engine, "Meta_BooleansByString.cpp.tpl", sourcedir_aux+"Meta_BooleansByString.cpp", api=api, profile=profile,
         #     booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
         # )
-        cls.render(template_engine, "Meta_StringsByEnum.cpp.tpl", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile,
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
+        # cls.render(template_engine, "Meta_StringsByEnum.cpp.tpl", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile,
+        #     constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
+        # )
+        # cls.render(template_engine, "Meta_EnumsByString.cpp.tpl", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile,
+        #     groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ], 3)
+        # )
+        # cls.render(template_engine, "Meta_StringsByExtension.cpp.tpl", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile,
+        #     extensions=api.extensions
+        # )
+        # cls.render(template_engine, "Meta_ExtensionsByString.cpp.tpl", sourcedir_aux+"Meta_ExtensionsByString.cpp", api=api, profile=profile,
+        #     groups=cls.identifierPrefixGroups(api, api.extensions, 3)
+        # )
+        # cls.render(template_engine, "Meta_ReqVersionsByExtension.cpp.tpl", sourcedir_aux+"Meta_ReqVersionsByExtension.cpp", api=api, profile=profile,
+        #     extensionsInCore=api.extensionsByCoreVersion()
+        # )
+        # cls.render(template_engine, "Meta_FunctionStringsByExtension.cpp.tpl", sourcedir_aux+"Meta_FunctionStringsByExtension.cpp", api=api, profile=profile,
+        #     extensions=api.extensions
+        # )
+        # cls.render(template_engine, "Meta_FunctionStringsByVersion.cpp.tpl", sourcedir_aux+"Meta_FunctionStringsByVersion.cpp", api=api, profile=profile,
+        #     versions=[ version for version in api.versions if isinstance(version, Version) ]
+        # )
+        cls.render(template_engine, "Meta_ExtensionsByFunctionString.cpp.tpl", sourcedir_aux+"Meta_ExtensionsByFunctionString.cpp", api=api, profile=profile,
+            extensionsByFunction=cls.identifierPrefixGroupsDict(api, api.extensionsByFunction(), 2)
         )
 
         # TODO
 
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_StringsByEnum.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_EnumsByString.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_StringsByExtension.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_ExtensionsByString.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_ReqVersionsByExtension.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_FunctionStringsByExtension.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_FunctionStringsByVersion.cpp"))
         #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_ExtensionsByFunctionString.cpp"))
 
         ## KHR binding
@@ -207,4 +221,12 @@ class CPPGenerator:
         result["0"] = []
         for value in values:
             result[value.identifier[lookupOffset].upper() if value.identifier[lookupOffset].isalpha() else '0'].append(value)
+        return result
+
+    @classmethod
+    def identifierPrefixGroupsDict(cls, api, dictionary, lookupOffset):
+        result = { chr(alpha):{} for alpha in range(ord('A'), ord('Z')+1) }
+        result["0"] = {}
+        for key, values in dictionary.items():
+            result[key.identifier[lookupOffset].upper() if key.identifier[lookupOffset].isalpha() else '0'][key] = values
         return result

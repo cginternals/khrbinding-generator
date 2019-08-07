@@ -1,36 +1,34 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api}}binding/{{api}}/extension.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/extension.h>
 
 
-using namespace {{api}};
+using namespace {{api.identifier}};
 
 
-namespace {{api}}binding { namespace aux
+namespace {{api.identifier}}binding { namespace aux
 {
 
 
-{{#extensionsByCommandsByInitial.groups}}
-{{#empty}}
-const std::unordered_map<std::string, std::set<{{extensionType}}>> Meta_ExtensionsByFunctionString_{{name}}{};
-{{/empty}}
-{{^empty}}
-const std::unordered_map<std::string, std::set<{{extensionType}}>> Meta_ExtensionsByFunctionString_{{name}} =
+{% for groupname, functions in extensionsByFunction|dictsort -%}
+{% if functions|length == 0 -%}
+const std::unordered_map<std::string, std::set<{{profile.extensionType}}>> Meta_ExtensionsByFunctionString_{{groupname}}{};
+{% else -%}
+const std::unordered_map<std::string, std::set<{{profile.extensionType}}>> Meta_ExtensionsByFunctionString_{{groupname}} =
 {
-{{#items}}
-    { "{{item.command}}", { {{#item.extensions.items}}{{extensionType}}::{{item.identifier}}{{^last}}, {{/last}}{{/item.extensions.items}} } }{{^last}},{{/last}}
-{{/items}}
+{%- for function, extensions in functions|dictsort %}{% if extensions|length > 0 %}
+    { "{{function.identifier}}", { {% for extension in extensions|sort(attribute='identifier') %}{{profile.extensionType}}::{{extension.identifier}}{{", " if not loop.last}}{% endfor %} } }{{"," if not loop.last}}
+{%- endif %}{% endfor %}
 };
-{{/empty}}
-
-{{/extensionsByCommandsByInitial.groups}}
-const std::array<std::unordered_map<std::string, std::set<{{api}}::{{extensionType}}>>, {{extensionsByCommandsByInitial.count}}> Meta_ExtensionsByFunctionStringMaps =
+{% endif %}
+{% endfor %}
+const std::array<std::unordered_map<std::string, std::set<{{api.identifier}}::{{profile.extensionType}}>>, {{extensionsByFunction|length}}> Meta_ExtensionsByFunctionStringMaps =
 { {
-{{#extensionsByCommandsByInitial.groups}}
-    Meta_ExtensionsByFunctionString_{{name}}{{^last}},{{/last}}
-{{/extensionsByCommandsByInitial.groups}}
+{%- for groupname, function in extensionsByFunction|dictsort %}
+    Meta_ExtensionsByFunctionString_{{groupname}}{{ "," if not loop.last }}
+{%- endfor %}
 } };
 
 
-} } // namespace {{api}}binding::aux
+} } // namespace {{api.identifier}}binding::aux

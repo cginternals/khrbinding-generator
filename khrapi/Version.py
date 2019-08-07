@@ -14,3 +14,6 @@ class Version(FeatureSet):
         self.removedFunctions = []
         self.removedConstants = []
         self.removedTypes = []
+
+    def __lt__(self, other):
+        return self.majorVersion < other.majorVersion or (self.majorVersion == other.majorVersion and self.minorVersion < other.minorVersion)

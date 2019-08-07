@@ -13,6 +13,7 @@ from khrapi.NativeType import NativeType
 
 from khrapi.Enumerator import Enumerator
 from khrapi.BitfieldGroup import BitfieldGroup
+from khrapi.ValueGroup import ValueGroup
 from khrapi.SpecialValues import SpecialValues
 from khrapi.Constant import Constant
 from khrapi.Function import Function
@@ -85,6 +86,8 @@ class GLParser(XMLParser):
 
                 if name.find("Mask") >= 0 or name == "PathFontStyle":
                     type = BitfieldGroup(api, name)
+                elif name.find("Boolean") >= 0:
+                    type = ValueGroup(api, name)
                 else:
                     type = Enumerator(api, name)
                 
@@ -104,8 +107,11 @@ class GLParser(XMLParser):
 
                 type = api.typeByIdentifier(name)
 
-                if type is None and name.find("Mask") >= 0:
+                if type is None and (name.find("Mask") >= 0 or name == "PathFontStyle"):
                     type = BitfieldGroup(api, name)
+                    api.types.append(type)
+                elif type is None and name.find("Boolean") >= 0:
+                    type = ValueGroup(api, name)
                     api.types.append(type)
                 elif type is None:
                     type = Enumerator(api, name)
@@ -168,7 +174,9 @@ class GLParser(XMLParser):
                         if child.tag == "enum":
                             extension.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
                         elif child.tag == "command":
-                            extension.requiredFunctions.append(api.functionByIdentifier(child.attrib["name"]))
+                            function = api.functionByIdentifier(child.attrib["name"])
+                            extension.requiredFunctions.append(function)
+                            function.requiringFeatureSets.append(extension)
                         elif child.tag == "type":
                             extension.requiredTypes.append(api.typeByIdentifier(child.attrib["name"]))
 
@@ -201,7 +209,9 @@ class GLParser(XMLParser):
                     if child.tag == "enum":
                         version.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
                     elif child.tag == "command":
-                        version.requiredFunctions.append(api.functionByIdentifier(child.attrib["name"]))
+                        function = api.functionByIdentifier(child.attrib["name"])
+                        version.requiredFunctions.append(function)
+                        function.requiringFeatureSets.append(version)
                     elif child.tag == "type":
                         version.requiredTypes.append(api.typeByIdentifier(child.attrib["name"]))
 

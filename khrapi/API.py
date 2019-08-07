@@ -1,6 +1,6 @@
 
-# from .Version import Version;
-# from .Extension import Extension;
+from .Version import Version;
+from .Extension import Extension;
 
 class API(object):
     def __init__(self, identifier, revision):
@@ -26,6 +26,19 @@ class API(object):
 
     def extensionByIdentifier(self, identifier):
         return next((e for e in self.extensions if e.identifier.endswith(identifier)), None)
+    
+    def extensionsByCoreVersion(self):
+        result = {}
+        for version in [ version for version in self.versions if isinstance(version, Version) ]:
+            for extension in version.requiredExtensions:
+                result[extension] = version
+        return result
+    
+    def extensionsByFunction(self):
+        result = {}
+        for function in self.functions:
+            result[function] = [ extension for extension in function.requiringFeatureSets if isinstance(extension, Extension) ]
+        return result
 
     def printSummary(self):
         print("%s API (%s)" % (self.identifier, self.revision))
