@@ -49,100 +49,102 @@ class CPPGenerator:
 
         # Generate files with common context
 
-        # cls.render(template_engine, "revision.h.tpl", sourcedir_aux+"{{profile.baseNamespace}}revision.h", api=api, profile=profile)
-        # cls.render(template_engine, "extension.h.tpl", includedir_api+"extension.h", api=api, profile=profile)
-        # cls.render(template_engine, "values.h.tpl", includedir_api+"values.h", api=api, profile=profile,
-        #     values=api.typeByIdentifier("SpecialValues")
-        # )
-#       # cls.render(template_engine, "types.h.tpl", includedir_api+"types.h", api=api, profile=profile)
-        # cls.render(template_engine, "bitfield.h.tpl", includedir_api+"bitfield.h", api=api, profile=profile,
-        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ],
-        #     constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
-        #     max_constant_length = str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ]))
-        # )
-        # cls.render(template_engine, "enum.h.tpl", includedir_api+"enum.h", api=api, profile=profile,
-        #     groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 ],
-        #     constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
-        #     max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]))
-        # )
-        # cls.render(template_engine, "functions.h.tpl", includedir_api+"functions.h", api=api, profile=profile,
-        #     functions=[ function for function in api.functions ]
-        # )
-        # cls.render(template_engine, "{{profile.baseNamespace}}.h.tpl", includedir_api+"{{profile.baseNamespace}}.h", api=api, profile=profile)
+        cls.render(template_engine, "revision.h", sourcedir_aux+"{{profile.baseNamespace}}revision.h", api=api, profile=profile)
+        cls.render(template_engine, "extension.h", includedir_api+"extension.h", api=api, profile=profile)
+        cls.render(template_engine, "values.h", includedir_api+"values.h", api=api, profile=profile,
+            values=api.typeByIdentifier("SpecialValues")
+        )
+#       cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile)
+        cls.render(template_engine, "bitfield.h", includedir_api+"bitfield.h", api=api, profile=profile,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ],
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
+            max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ]))
+        )
+        cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile,
+            groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 ],
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
+            max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]))
+        )
+        cls.render(template_engine, "functions.h", includedir_api+"functions.h", api=api, profile=profile,
+            functions=[ function for function in api.functions ]
+        )
+        cls.render(template_engine, "entrypoint.h", includedir_api+"{{profile.baseNamespace}}.h", api=api, profile=profile)
 
-        # cls.render(template_engine, "AllVersions_test.cpp.tpl", testdir+"AllVersions_test.cpp", api=api, profile=profile,
-        #     versions=api.versions
-        # )
-        # cls.render(template_engine, "ValidVersions_list.cpp.tpl", sourcedir_aux+"ValidVersions_list.cpp", api=api, profile=profile,
-        #     versions=[ version for version in api.versions if isinstance(version, Version) ]
-        # )
+        cls.render(template_engine, "AllVersions_test.cpp", testdir+"AllVersions_test.cpp", api=api, profile=profile,
+            versions=api.versions
+        )
+        cls.render(template_engine, "ValidVersions_list.cpp", sourcedir_aux+"ValidVersions_list.cpp", api=api, profile=profile,
+            versions=[ version for version in api.versions if isinstance(version, Version) ]
+        )
 
-        # cls.render(template_engine, "Meta.h.tpl", includedir_aux+"Meta.h", api=api, profile=profile,
-        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
-        # )
-        # cls.render(template_engine, "Meta_Maps.h.tpl", sourcedir_aux+"Meta_Maps.h", api=api, profile=profile,
-        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
-        # )
-        # cls.render(template_engine, "Meta_getStringByBitfield.cpp.tpl", sourcedir_aux+"Meta_getStringByBitfield.cpp", api=api, profile=profile,
-        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
-        # )
-        # cls.render(template_engine, "Meta_StringsByBitfield.cpp.tpl", sourcedir_aux+"Meta_StringsByBitfield.cpp", api=api, profile=profile,
-        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
-        # )
-        # cls.render(template_engine, "Meta_BitfieldsByString.cpp.tpl", sourcedir_aux+"Meta_BitfieldsByString.cpp", api=api, profile=profile,
-        #     groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], 3)
-        # )
-        # cls.render(template_engine, "Meta_StringsByBoolean.cpp.tpl", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile,
-        #     booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
-        # )
-        # cls.render(template_engine, "Meta_BooleansByString.cpp.tpl", sourcedir_aux+"Meta_BooleansByString.cpp", api=api, profile=profile,
-        #     booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
-        # )
-        # cls.render(template_engine, "Meta_StringsByEnum.cpp.tpl", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile,
-        #     constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
-        # )
-        # cls.render(template_engine, "Meta_EnumsByString.cpp.tpl", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile,
-        #     groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ], 3)
-        # )
-        # cls.render(template_engine, "Meta_StringsByExtension.cpp.tpl", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile,
-        #     extensions=api.extensions
-        # )
-        # cls.render(template_engine, "Meta_ExtensionsByString.cpp.tpl", sourcedir_aux+"Meta_ExtensionsByString.cpp", api=api, profile=profile,
-        #     groups=cls.identifierPrefixGroups(api, api.extensions, 3)
-        # )
-        # cls.render(template_engine, "Meta_ReqVersionsByExtension.cpp.tpl", sourcedir_aux+"Meta_ReqVersionsByExtension.cpp", api=api, profile=profile,
-        #     extensionsInCore=api.extensionsByCoreVersion()
-        # )
-        # cls.render(template_engine, "Meta_FunctionStringsByExtension.cpp.tpl", sourcedir_aux+"Meta_FunctionStringsByExtension.cpp", api=api, profile=profile,
-        #     extensions=api.extensions
-        # )
-        # cls.render(template_engine, "Meta_FunctionStringsByVersion.cpp.tpl", sourcedir_aux+"Meta_FunctionStringsByVersion.cpp", api=api, profile=profile,
-        #     versions=[ version for version in api.versions if isinstance(version, Version) ]
-        # )
-        cls.render(template_engine, "Meta_ExtensionsByFunctionString.cpp.tpl", sourcedir_aux+"Meta_ExtensionsByFunctionString.cpp", api=api, profile=profile,
+        cls.render(template_engine, "Meta.h", includedir_aux+"Meta.h", api=api, profile=profile,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+        cls.render(template_engine, "Meta_Maps.h", sourcedir_aux+"Meta_Maps.h", api=api, profile=profile,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+        cls.render(template_engine, "Meta_getStringByBitfield.cpp", sourcedir_aux+"Meta_getStringByBitfield.cpp", api=api, profile=profile,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+        cls.render(template_engine, "Meta_StringsByBitfield.cpp", sourcedir_aux+"Meta_StringsByBitfield.cpp", api=api, profile=profile,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+        cls.render(template_engine, "Meta_BitfieldsByString.cpp", sourcedir_aux+"Meta_BitfieldsByString.cpp", api=api, profile=profile,
+            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], 3)
+        )
+        cls.render(template_engine, "Meta_StringsByBoolean.cpp", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile,
+            booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
+        )
+        cls.render(template_engine, "Meta_BooleansByString.cpp", sourcedir_aux+"Meta_BooleansByString.cpp", api=api, profile=profile,
+            booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
+        )
+        cls.render(template_engine, "Meta_StringsByEnum.cpp", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile,
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
+        )
+        cls.render(template_engine, "Meta_EnumsByString.cpp", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile,
+            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ], 3)
+        )
+        cls.render(template_engine, "Meta_StringsByExtension.cpp", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile,
+            extensions=api.extensions
+        )
+        cls.render(template_engine, "Meta_ExtensionsByString.cpp", sourcedir_aux+"Meta_ExtensionsByString.cpp", api=api, profile=profile,
+            groups=cls.identifierPrefixGroups(api, api.extensions, 3)
+        )
+        cls.render(template_engine, "Meta_ReqVersionsByExtension.cpp", sourcedir_aux+"Meta_ReqVersionsByExtension.cpp", api=api, profile=profile,
+            extensionsInCore=api.extensionsByCoreVersion()
+        )
+        cls.render(template_engine, "Meta_FunctionStringsByExtension.cpp", sourcedir_aux+"Meta_FunctionStringsByExtension.cpp", api=api, profile=profile,
+            extensions=api.extensions
+        )
+        cls.render(template_engine, "Meta_FunctionStringsByVersion.cpp", sourcedir_aux+"Meta_FunctionStringsByVersion.cpp", api=api, profile=profile,
+            versions=[ version for version in api.versions if isinstance(version, Version) ]
+        )
+        cls.render(template_engine, "Meta_ExtensionsByFunctionString.cpp", sourcedir_aux+"Meta_ExtensionsByFunctionString.cpp", api=api, profile=profile,
             extensionsByFunction=cls.identifierPrefixGroupsDict(api, api.extensionsByFunction(), 2)
         )
 
-        # TODO
-
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_ExtensionsByFunctionString.cpp"))
-
         ## KHR binding
 
-        #if multiContextBinding:
-        #    Generator.generate(generalContext, pjoin(includedir, "Binding.h"), "khrbinding/MultiContextBinding.h")
+        if profile.multiContextBinding:
+            cls.render(template_engine, "khrbinding/MultiContextBinding.h", includedir+"Binding.h", api=api, profile=profile,
+                functions=api.functions
+            )
+            pass
         #    Generator.generate(generalContext, pjoin(sourcedir, "Binding.cpp"), "khrbinding/MultiContextBinding.cpp")
         #    Generator.generate(generalContext, pjoin(includedir, bindingNamespace + ".h"),
         #                       "khrbinding/multicontextinterface.h")
         #    Generator.generate(generalContext, pjoin(sourcedir, bindingNamespace + ".cpp"),
         #                       "khrbinding/multicontextinterface.cpp")
-        #else:
+        else:
+            pass
         #    Generator.generate(generalContext, pjoin(includedir, "Binding.h"), "khrbinding/SingleContextBinding.h")
         #    Generator.generate(generalContext, pjoin(sourcedir, "Binding.cpp"), "khrbinding/SingleContextBinding.cpp")
         #    Generator.generate(generalContext, pjoin(includedir, bindingNamespace + ".h"),
         #                       "khrbinding/singlecontextinterface.h")
         #    Generator.generate(generalContext, pjoin(sourcedir, bindingNamespace + ".cpp"),
         #                       "khrbinding/singlecontextinterface.cpp")
+
+        # TODO
 
         #Generator.generate(generalContext, pjoin(sourcedir, "Binding_list.cpp"))
 
@@ -213,7 +215,7 @@ class CPPGenerator:
         #    Generator.generate(specificContext, pjoin(includedir_api, "bitfield.h"), "bitfieldF.h")
         #    Generator.generate(specificContext, pjoin(includedir_api, "enum.h"), "enumF.h")
         #    Generator.generate(specificContext, pjoin(includedir_api, "functions.h"), "functionsF.h")
-        #    Generator.generate(specificContext, pjoin(includedir_api, "{api}.h"), "{api}F.h")
+        #    Generator.generate(specificContext, pjoin(includedir_api, "{api}.h"), "entrypointF.h")
 
     @classmethod
     def identifierPrefixGroups(cls, api, values, lookupOffset):

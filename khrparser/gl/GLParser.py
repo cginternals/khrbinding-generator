@@ -251,13 +251,13 @@ class GLParser(XMLParser):
         # Fix Special Values
         specialNumbersType = None
         for constant in api.constants:
-            if len(constant.groups) == 0 and constant.type is not None:
+            if len(constant.groups) == 1 and constant.groups[0].identifier == "SpecialNumbers" and constant.type is not None:
                 if specialNumbersType is None:
                     specialNumbersType = SpecialValues(api, "SpecialValues")
                     api.types.append(specialNumbersType)
             
                 specialNumbersType.values.append(constant)
-                constant.groups.append(specialNumbersType)
+                constant.groups = [specialNumbersType]
 
         # Assign Ungrouped
         ungroupedType = None
@@ -283,6 +283,9 @@ class GLParser(XMLParser):
     @classmethod
     def detectSpecialValueType(cls, api, enum):
         if "comment" in enum.attrib:
+            if re.search('Not an API enum.*', enum.attrib["comment"]) is not None:
+                return None
+
             result = re.search('%s([A-Za-z0-9_]+)' % ("Tagged as "), enum.attrib["comment"])
             if result is not None:
                 typeName = result.group(1).strip()
