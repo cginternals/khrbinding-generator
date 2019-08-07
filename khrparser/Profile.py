@@ -24,3 +24,5 @@ class Profile:
         self.enumType = jsonObject["enumType"]
         self.bitfieldType = jsonObject["bitfieldType"]
         self.booleanType = jsonObject["booleanType"]
+        self.headerGuardMacro = jsonObject["headerGuardMacro"]
+        self.headerReplacement = jsonObject["headerReplacement"]

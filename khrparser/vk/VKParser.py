@@ -62,6 +62,10 @@ class VKParser(XMLParser):
         return api
 
     @classmethod
+    def deriveBinding(cls, api, profile, binding):
+        return binding
+
+    @classmethod
     def handleVendor(cls, api, vendor):
         api.vendors.append(
             Vendor(

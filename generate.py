@@ -8,6 +8,8 @@ from khrparser.gl.GLParser import GLParser
 from khrparser.egl.EGLParser import EGLParser
 from khrparser.vk.VKParser import VKParser
 
+from khrbinding.Binding import Binding
+
 from khrgenerator.cpp.CPPGenerator import CPPGenerator
 
 
@@ -70,11 +72,15 @@ def main(argv):
     
     # api.printSummary()
 
+    binding = Binding(api)
+
+    binding = khrParser.deriveBinding(binding)
+
     print("Start generation")
 
     generateBegin = time.time()
 
-    khrGenerator.generate(profile, api)
+    khrGenerator.generate(profile, api, binding)
 
     generateEnd = time.time()
     print("Generation took {:.3f} seconds".format(generateEnd - generateBegin))

@@ -28,6 +28,7 @@
 	"generateLogging": true,
 	"generateHeaderGuard": true,
 	"headerGuardMacro": "__gl_h_",
+	"headerReplacement": "gl.h",
 
 	"": "Types",
 	"extensionType": "GLextension",

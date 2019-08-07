@@ -23,3 +23,15 @@ class XMLParser:
         cls.parseXML(api, profile, tree.getroot())
 
         return api
+
+    @classmethod
+    def parseXML(cls, api, profile, registry)
+        pass
+    
+    @classmethod
+    def patch(cls, api, profile0)
+        pass
+    
+    @classmethod
+    def deriveBinding(cls, api, profile, binding):
+        return binding

@@ -238,7 +238,7 @@ class GLParser(XMLParser):
         for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
             group.values.append(genericNoneBit)
             genericNoneBit.groups.append(group)
-        
+
         # Remove shared enum and bitfield GL_NONE
         noneBit = api.constantByIdentifier("GL_NONE")
         if noneBit is not None:
@@ -279,6 +279,30 @@ class GLParser(XMLParser):
         api.versions.append(allFeatureSet)
         
         return api
+
+    @classmethod
+    def deriveBinding(cls, api, profile, binding):
+        binding.baseNamespace = profile.baseNamespace
+        binding.multiContextBinding = profile.multiContextBinding
+        binding.booleanWidth = profile.booleanWidth
+        binding.minCoreVersion = profile.minCoreVersion
+        binding.identifier = api.identifier+"binding"
+        binding.namespace = api.identifier+"binding"
+        binding.auxIdentifier = "aux"
+        binding.auxNamespace = "aux"
+        binding.bindingAuxIdentifier = binding.identifier + "-" + binding.auxIdentifier
+        binding.bindingAuxNamespace = binding.namespace + "::" + binding.auxNamespace
+        binding.apiExport = binding.identifier.upper + "_API"
+        binding.apiTemplateExport = binding.identifier.upper + "_TEMPLATE_API"
+        binding.auxApiExport = binding.bindingAuxIdentifier.upper + "_API"
+        binding.auxApiTemplateExport = binding.bindingAuxIdentifier.upper + "_TEMPLATE_API"
+        binding.constexpr = binding.identifier.upper + "_CONSTEXPR"
+        binding.threadlocal = binding.identifier.upper + "_THREAD_LOCAL"
+        binding.useboostthread = binding.identifier.upper + "_USE_BOOST_THREAD"
+        binding.headerGuardMacro = profile.headerGuardMacro
+        binding.headerReplacement = profile.headerReplacement
+
+        return binding
 
     @classmethod
     def detectSpecialValueType(cls, api, enum):

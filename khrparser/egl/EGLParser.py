@@ -214,3 +214,8 @@ class EGLParser(XMLParser):
     @classmethod
     def patch(cls, profile, api):
         return api
+
+    @classmethod
+    def deriveBinding(cls, api, profile, binding):
+        return binding
+    
