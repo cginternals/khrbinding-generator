@@ -1,36 +1,33 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api}}binding/{{api}}/bitfield.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/bitfield.h>
 
 
-using namespace {{api}};
+using namespace {{api.identifier}};
 
 
-namespace {{api}}binding { namespace aux
+namespace {{api.identifier}}binding { namespace aux
 {
 
-
-{{#bitfieldsByInitial.groups}}
-{{#empty}}
-const std::unordered_map<std::string, {{bitfieldType}}> Meta_BitfieldsByString_{{name}}{};
-{{/empty}}
-{{^empty}}
-const std::unordered_map<std::string, {{bitfieldType}}> Meta_BitfieldsByString_{{name}} =
+{% for groupname, constants in groups|dictsort -%}
+{% if constants|length == 0 %}
+const std::unordered_map<std::string, {{profile.bitfieldType}}> Meta_BitfieldsByString_{{groupname}}{};
+{%- else %}
+const std::unordered_map<std::string, {{profile.bitfieldType}}> Meta_BitfieldsByString_{{groupname}} =
 {
-{{#items}}
-    { "{{item.name}}", static_cast<{{bitfieldType}}>({{item.primaryGroup}}::{{item.identifier}}) }{{^last}},{{/last}}
-{{/items}}
+{%- for constant in constants|sort(attribute='identifier') %}
+    { "{{constant.identifier}}", static_cast<{{profile.bitfieldType}}>({{constant.groups[0].identifier}}::{{constant.identifier}}) }{% if not loop.last %},{% endif %}
+{%- endfor %}
 };
-{{/empty}}
-
-{{/bitfieldsByInitial.groups}}
-const std::array<std::unordered_map<std::string, {{bitfieldType}}>, {{bitfieldsByInitial.count}}> Meta_BitfieldsByStringMaps =
+{%- endif %}
+{% endfor %}
+const std::array<std::unordered_map<std::string, {{profile.bitfieldType}}>, {{groups|length}}> Meta_BitfieldsByStringMaps =
 { {
-{{#bitfieldsByInitial.groups}}
-    Meta_BitfieldsByString_{{name}}{{^last}},{{/last}}
-{{/bitfieldsByInitial.groups}}
+{%- for groupname, constants in groups|dictsort %}
+    Meta_BitfieldsByString_{{groupname}}{% if not loop.last %},{% endif %}
+{%- endfor %}
 } };
 
 
-} } // namespace {{api}}binding::aux
+} } // namespace {{api.identifier}}binding::aux

@@ -3,6 +3,7 @@ import os, sys
 from os.path import join as pjoin
 import time
 import re
+from itertools import groupby
 
 from jinja2 import Environment, PackageLoader, Template
 
@@ -85,15 +86,24 @@ class CPPGenerator:
         # cls.render(template_engine, "Meta_getStringByBitfield.cpp.tpl", sourcedir_aux+"Meta_getStringByBitfield.cpp", api=api, profile=profile,
         #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
         # )
-        cls.render(template_engine, "Meta_StringsByBitfield.cpp.tpl", sourcedir_aux+"Meta_StringsByBitfield.cpp", api=api, profile=profile,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        # cls.render(template_engine, "Meta_StringsByBitfield.cpp.tpl", sourcedir_aux+"Meta_StringsByBitfield.cpp", api=api, profile=profile,
+        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        # )
+        # cls.render(template_engine, "Meta_BitfieldsByString.cpp.tpl", sourcedir_aux+"Meta_BitfieldsByString.cpp", api=api, profile=profile,
+        #     groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], 3)
+        # )
+        # cls.render(template_engine, "Meta_StringsByBoolean.cpp.tpl", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile,
+        #     booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
+        # )
+        # cls.render(template_engine, "Meta_BooleansByString.cpp.tpl", sourcedir_aux+"Meta_BooleansByString.cpp", api=api, profile=profile,
+        #     booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
+        # )
+        cls.render(template_engine, "Meta_StringsByEnum.cpp.tpl", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile,
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
         )
 
         # TODO
 
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_BitfieldsByString.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_StringsByBoolean.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_BooleansByString.cpp"))
         #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_StringsByEnum.cpp"))
         #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_EnumsByString.cpp"))
         #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_StringsByExtension.cpp"))
@@ -190,3 +200,11 @@ class CPPGenerator:
         #    Generator.generate(specificContext, pjoin(includedir_api, "enum.h"), "enumF.h")
         #    Generator.generate(specificContext, pjoin(includedir_api, "functions.h"), "functionsF.h")
         #    Generator.generate(specificContext, pjoin(includedir_api, "{api}.h"), "{api}F.h")
+
+    @classmethod
+    def identifierPrefixGroups(cls, api, values, lookupOffset):
+        result = { chr(alpha):[] for alpha in range(ord('A'), ord('Z')+1) }
+        result["0"] = []
+        for value in values:
+            result[value.identifier[lookupOffset].upper() if value.identifier[lookupOffset].isalpha() else '0'].append(value)
+        return result
