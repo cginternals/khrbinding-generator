@@ -10,7 +10,7 @@ class XMLParser:
 
     @classmethod
     def parse(cls, profile):
-        xmlFile = profile.inputfile
+        xmlFile = profile.inputfilepath
         apiRequire = profile.apiRequire
 
         revision_date = datetime.datetime.fromtimestamp(os.path.getmtime(xmlFile))
@@ -20,6 +20,6 @@ class XMLParser:
         
         tree = xml.etree.ElementTree.parse(xmlFile)
 
-        cls.parseXML(api, tree.getroot())
+        cls.parseXML(api, profile, tree.getroot())
 
         return api

@@ -12,6 +12,7 @@ from khrapi.NativeType import NativeType
 
 from khrapi.Enumerator import Enumerator
 from khrapi.BitfieldGroup import BitfieldGroup
+from khrapi.SpecialValues import SpecialValues
 from khrapi.Constant import Constant
 from khrapi.Function import Function
 from khrapi.Parameter import Parameter
@@ -19,7 +20,7 @@ from khrapi.Parameter import Parameter
 class GLParser(XMLParser):
 
     @classmethod
-    def parseXML(cls, api, registry):
+    def parseXML(cls, api, profile, registry):
         # Types
         for T in registry.iter("types"):
             for type in T.findall("type"):
@@ -67,60 +68,54 @@ class GLParser(XMLParser):
                     typename = nameTag.text
                     api.types.append(TypeAlias(api, typename, alias))
 
-        # Enumerators
-        constantNamesByGroupName = dict()
-        groupNamesByConstantName = dict()
-        for G in registry.iter("groups"):
+        # Constants
+        for E in registry.iter("enums"):
+            for enum in E.findall("enum"):
+                constant = Constant(api, enum.attrib["name"], enum.attrib["value"])
+                if "group" in E.attrib and E.attrib["group"] == "SpecialNumbers":
+                    constant.type = cls.detectSpecialValueType(api, enum)
+                api.constants.append(constant)
 
+        # Groups
+
+        for G in registry.iter("groups"):
             for group in G.findall("group"):
                 name = group.attrib["name"]
 
-                if name.endswith("Mask"):
+                if name.find("Mask") >= 0 or name == "PathFontStyle":
                     type = BitfieldGroup(api, name)
                 else:
                     type = Enumerator(api, name)
-
-                api.types.append(type)
-
+                
                 for enum in group.findall("enum"):
-                    enumName = enum.attrib["name"]
-                    if not name in constantNamesByGroupName:
-                        constantNamesByGroupName[name] = [ enumName ]
-                    else:
-                        constantNamesByGroupName[name].append(enumName)
-                    if not enumName in groupNamesByConstantName:
-                        groupNamesByConstantName[enumName] = [ name ]
-                    else:
-                        groupNamesByConstantName[enumName].append(name)
-
-        # Constants
+                    constant = api.constantByIdentifier(enum.attrib["name"])
+                    if constant is None:
+                        continue
+                    type.values.append(constant)
+                    constant.groups.append(type)
+                
+                if len(type.values) > 0:
+                    api.types.append(type)
+        
         for E in registry.iter("enums"):
+            if "group" in E.attrib:
+                name = E.attrib["group"]
 
-            groupString = E.attrib.get("group", None)
-            groupType = E.attrib.get("type", None)
-            groupNamespace = E.attrib.get("namespace", None)
+                type = api.typeByIdentifier(name)
 
-            for enum in E.findall("enum"):
-                name = enum.attrib["name"]
+                if type is None and name.find("Mask") >= 0:
+                    type = BitfieldGroup(api, name)
+                    api.types.append(type)
+                elif type is None:
+                    type = Enumerator(api, name)
+                    api.types.append(type)
 
-                constant = Constant(api, name, enum.attrib["value"])
-
-                groupNames = groupNamesByConstantName[name] if name in groupNamesByConstantName else []
-
-                if len(groupNames) == 0 and groupString is None:
-                    groupNames.append("UNGROUPED")
-
-                for groupName in groupNames:
-                    group = api.typeByIdentifier(groupName)
-
-                    if group is None:
-                        group = Enumerator(api, groupName)
-                        api.types.append(group)
-
-                    group.values.append(constant)
-                    constant.groups.append(group)
-
-                api.constants.append(constant)
+                for enum in E.findall("enum"):
+                    constant = api.constantByIdentifier(enum.attrib["name"])
+                    if constant is None or constant in type.values:
+                        continue
+                    type.values.append(constant)
+                    constant.groups.append(type)
 
         # Functions
         for C in registry.iter("commands"):
@@ -224,4 +219,54 @@ class GLParser(XMLParser):
 
     @classmethod
     def patch(cls, profile, api):
+
+        # Generic None Bit
+        genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+        genericNoneBit.generic = True
+        api.constants.append(genericNoneBit)
+        for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
+            group.values.append(genericNoneBit)
+            genericNoneBit.groups.append(group)
+        
+        # Remove shared enum and bitfield GL_NONE
+        noneBit = api.constantByIdentifier("GL_NONE")
+        if noneBit is not None:
+            for group in noneBit.groups:
+                if isinstance(group, BitfieldGroup):
+                    group.values.remove(noneBit)
+            if len(noneBit.groups) == 0:
+                api.constants.remove(noneBit)
+
+        # Fix Special Values
+        specialNumbersType = None
+        for constant in api.constants:
+            if len(constant.groups) == 0 and constant.type is not None:
+                if specialNumbersType is None:
+                    specialNumbersType = SpecialValues(api, "SpecialValues")
+                    api.types.append(specialNumbersType)
+            
+                specialNumbersType.values.append(constant)
+                constant.groups.append(specialNumbersType)
+
+        # Assign Ungrouped
+        ungroupedType = None
+        for constant in api.constants:
+            if len(constant.groups) == 0 and constant.type is None:
+                if ungroupedType is None:
+                    ungroupedType = Enumerator(api, "UNGROUPED")
+                    api.types.append(ungroupedType)
+            
+                ungroupedType.values.append(constant)
+                constant.groups.append(ungroupedType)
+        
         return api
+
+    @classmethod
+    def detectSpecialValueType(cls, api, enum):
+        if "comment" in enum.attrib:
+            result = re.search('%s([A-Za-z0-9_]+)' % ("Tagged as "), enum.attrib["comment"])
+            if result is not None:
+                typeName = result.group(1).strip()
+                return next((t for t in api.types if t.identifier.endswith(typeName)), api.typeByIdentifier("GLuint"))
+        
+        return api.typeByIdentifier("GLuint")

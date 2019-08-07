@@ -22,7 +22,7 @@ from khrapi.CompoundType import CompoundType
 class VKParser(XMLParser):
 
     @classmethod
-    def parseXML(cls, api, registry):
+    def parseXML(cls, api, profile, registry):
         # Vendors
         for V in registry.iter("tags"):
             for vendor in V.findall("tag"):

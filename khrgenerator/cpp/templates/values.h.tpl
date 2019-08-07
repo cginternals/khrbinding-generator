@@ -2,24 +2,18 @@
 #pragma once
 
 
-#include <{{api}}binding/{{api}}binding_features.h>
+#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
 
-#include <{{api}}binding/no{{api}}.h>
-#include <{{api}}binding/{{api}}/types.h>
+#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/types.h>
 
 
-namespace {{api}}
+namespace {{api.identifier}}
 {
 
 
-{{#valuesByType.groups}}
-{{#items}}
-{{ucapi}}BINDING_CONSTEXPR static const {{item.type}} {{item.identifier}} = {{item.value}};
-{{/items}}
-{{^last}}
+{% for constant in values.values -%}
+{{api.identifier|upper}}BINDING_CONSTEXPR static const {{constant.type.identifier}} {{constant.identifier}} = {{constant.value}};
+{% endfor %}
 
-{{/last}}
-{{/valuesByType.groups}}
-
-
-} // namespace {{api}}
+} // namespace {{api.identifier}}

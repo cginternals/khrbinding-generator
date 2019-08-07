@@ -2,26 +2,22 @@
 #pragma once
 
 
-#include <{{api}}binding/{{api}}binding_api.h>
+#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
 
-#include <{{api}}binding/no{{api}}.h>
-#include <{{api}}binding/{{api}}/types.h>
+#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/types.h>
 
 
-namespace {{api}}
+namespace {{api.identifier}}
 {
 
 
-{{#functionsByInitial.groups}}
-{{#items}}
-{{ucapi}}BINDING_API {{#item}}{{>partials/general_type}} {{identifier}}({{>partials/general_params}}){{/item}};
-{{/items}}
+{% for function in functions|sort(attribute='identifier') -%}
+{{api.identifier|upper}}BINDING_API {{function.returnType.identifier}} {{function.identifier}}({% for param in function.parameters %}{{ param.type.identifier }} {{ param.name }}{% if not loop.last %}, {% endif %}{% endfor %});
+{% endfor %}
 
-{{/functionsByInitial.groups}}
-
-
-} // namespace {{api}}
+} // namespace {{api.identifier}}
 
 
 // Include function patches due to dinstinguished types GLint, GLuint, GLenum, and GLboolean
-#include <{{api}}binding/{{api}}/functions-patches.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/functions-patches.h>

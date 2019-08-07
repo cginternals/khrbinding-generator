@@ -2,20 +2,20 @@
 #pragma once
 
 
-#include <{{api}}binding/no{{api}}.h>
+#include <{{api.identifier}}binding/no{{api.identifier}}.h>
 
 
-namespace {{api}}
+namespace {{api.identifier}}
 {
 
 
-enum class {{extensionType}} : int // {{extensionType}} is not a type introduced by {{ucapi}} API so far
+enum class {{profile.extensionType}} : int // {{profile.extensionType}} is not a type introduced by {{api.identifier | upper}} API so far
 {
     UNKNOWN = -1,
-{{#extensions.items}}
-    {{item.identifier}}{{^last}},{{/last}}
-{{/extensions.items}}
+    {% for extension in api.extensions|sort(attribute='identifier') -%}
+    {{extension.identifier}}{{ "," if not loop.last }}
+    {% endfor %}
 };
 
 
-} // namespace {{api}}
+} // namespace {{api.identifier}}

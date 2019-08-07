@@ -4,7 +4,10 @@ from os.path import join as pjoin
 import time
 import re
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, PackageLoader, Template
+
+from khrapi.BitfieldGroup import BitfieldGroup
+from khrapi.Enumerator import Enumerator
 
 # execDir = os.path.dirname(os.path.abspath(sys.argv[0])) + "/"
 
@@ -26,28 +29,37 @@ class CPPGenerator:
         # target directory structure
 
         includedir = pjoin(targetdir, pjoin(bindingNamespace, "include/" + bindingNamespace + "/"))
-        includedir_api = pjoin(includedir, "{api}{memberSet}/")
+        includedir_api = pjoin(includedir, "{{profile.baseNamespace}}{{memberSet}}/")
         includedir_aux = pjoin(targetdir, pjoin(bindingNamespace + "-aux", "include/" + bindingNamespace + "-aux/"))
         sourcedir = pjoin(targetdir, pjoin(bindingNamespace, "source/"))
-        sourcedir_api = pjoin(sourcedir, "{api}/")
+        sourcedir_api = pjoin(sourcedir, "{{profile.baseNamespace}}/")
         sourcedir_aux = pjoin(targetdir, pjoin(bindingNamespace + "-aux", "source/"))
         testdir = pjoin(targetdir, "tests/" + bindingNamespace + "-test/")
 
         # TEMPLATE APPLICATION
 
-        template = template_engine.get_template("%srevision.h.tpl" % (profile.baseNamespace))
-        print (template.render(api=api))
+        # Generate files with common context
 
-        ## Generate files with common context
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "{api}revision.h"))
-        #Generator.generate(generalContext, pjoin(includedir_api, "extension.h"))
-        ## Generator.generate(generalContext, pjoin(includedir_api, "boolean.h"))
-        #Generator.generate(generalContext, pjoin(includedir_api, "values.h"))
-        #Generator.generate(generalContext, pjoin(includedir_api, "types.h"))
-        #Generator.generate(generalContext, pjoin(includedir_api, "bitfield.h"))
-        #Generator.generate(generalContext, pjoin(includedir_api, "enum.h"))
-        #Generator.generate(generalContext, pjoin(includedir_api, "functions.h"))
-        #Generator.generate(generalContext, pjoin(includedir_api, "{api}.h"))
+        # cls.render(template_engine, "revision.h.tpl", sourcedir_aux+"{{profile.baseNamespace}}revision.h", api=api, profile=profile)
+        # cls.render(template_engine, "extension.h.tpl", includedir_api+"extension.h", api=api, profile=profile)
+        # cls.render(template_engine, "values.h.tpl", includedir_api+"values.h", api=api, profile=profile,
+        #     values=api.typeByIdentifier("SpecialValues")
+        # )
+#       # cls.render(template_engine, "types.h.tpl", includedir_api+"types.h", api=api, profile=profile)
+        # cls.render(template_engine, "bitfield.h.tpl", includedir_api+"bitfield.h", api=api, profile=profile,
+        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ],
+        #     constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
+        #     max_constant_length = str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ]))
+        # )
+        # cls.render(template_engine, "enum.h.tpl", includedir_api+"enum.h", api=api, profile=profile,
+        #     groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 ],
+        #     constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
+        #     max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]))
+        # )
+        # cls.render(template_engine, "functions.h.tpl", includedir_api+"functions.h", api=api, profile=profile,
+        #     functions=[ function for function in api.functions ]
+        # )
+        cls.render(template_engine, "{{profile.baseNamespace}}.h.tpl", includedir_api+"{{profile.baseNamespace}}.h", api=api, profile=profile)
 
         #Generator.generate(generalContext, pjoin(testdir, "AllVersions_test.cpp"))
         #Generator.generate(generalContext, pjoin(sourcedir_aux, "ValidVersions_list.cpp"))
@@ -155,3 +167,8 @@ class CPPGenerator:
         #    Generator.generate(specificContext, pjoin(includedir_api, "enum.h"), "enumF.h")
         #    Generator.generate(specificContext, pjoin(includedir_api, "functions.h"), "functionsF.h")
         #    Generator.generate(specificContext, pjoin(includedir_api, "{api}.h"), "{api}F.h")
+
+    @classmethod
+    def render(cls, engine, template, target, **kwargs):
+        t = engine.get_template(Template(template).render(**kwargs))
+        t.stream(**kwargs).dump(Template(target).render(**kwargs))

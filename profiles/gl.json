@@ -35,6 +35,7 @@
 	"booleanWidth": 8,
 	"enumType": "GLenum",
 	"bitfieldType": "GLbitfield",
+	"noneBitfieldValue": "GL_NONE_BIT",
 	"platformIncludes": [
 		"KHR/khr_platform.h"
 	],

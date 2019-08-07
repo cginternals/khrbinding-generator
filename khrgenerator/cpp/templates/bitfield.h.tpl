@@ -2,38 +2,36 @@
 #pragma once
 
 
-#include <{{api}}binding/no{{api}}.h>
+#include <{{api.identifier}}binding/no{{api.identifier}}.h>
 
-#include <{{api}}binding/{{api}}binding_features.h>
+#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
 
-#include <{{api}}binding/SharedBitfield.h>
+#include <{{api.identifier}}binding/SharedBitfield.h>
 
 
-namespace {{api}}
+namespace {{api.identifier}}
 {
 
 
-{{#bitfieldsByGroup.groups}}
-enum class {{name}} : unsigned int
+{% for group in groups|sort(attribute="identifier") -%}
+enum class {{group.identifier}} : unsigned int
 {
-{{#items}}
-    {{item.identifier}}{{item.spaces}} = {{item.value}},{{#item.generic}} // Generic {{item.identifier}}{{/item.generic}}{{^item.generic}}{{#isSecondary}} // reuse from {{item.primaryGroup}}{{/isSecondary}}{{/item.generic}}
-{{/items}}
+{%- for value in group.values|sort(attribute="value") %}
+    {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}}{{ "," if not loop.last }}{% if value.generic %} // Generic {{ value.identifier }}{% else %}{% if group.identifier != value.groups[0].identifier %} // reuse from {{ value.groups[0].identifier }}{% endif %}{% endif %}
+{%- endfor %}
 };
 
 
-{{/bitfieldsByGroup.groups}}
+{% endfor -%}
 
 // import bitfields to namespace
 
-{{#bitfields.items}}
-{{#item.groups.multipleItems}}
-{{ucapi}}BINDING_CONSTEXPR static const {{api}}binding::SharedBitfield<{{#item.groups.items}}{{item}}{{^last}}, {{/last}}{{/item.groups.items}}> {{item.identifier}} = {{item.primaryGroup}}::{{item.identifier}};
-{{/item.groups.multipleItems}}
-{{^item.groups.multipleItems}}
-{{ucapi}}BINDING_CONSTEXPR static const {{item.primaryGroup}} {{item.identifier}} = {{item.primaryGroup}}::{{item.identifier}};
-{{/item.groups.multipleItems}}
-{{/bitfields.items}}
+{% for constant in constants|sort(attribute="identifier") -%}
+{% if constant.groups|length > 1 -%}
+{{api.identifier|upper}}BINDING_CONSTEXPR static const {{api.identifier}}binding::SharedBitfield<{% for group in constant.groups %}{{group.identifier}}{{ ", " if not loop.last }}{% endfor %}> {{constant.identifier}} = {{constant.groups[0].identifier}}::{{constant.identifier}};
+{%- else -%}
+{{api.identifier|upper}}BINDING_CONSTEXPR static const {{constant.groups[0].identifier}} {{constant.identifier}} = {{constant.groups[0].identifier}}::{{constant.identifier}};
+{%- endif %}
+{% endfor %}
 
-
-} // namespace {{api}}
+} // namespace {{api.identifier}}

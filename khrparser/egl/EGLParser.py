@@ -19,7 +19,7 @@ from khrapi.Parameter import Parameter
 class EGLParser(XMLParser):
 
     @classmethod
-    def parseXML(cls, api, registry):
+    def parseXML(cls, api, profile, registry):
         # Types
         for T in registry.iter("types"):
             for type in T.findall("type"):

@@ -2,48 +2,43 @@
 #pragma once
 
 
-#include <{{api}}binding/no{{api}}.h>
+#include <{{api.identifier}}binding/no{{api.identifier}}.h>
 
-#include <{{api}}binding/{{api}}binding_features.h>
+#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
 
 
-namespace {{api}}
+namespace {{api.identifier}}
 {
 
 
-enum class {{enumType}} : unsigned int
+enum class {{profile.enumType}} : unsigned int
 {
-{{#enumsByGroup.groups}}
-    // {{name}}
-
-{{#items}}
-{{#isPrimary}}
-    {{item.identifier}}{{item.spaces}} = {{#item.cast}}static_cast<unsigned int>({{/item.cast}}{{item.value}}{{#item.cast}}){{/item.cast}},{{#item.decimalValue}} // decimal value: {{item.decimalValue}}{{/item.decimalValue}}
-{{/isPrimary}}
-{{#isSecondary}}
-//  {{item.identifier}}{{item.spaces}} = {{#item.cast}}static_cast<unsigned int>({{/item.cast}}{{item.value}}{{#item.cast}}){{/item.cast}}, // reuse {{item.primaryGroup}}{{#item.decimalValue}}, decimal value: {{item.decimalValue}}{{/item.decimalValue}}
-{{/isSecondary}}
-{{/items}}
-
-{{/enumsByGroup.groups}}
+{%- for group in groups|sort(attribute='identifier') %}
+    // {{ group.identifier }}
+{% for value in group.values|sort(attribute='value') -%}
+{%- if group.identifier == value.groups[0].identifier %}
+    {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}},
+{%- else %}
+//  {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}}, // reuse {{value.groups[0].identifier}}
+{%- endif %}
+{%- endfor %}
+{% endfor %}
 };
 
 
 // import enums to namespace
 
-{{#enumsByGroup.groups}}
-// {{name}}
+{% for group in groups|sort(attribute='identifier') -%}
+// {{ group.identifier }}
 
-{{#items}}
-{{#isPrimary}}
-{{ucapi}}BINDING_CONSTEXPR static const {{enumType}} {{item.identifier}} = {{enumType}}::{{item.identifier}};
-{{/isPrimary}}
-{{#isSecondary}}
-// {{ucapi}}BINDING_CONSTEXPR static const {{enumType}} {{item.identifier}} = {{enumType}}::{{item.identifier}}; // reuse {{item.primaryGroup}}
-{{/isSecondary}}
-{{/items}}
-
-{{/enumsByGroup.groups}}
+{% for value in group.values|sort(attribute='value') -%}
+{% if group.identifier == value.groups[0].identifier -%}
+{{api.identifier|upper}}BINDING_CONSTEXPR static const {{profile.enumType}} {{value.identifier}} = {{profile.enumType}}::{{value.identifier}};
+{% else -%}
+// {{api.identifier|upper}}BINDING_CONSTEXPR static const {{profile.enumType}} {{value.identifier}} = {{profile.enumType}}::{{value.identifier}}; // reuse {{value.groups[0].identifier}}
+{% endif -%}
+{% endfor %}
+{% endfor %}
 
 
-} // namespace {{api}}
+} // namespace {{api.identifier}}
