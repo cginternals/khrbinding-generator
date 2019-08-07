@@ -297,8 +297,8 @@ class GLParser(XMLParser):
         binding.bindingAuxNamespace = binding.namespace + "::" + binding.auxNamespace
         binding.apiExport = binding.identifier.upper() + "_API"
         binding.apiTemplateExport = binding.identifier.upper() + "_TEMPLATE_API"
-        binding.auxApiExport = binding.bindingAuxIdentifier.upper() + "_API"
-        binding.auxApiTemplateExport = binding.bindingAuxIdentifier.upper() + "_TEMPLATE_API"
+        binding.auxApiExport = binding.identifier.upper() + "_" + binding.auxIdentifier.upper() + "_API"
+        binding.auxApiTemplateExport = binding.identifier.upper() + "_" + binding.auxIdentifier.upper() + "_TEMPLATE_API"
         binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
         binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"

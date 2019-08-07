@@ -4,11 +4,11 @@
 
 #include <type_traits>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 
-namespace {{api.identifier}}binding 
+namespace {{binding.namespace}} 
 {
 
 
@@ -20,7 +20,7 @@ namespace {{api.identifier}}binding
 *    The valid bitfield types for the given value
 */
 template <typename... Types>
-class {{api.identifier|upper}}BINDING_TEMPLATE_API SharedBitfield;
+class {{binding.apiTemplateExport}} SharedBitfield;
 
 
 // intersection
@@ -39,7 +39,7 @@ class {{api.identifier|upper}}BINDING_TEMPLATE_API SharedBitfield;
 *    This template is used if the list of Types is empty
 */
 template<typename T, typename... Types>
-struct {{api.identifier|upper}}BINDING_TEMPLATE_API is_member_of_SharedBitfield
+struct {{binding.apiTemplateExport}} is_member_of_SharedBitfield
 {
     static const bool value = false; ///< result of the inclusion test; always false since the list of types to test against is empty
 };
@@ -57,7 +57,7 @@ struct {{api.identifier|upper}}BINDING_TEMPLATE_API is_member_of_SharedBitfield
 *    The tail of the list of Types
 */
 template<typename T, typename U, typename... Types>
-struct {{api.identifier|upper}}BINDING_TEMPLATE_API is_member_of_SharedBitfield<T, U, Types...>
+struct {{binding.apiTemplateExport}} is_member_of_SharedBitfield<T, U, Types...>
 {
     static const bool value = std::conditional<std::is_same<T, U>::value, std::true_type, is_member_of_SharedBitfield<T, Types...>>::type::value; ///< result of the inclusion test
 };
@@ -68,7 +68,7 @@ struct {{api.identifier|upper}}BINDING_TEMPLATE_API is_member_of_SharedBitfield<
 *    Break condition for the SharedBitfield type concatenation
 */
 template<typename, typename>
-struct {{api.identifier|upper}}BINDING_TEMPLATE_API prepend_to_SharedBitfield
+struct {{binding.apiTemplateExport}} prepend_to_SharedBitfield
 {
 };
 
@@ -83,7 +83,7 @@ struct {{api.identifier|upper}}BINDING_TEMPLATE_API prepend_to_SharedBitfield
 *   The tail of the list of Types
 */
 template<typename T, typename... Types>
-struct {{api.identifier|upper}}BINDING_TEMPLATE_API prepend_to_SharedBitfield<T, SharedBitfield<Types...>>
+struct {{binding.apiTemplateExport}} prepend_to_SharedBitfield<T, SharedBitfield<Types...>>
 {
     using type = SharedBitfield<T, Types...>; ///< the compound SharedBitfield type
 };
@@ -94,7 +94,7 @@ struct {{api.identifier|upper}}BINDING_TEMPLATE_API prepend_to_SharedBitfield<T,
 *    Break condition for the SharedBitfield intersection
 */
 template<typename, typename>
-struct {{api.identifier|upper}}BINDING_TEMPLATE_API intersect_SharedBitfield
+struct {{binding.apiTemplateExport}} intersect_SharedBitfield
 {
     using type = SharedBitfield<>; ///< Result of the intersection; always empty for non-overlapping SharedBitfield type lists
 };
@@ -112,7 +112,7 @@ struct {{api.identifier|upper}}BINDING_TEMPLATE_API intersect_SharedBitfield
 *    Head and Tail of the second SharedBitfield type list
 */
 template<typename T, typename... Types, typename... OtherTypes>
-struct {{api.identifier|upper}}BINDING_TEMPLATE_API intersect_SharedBitfield<SharedBitfield<T, Types...>, SharedBitfield<OtherTypes...>>
+struct {{binding.apiTemplateExport}} intersect_SharedBitfield<SharedBitfield<T, Types...>, SharedBitfield<OtherTypes...>>
 {
     using type = typename std::conditional<!is_member_of_SharedBitfield<T, OtherTypes...>::value, typename intersect_SharedBitfield<SharedBitfield<Types...>, SharedBitfield<OtherTypes...>>::type, typename prepend_to_SharedBitfield<T, typename intersect_SharedBitfield<SharedBitfield<Types...>, SharedBitfield<OtherTypes...>>::type>::type>::type; ///< Result of the intersection
 };
@@ -129,7 +129,7 @@ struct {{api.identifier|upper}}BINDING_TEMPLATE_API intersect_SharedBitfield<Sha
 *    The underlying type of the type-safe enum class
 */
 template <typename T>
-class {{api.identifier|upper}}BINDING_TEMPLATE_API SharedBitfieldBase
+class {{binding.apiTemplateExport}} SharedBitfieldBase
 {
 public:
     using UnderlyingType = T; ///< Propagate underlying type
@@ -141,7 +141,7 @@ public:
     *  @param[in] value
     *    The value encoded in this shared bitfield
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline SharedBitfieldBase(T value);
+    {{binding.constexpr}} inline SharedBitfieldBase(T value);
 
     /**
     *  @brief
@@ -150,7 +150,7 @@ public:
     *  @return
     *    The bitfield value
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline explicit operator T() const;
+    {{binding.constexpr}} inline explicit operator T() const;
 
 
 protected:
@@ -163,7 +163,7 @@ protected:
 *    Invalid SharedBitfield class as it contains no valid bitfield types.
 */
 template <>
-class {{api.identifier|upper}}BINDING_TEMPLATE_API SharedBitfield<>
+class {{binding.apiTemplateExport}} SharedBitfield<>
 {
 };
 
@@ -177,7 +177,7 @@ class {{api.identifier|upper}}BINDING_TEMPLATE_API SharedBitfield<>
 *    The one valid bitfield type for the given value.
 */
 template <typename Type>
-class {{api.identifier|upper}}BINDING_TEMPLATE_API SharedBitfield<Type> : public SharedBitfieldBase<typename std::underlying_type<Type>::type>
+class {{binding.apiTemplateExport}} SharedBitfield<Type> : public SharedBitfieldBase<typename std::underlying_type<Type>::type>
 {
 public:
     using UnderlyingType = typename SharedBitfieldBase<typename std::underlying_type<Type>::type>::UnderlyingType; ///< inherit UnderlyingType declaration
@@ -193,7 +193,7 @@ public:
     *    The value of this SharedBitfield
     */
     template <typename ConstructionType>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline SharedBitfield(ConstructionType value);
+    {{binding.constexpr}} inline SharedBitfield(ConstructionType value);
 
     /**
     *  @brief
@@ -202,7 +202,7 @@ public:
     *  @param[in] value
     *    The value of this SharedBitfield
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline SharedBitfield(typename std::underlying_type<Type>::type value);
+    {{binding.constexpr}} inline SharedBitfield(typename std::underlying_type<Type>::type value);
 
     /**
     *  @brief
@@ -211,7 +211,7 @@ public:
     *  @return
     *    The bitfield value as type of Type.
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline operator Type() const;
+    {{binding.constexpr}} inline operator Type() const;
 
     /**
     *  @brief
@@ -227,7 +227,7 @@ public:
     *    This method is not visible to the compiler if the operands don't share any bitfield type (the intersection is empty) and thus results in a compiler error
     */
     template <typename... T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator|(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type>::type;
+    {{binding.constexpr}} inline auto operator|(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type>::type;
 
     /**
     *  @brief
@@ -256,7 +256,7 @@ public:
     *    This method is not visible to the compiler if the operands don't share any bitfield type (the intersection is empty) and thus results in a compiler error
     */
     template <typename... T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator&(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type>::type;
+    {{binding.constexpr}} inline auto operator&(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type>::type;
 
     /**
     *  @brief
@@ -285,7 +285,7 @@ public:
     *    This method is not visible to the compiler if the operands don't share any bitfield type (the intersection is empty) and thus results in a compiler error
     */
     template <typename... T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator^(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type>::type;
+    {{binding.constexpr}} inline auto operator^(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type>::type;
 
     /**
     *  @brief
@@ -314,7 +314,7 @@ public:
     *    This method is not visible to the compiler if the operands don't share any bitfield type (the intersection is empty) and thus results in a compiler error
     */
     template <typename... T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator==(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, bool>::type;
+    {{binding.constexpr}} inline auto operator==(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, bool>::type;
 
     /**
     *  @brief
@@ -332,7 +332,7 @@ public:
     *    This method is only visible to the compiler if the this SharedBitfield's type list contains the type T
     */
     template <typename T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator==(T other) const -> typename std::enable_if<is_member_of_SharedBitfield<T, Type>::value, bool>::type;
+    {{binding.constexpr}} inline auto operator==(T other) const -> typename std::enable_if<is_member_of_SharedBitfield<T, Type>::value, bool>::type;
 };
 
 
@@ -346,7 +346,7 @@ public:
 *    The tail of valid bitfields type for the given value
 */
 template <typename Type, typename... Types>
-class {{api.identifier|upper}}BINDING_TEMPLATE_API SharedBitfield<Type, Types...> : public SharedBitfield<Types...>
+class {{binding.apiTemplateExport}} SharedBitfield<Type, Types...> : public SharedBitfield<Types...>
 {
 public:
     using UnderlyingType = typename SharedBitfield<Types...>::UnderlyingType; ///< inherit UnderlyingType declaration
@@ -361,7 +361,7 @@ public:
     *    The value of this SharedBitfield
     */
     template <typename ConstructionType>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline SharedBitfield(ConstructionType value);
+    {{binding.constexpr}} inline SharedBitfield(ConstructionType value);
 
     /**
     *  @brief
@@ -370,7 +370,7 @@ public:
     *  @param[in] value
     *    The value of this SharedBitfield
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline SharedBitfield(typename std::underlying_type<Type>::type value);
+    {{binding.constexpr}} inline SharedBitfield(typename std::underlying_type<Type>::type value);
 
     /**
     *  @brief
@@ -379,7 +379,7 @@ public:
     *  @return
     *    The bitfield value as type of Type
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline operator Type() const;
+    {{binding.constexpr}} inline operator Type() const;
 
     /**
     *  @brief
@@ -395,7 +395,7 @@ public:
     *    This method is not visible to the compiler if the operands don't share any bitfield type (the intersection is empty) and thus results in a compiler error
     */
     template <typename... T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator|(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type>::type;
+    {{binding.constexpr}} inline auto operator|(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type>::type;
 
     /**
     *  @brief
@@ -424,7 +424,7 @@ public:
     *    This method is not visible to the compiler if the operands don't share any bitfield type (the intersection is empty) and thus results in a compiler error
     */
     template <typename... T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator&(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type>::type;
+    {{binding.constexpr}} inline auto operator&(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type>::type;
 
     /**
     *  @brief
@@ -453,7 +453,7 @@ public:
     *    This method is not visible to the compiler if the operands don't share any bitfield type (the intersection is empty) and thus results in a compiler error
     */
     template <typename... T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator^(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type>::type;
+    {{binding.constexpr}} inline auto operator^(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type>::type;
 
     /**
     *  @brief
@@ -482,7 +482,7 @@ public:
     *    This method is not visible to the compiler if the operands don't share any bitfield type (the intersection is empty) and thus results in a compiler error
     */
     template <typename... T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator==(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, bool>::type;
+    {{binding.constexpr}} inline auto operator==(SharedBitfield<T...> other) const -> typename std::enable_if<!std::is_same<typename intersect_SharedBitfield<SharedBitfield<Type, Types...>, SharedBitfield<T...>>::type, SharedBitfield<>>::value, bool>::type;
 
     /**
     *  @brief
@@ -500,7 +500,7 @@ public:
     *    This method is only visible to the compiler if the this SharedBitfield's type list contains the type T
     */
     template <typename T>
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline auto operator==(T other) const -> typename std::enable_if<is_member_of_SharedBitfield<T, Type, Types...>::value, bool>::type;
+    {{binding.constexpr}} inline auto operator==(T other) const -> typename std::enable_if<is_member_of_SharedBitfield<T, Type, Types...>::value, bool>::type;
 };
 
 
@@ -527,7 +527,7 @@ public:
 *    This method is not visible to the compiler if the bitfield type is not in the list of types of the SharedBitfield and thus results in a compiler error
 */
 template <typename Enum, typename ConvertibleEnum>
-{{api.identifier|upper}}BINDING_CONSTEXPR inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
+{{binding.constexpr}} inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
 operator|(Enum a, ConvertibleEnum b);
 
 /**
@@ -550,7 +550,7 @@ operator|(Enum a, ConvertibleEnum b);
 *    This method is not visible to the compiler if the bitfield type is not in the list of types of the SharedBitfield and thus results in a compiler error
 */
 template <typename ConvertibleEnum, typename Enum>
-{{api.identifier|upper}}BINDING_CONSTEXPR inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
+{{binding.constexpr}} inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
 operator|(ConvertibleEnum a, Enum b);
 
 /**
@@ -596,7 +596,7 @@ operator|=(Enum & a, ConvertibleEnum b);
 *    This method is not visible to the compiler if the bitfield type is not in the list of types of the SharedBitfield and thus results in a compiler error
 */
 template <typename Enum, typename ConvertibleEnum>
-{{api.identifier|upper}}BINDING_CONSTEXPR inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
+{{binding.constexpr}} inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
 operator&(Enum a, ConvertibleEnum b);
 
 /**
@@ -619,7 +619,7 @@ operator&(Enum a, ConvertibleEnum b);
 *    This method is not visible to the compiler if the bitfield type is not in the list of types of the SharedBitfield and thus results in a compiler error
 */
 template <typename ConvertibleEnum, typename Enum>
-{{api.identifier|upper}}BINDING_CONSTEXPR inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
+{{binding.constexpr}} inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
 operator&(ConvertibleEnum a, Enum b);
 
 /**
@@ -665,7 +665,7 @@ operator&=(Enum & a, ConvertibleEnum b);
 *    This method is not visible to the compiler if the bitfield type is not in the list of types of the SharedBitfield and thus results in a compiler error
 */
 template <typename Enum, typename ConvertibleEnum>
-{{api.identifier|upper}}BINDING_CONSTEXPR inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
+{{binding.constexpr}} inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
 operator^(Enum a, ConvertibleEnum b);
 
 /**
@@ -688,7 +688,7 @@ operator^(Enum a, ConvertibleEnum b);
 *    This method is not visible to the compiler if the bitfield type is not in the list of types of the SharedBitfield and thus results in a compiler error
 */
 template <typename ConvertibleEnum, typename Enum>
-{{api.identifier|upper}}BINDING_CONSTEXPR inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
+{{binding.constexpr}} inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::underlying_type<typename std::enable_if<std::is_enum<Enum>::value, Enum>::type>::type>, ConvertibleEnum>::value, Enum>::type
 operator^(ConvertibleEnum a, Enum b);
 
 /**
@@ -715,7 +715,7 @@ inline typename std::enable_if<std::is_base_of<SharedBitfieldBase<typename std::
 operator^=(Enum & a, ConvertibleEnum b);
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}
 
 
-#include <{{api.identifier}}binding/SharedBitfield.inl>
+#include <{{binding.identifier}}/SharedBitfield.inl>

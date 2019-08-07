@@ -1,7 +1,7 @@
 
-#include <{{api.identifier}}binding/AbstractState.h>
+#include <{{binding.identifier}}/AbstractState.h>
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 AbstractState::AbstractState()
@@ -45,4 +45,4 @@ void AbstractState::setCallbackMask(CallbackMask mask)
     m_callbackMask = mask;
 }
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

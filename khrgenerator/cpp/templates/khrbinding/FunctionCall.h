@@ -7,11 +7,11 @@
 #include <chrono>
 #include <memory>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -23,7 +23,7 @@ class AbstractFunction;
 *  @brief
 *    A FunctionCall represents a function call of an OpenGL API function, including the parameter and return values
 */
-class {{api.identifier|upper}}BINDING_API FunctionCall
+class {{binding.apiExport}} FunctionCall
 {
 public:
     /**
@@ -74,4 +74,4 @@ public:
 };
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

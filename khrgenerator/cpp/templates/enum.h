@@ -2,16 +2,16 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/no{{api.identifier}}.h>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 
 namespace {{api.identifier}}
 {
 
 
-enum class {{profile.enumType}} : unsigned int
+enum class {{binding.enumType}} : unsigned int
 {
 {%- for group in groups|sort(attribute='identifier') %}
     // {{ group.identifier }}
@@ -33,9 +33,9 @@ enum class {{profile.enumType}} : unsigned int
 
 {% for value in group.values|sort(attribute='value') -%}
 {% if group.identifier == value.groups[0].identifier -%}
-{{api.identifier|upper}}BINDING_CONSTEXPR static const {{profile.enumType}} {{value.identifier}} = {{profile.enumType}}::{{value.identifier}};
+{{binding.constexpr}} static const {{binding.enumType}} {{value.identifier}} = {{binding.enumType}}::{{value.identifier}};
 {% else -%}
-// {{api.identifier|upper}}BINDING_CONSTEXPR static const {{profile.enumType}} {{value.identifier}} = {{profile.enumType}}::{{value.identifier}}; // reuse {{value.groups[0].identifier}}
+// {{binding.constexpr}} static const {{binding.enumType}} {{value.identifier}} = {{binding.enumType}}::{{value.identifier}}; // reuse {{value.groups[0].identifier}}
 {% endif -%}
 {% endfor -%}
 {% endfor %}

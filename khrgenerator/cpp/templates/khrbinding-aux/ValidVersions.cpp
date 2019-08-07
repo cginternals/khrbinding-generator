@@ -1,8 +1,8 @@
 
-#include <{{api.identifier}}binding-aux/ValidVersions.h>
+#include <{{binding.identifier}}-aux/ValidVersions.h>
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
@@ -58,4 +58,4 @@ std::set<Version> ValidVersions::succeeding(const Version & version)
 }
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

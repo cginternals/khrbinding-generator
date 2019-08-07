@@ -5,8 +5,8 @@
 #include <vector>
 #include <functional>
 
-#include <{{api.identifier}}binding/State.h>
-#include <{{api.identifier}}binding/AbstractFunction.h>
+#include <{{binding.identifier}}/State.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
 
 
 #ifndef WINAPI
@@ -18,7 +18,7 @@
 #endif
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -39,7 +39,7 @@ struct FunctionHelper;
 *    The types of the arguments
 */
 template <typename ReturnType, typename... Arguments>
-struct {{api.identifier|upper}}BINDING_TEMPLATE_API CallbackType
+struct {{binding.apiTemplateExport}} CallbackType
 {
     using type = std::function<void(ReturnType, Arguments...)>; ///< Propagate the actual callable callback type
 };
@@ -53,7 +53,7 @@ struct {{api.identifier|upper}}BINDING_TEMPLATE_API CallbackType
 *    The types of the arguments
 */
 template <typename... Arguments>
-struct {{api.identifier|upper}}BINDING_TEMPLATE_API CallbackType<void, Arguments...>
+struct {{binding.apiTemplateExport}} CallbackType<void, Arguments...>
 {
     using type = std::function<void(Arguments...)>; ///< Propagate the actual callable callback type
 };
@@ -74,7 +74,7 @@ struct {{api.identifier|upper}}BINDING_TEMPLATE_API CallbackType<void, Arguments
 *    The types of the arguments
 */
 template <typename ReturnType, typename... Arguments>
-class {{api.identifier|upper}}BINDING_TEMPLATE_API Function : public AbstractFunction
+class {{binding.apiTemplateExport}} Function : public AbstractFunction
 {
 public:
     friend struct FunctionHelper<ReturnType, Arguments...>;
@@ -212,4 +212,4 @@ protected:
 } // namespace glbinding
 
 
-#include <{{api.identifier}}binding/Function.inl>
+#include <{{binding.identifier}}/Function.inl>

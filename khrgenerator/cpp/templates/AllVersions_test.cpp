@@ -2,7 +2,7 @@
 #include <gmock/gmock.h>
 
 {% for version in versions|sort(attribute='identifier') %}
-#include <{{api.identifier}}binding/{{ version.identifier }}/{{api.identifier}}.h>
+#include <{{binding.identifier}}/{{ version.identifier }}/{{api.identifier}}.h>
 {%- endfor %}
 
 

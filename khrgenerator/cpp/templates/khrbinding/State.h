@@ -2,10 +2,10 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/AbstractState.h>
+#include <{{binding.identifier}}/AbstractState.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -14,7 +14,7 @@ namespace {{api.identifier}}binding
 *    The State class represents the configuration of a function for one thread.
 *    This includes the driver function pointer (is allowed to differ between contexts) and the callback mask
 */
-class {{api.identifier|upper}}BINDING_API State : public AbstractState
+class {{binding.apiExport}} State : public AbstractState
 {
 public:
     /**
@@ -34,4 +34,4 @@ public:
 };
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

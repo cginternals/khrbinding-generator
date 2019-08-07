@@ -2,11 +2,11 @@
 #pragma once
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
 using ContextHandle = long long int; ///< Type for storing context handles
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

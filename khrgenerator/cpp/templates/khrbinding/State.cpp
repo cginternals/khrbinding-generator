@@ -1,10 +1,10 @@
 
-#include <{{api.identifier}}binding/State.h>
+#include <{{binding.identifier}}/State.h>
 
-#include <{{api.identifier}}binding/Binding.h>
+#include <{{binding.identifier}}/Binding.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -20,4 +20,4 @@ void State::resolve(const char * name)
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

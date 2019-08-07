@@ -1,16 +1,16 @@
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding.h>
+#include <{{binding.identifier}}/{{binding.identifier}}.h>
 
-#include <{{api.identifier}}binding/AbstractFunction.h>
-#include <{{api.identifier}}binding/Binding.h>
-#include <{{api.identifier}}binding/FunctionCall.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
+#include <{{binding.identifier}}/Binding.h>
+#include <{{binding.identifier}}/FunctionCall.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
-void initialize({{api.identifier}}binding::GetProcAddress functionPointerResolver, bool resolveFunctions)
+void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions)
 {
     Binding::initialize(functionPointerResolver, resolveFunctions);
 }
@@ -105,7 +105,7 @@ void setLogCallback(FunctionLogCallback callback)
     Binding::setLogCallback(callback);
 }
 
-void initialize(ContextHandle context, {{api.identifier}}binding::GetProcAddress functionPointerResolver, bool useContext, bool resolveFunctions)
+void initialize(ContextHandle context, {{binding.identifier}}::GetProcAddress functionPointerResolver, bool useContext, bool resolveFunctions)
 {
     Binding::initialize(context, functionPointerResolver, useContext, resolveFunctions);
 }
@@ -131,4 +131,4 @@ void releaseContext(ContextHandle context)
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

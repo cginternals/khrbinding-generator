@@ -1,19 +1,19 @@
 
-#include <{{api.identifier}}binding/AbstractFunction.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
 
 #include <memory>
 #include <set>
 #include <cassert>
 #include <type_traits>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
-#include <{{api.identifier}}binding/AbstractState.h>
+#include <{{binding.identifier}}/AbstractState.h>
 
-#include <{{api.identifier}}binding/Binding.h>
+#include <{{binding.identifier}}/Binding.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -125,4 +125,4 @@ int AbstractFunction::maxPos()
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

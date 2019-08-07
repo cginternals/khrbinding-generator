@@ -7,15 +7,15 @@
 #include <vector>
 #include <functional>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
-#include <{{api.identifier}}binding/ContextHandle.h>
-#include <{{api.identifier}}binding/CallbackMask.h>
-#include <{{api.identifier}}binding/ProcAddress.h>
+#include <{{binding.identifier}}/ContextHandle.h>
+#include <{{binding.identifier}}/CallbackMask.h>
+#include <{{binding.identifier}}/ProcAddress.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -34,7 +34,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *
 *  @param[in] functionPointerResolver
 *    A function pointer to resolve binding functions for this context.
-*    If `nullptr` is passed, `{{api.identifier}}binding::getProcAddress` is used for convenience.
+*    If `nullptr` is passed, `{{binding.identifier}}::getProcAddress` is used for convenience.
 *  @param[in] resolveFunctions (optional)
 *    Whether to resolve function pointers lazily (\a resolveFunctions = `false`) or immediately
 *
@@ -46,14 +46,14 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *    pointer from the initial thread.
 *
 *  @remark
-*    Using {{api.identifier}}binding::getProcAddress is provided for convenience only. Please don't use this in new code.
+*    Using {{binding.identifier}}::getProcAddress is provided for convenience only. Please don't use this in new code.
 *    Instead, use an external function resolution callback, e.g.,
 *     * wglGetProcAddress
 *     * glxGetProcAddress
 *     * glfwGetProcAddress
 *     * QOpenGlContext::getProcAddress
 */
-{{api.identifier|upper}}BINDING_API void initialize({{api.identifier}}binding::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
+{{binding.apiExport}} void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
 
 /**
 *  @brief
@@ -65,7 +65,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    The additional features are callbacks, and used in multi-context environments
 */
-{{api.identifier|upper}}BINDING_API void registerAdditionalFunction(AbstractFunction * function);
+{{binding.apiExport}} void registerAdditionalFunction(AbstractFunction * function);
 
 /**
 *  @brief
@@ -74,13 +74,13 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] name
 *    The name of the function
 */
-{{api.identifier|upper}}BINDING_API ProcAddress resolveFunction(const char * name);
+{{binding.apiExport}} ProcAddress resolveFunction(const char * name);
 
 /**
 *  @brief
 *    Resolves the funtion pointers of all registered OpenGL functions immediately for the current context
 */
-{{api.identifier|upper}}BINDING_API void resolveFunctions();
+{{binding.apiExport}} void resolveFunctions();
 
 /**
 *  @brief
@@ -89,7 +89,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] mask
 *    The new CallbackMask
 */
-{{api.identifier|upper}}BINDING_API void setCallbackMask(CallbackMask mask);
+{{binding.apiExport}} void setCallbackMask(CallbackMask mask);
 
 /**
 *  @brief
@@ -100,7 +100,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] blackList
 *    The blacklist of functions to exclude in this update
 */
-{{api.identifier|upper}}BINDING_API void setCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
+{{binding.apiExport}} void setCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
 
 /**
 *  @brief
@@ -109,7 +109,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] mask
 *    The CallbackMask to include
 */
-{{api.identifier|upper}}BINDING_API void addCallbackMask(CallbackMask mask);
+{{binding.apiExport}} void addCallbackMask(CallbackMask mask);
 
 /**
 *  @brief
@@ -120,7 +120,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] blackList
 *    The blacklist of functions to exclude in this update
 */
-{{api.identifier|upper}}BINDING_API void addCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
+{{binding.apiExport}} void addCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
 
 /**
 *  @brief
@@ -129,7 +129,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] mask
 *    The CallbackMask to exclude
 */
-{{api.identifier|upper}}BINDING_API void removeCallbackMask(CallbackMask mask);
+{{binding.apiExport}} void removeCallbackMask(CallbackMask mask);
 
 /**
 *  @brief
@@ -140,7 +140,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] blackList
 *    The blacklist of functions to exclude in this update
 */
-{{api.identifier|upper}}BINDING_API void removeCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
+{{binding.apiExport}} void removeCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
 
 /**
 *  @brief
@@ -152,7 +152,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the After flag to enable the callback
 */
-{{api.identifier|upper}}BINDING_API SimpleFunctionCallback unresolvedCallback();
+{{binding.apiExport}} SimpleFunctionCallback unresolvedCallback();
 
 /**
 *  @brief
@@ -167,7 +167,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the Unresolved flag to enable the callback
 */
-{{api.identifier|upper}}BINDING_API void setUnresolvedCallback(SimpleFunctionCallback callback);
+{{binding.apiExport}} void setUnresolvedCallback(SimpleFunctionCallback callback);
 
 /**
 *  @brief
@@ -179,7 +179,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the After flag to enable the callback
 */
-{{api.identifier|upper}}BINDING_API FunctionCallback beforeCallback();
+{{binding.apiExport}} FunctionCallback beforeCallback();
 
 /**
 *  @brief
@@ -194,7 +194,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the Before flag to enable the callback
 */
-{{api.identifier|upper}}BINDING_API void setBeforeCallback(FunctionCallback callback);
+{{binding.apiExport}} void setBeforeCallback(FunctionCallback callback);
 
 /**
 *  @brief
@@ -206,7 +206,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the After flag to enable the callback
 */
-{{api.identifier|upper}}BINDING_API FunctionCallback afterCallback();
+{{binding.apiExport}} FunctionCallback afterCallback();
 
 /**
 *  @brief
@@ -221,7 +221,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the After flag to enable the callback
 */
-{{api.identifier|upper}}BINDING_API void setAfterCallback(FunctionCallback callback);
+{{binding.apiExport}} void setAfterCallback(FunctionCallback callback);
 
 /**
 *  @brief
@@ -233,7 +233,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the Logging flag to enable the callback
 */
-{{api.identifier|upper}}BINDING_API FunctionLogCallback logCallback();
+{{binding.apiExport}} FunctionLogCallback logCallback();
 
 /**
 *  @brief
@@ -248,7 +248,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the Logging flag to enable the callback
 */
-{{api.identifier|upper}}BINDING_API void setLogCallback(FunctionLogCallback callback);
+{{binding.apiExport}} void setLogCallback(FunctionLogCallback callback);
 
 /**
 *  @brief
@@ -257,7 +257,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    There may be multiple context switch callbacks registered at once
 */
-{{api.identifier|upper}}BINDING_API void addContextSwitchCallback(ContextSwitchCallback callback);
+{{binding.apiExport}} void addContextSwitchCallback(ContextSwitchCallback callback);
 
 /**
 *  @brief
@@ -276,43 +276,43 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *    A functionPointerResolver with value 'nullptr' will get initialized with the function
 *    pointer from the initial thread.
 */
-{{api.identifier|upper}}BINDING_API void initialize(ContextHandle context, {{api.identifier}}binding::GetProcAddress functionPointerResolver, bool useContext = true, bool resolveFunctions = true);
+{{binding.apiExport}} void initialize(ContextHandle context, {{binding.identifier}}::GetProcAddress functionPointerResolver, bool useContext = true, bool resolveFunctions = true);
 
 /**
 *  @brief
-*    Update the current context state in {{api.identifier}}binding
+*    Update the current context state in {{binding.identifier}}
 *
 *  @remark
 *    This function queries the driver for the current OpenGL context
 */
-{{api.identifier|upper}}BINDING_API void useCurrentContext();
+{{binding.apiExport}} void useCurrentContext();
 
 /**
 *  @brief
-*    Update the current context state in {{api.identifier}}binding
+*    Update the current context state in {{binding.identifier}}
 *
 *  @param[in] context
 *    The context handle of the context to set current
 */
-{{api.identifier|upper}}BINDING_API void useContext(ContextHandle context);
+{{binding.apiExport}} void useContext(ContextHandle context);
 
 /**
 *  @brief
-*    Removes the current context from the state of {{api.identifier}}binding
+*    Removes the current context from the state of {{binding.identifier}}
 *
 *  @remark
 *    This function queries the driver for the current OpenGL context
 */
-{{api.identifier|upper}}BINDING_API void releaseCurrentContext();
+{{binding.apiExport}} void releaseCurrentContext();
 
 /**
 *  @brief
-*    Removes the current context from the state of {{api.identifier}}binding
+*    Removes the current context from the state of {{binding.identifier}}
 *
 *  @param[in] context
 *    The context handle of the context to remove
 */
-{{api.identifier|upper}}BINDING_API void releaseContext(ContextHandle context);
+{{binding.apiExport}} void releaseContext(ContextHandle context);
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

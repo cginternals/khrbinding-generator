@@ -1,29 +1,29 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api.identifier}}binding/{{api.identifier}}/extension.h>
+#include <{{binding.identifier}}/{{api.identifier}}/extension.h>
 
 
 using namespace {{api.identifier}};
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
 {% for groupname, extensions in groups|dictsort -%}
 {% if extensions|length == 0 -%}
-const std::unordered_map<std::string, {{profile.extensionType}}> Meta_ExtensionsByString_{{groupname}}{};
+const std::unordered_map<std::string, {{binding.extensionType}}> Meta_ExtensionsByString_{{groupname}}{};
 {% else -%}
-const std::unordered_map<std::string, {{profile.extensionType}}> Meta_ExtensionsByString_{{groupname}} =
+const std::unordered_map<std::string, {{binding.extensionType}}> Meta_ExtensionsByString_{{groupname}} =
 {
 {%- for extension in extensions %}
-    { "{{extension.identifier}}", {{profile.extensionType}}::{{extension.identifier}} }{{ "," if not loop.last }}
+    { "{{extension.identifier}}", {{binding.extensionType}}::{{extension.identifier}} }{{ "," if not loop.last }}
 {%- endfor %}
 };
 {% endif %}
 {% endfor -%}
-const std::array<std::unordered_map<std::string, {{api.identifier}}::{{profile.extensionType}}>, {{groups|length}}> Meta_ExtensionsByStringMaps =
+const std::array<std::unordered_map<std::string, {{api.identifier}}::{{binding.extensionType}}>, {{groups|length}}> Meta_ExtensionsByStringMaps =
 { {
 {%- for groupname, extensions in groups|dictsort %}
     Meta_ExtensionsByString_{{groupname}}{{ "," if not loop.last }}
@@ -31,4 +31,4 @@ const std::array<std::unordered_map<std::string, {{api.identifier}}::{{profile.e
 } };
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

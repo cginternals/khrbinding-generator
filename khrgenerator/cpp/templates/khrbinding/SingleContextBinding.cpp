@@ -1,14 +1,14 @@
 
-#include <{{api.identifier}}binding/Binding.h>
+#include <{{binding.identifier}}/Binding.h>
 
 #include <cassert>
 #include <iostream>
 
-#include <{{api.identifier}}binding/State.h>
-#include <{{api.identifier}}binding/AbstractFunction.h>
+#include <{{binding.identifier}}/State.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -151,7 +151,7 @@ size_t Binding::size()
     return Binding::functions().size() + s_additionalFunctions().size();
 }
 
-void Binding::initialize(const {{api.identifier}}binding::GetProcAddress functionPointerResolver, const bool _resolveFunctions)
+void Binding::initialize(const {{binding.identifier}}::GetProcAddress functionPointerResolver, const bool _resolveFunctions)
 {
     std_boost::lock_guard<std_boost::recursive_mutex> lock(s_mutex());
 
@@ -241,9 +241,9 @@ Binding::FunctionLogCallback & Binding::s_logCallback()
     return logCallback;
 }
 
-{{api.identifier}}binding::GetProcAddress & Binding::s_getProcAddress()
+{{binding.identifier}}::GetProcAddress & Binding::s_getProcAddress()
 {
-    static {{api.identifier}}binding::GetProcAddress getProcAddress = nullptr;
+    static {{binding.identifier}}::GetProcAddress getProcAddress = nullptr;
 
     return getProcAddress;
 }
@@ -266,4 +266,4 @@ int Binding::maxPos()
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

@@ -2,11 +2,11 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -39,7 +39,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The inverted CallbackMask
 */
-{{api.identifier|upper}}BINDING_CONSTEXPR inline CallbackMask operator~(CallbackMask a);
+{{binding.constexpr}} inline CallbackMask operator~(CallbackMask a);
 
 /**
 *  @brief
@@ -53,7 +53,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The compound CallbackMask
 */
-{{api.identifier|upper}}BINDING_CONSTEXPR inline CallbackMask operator|(CallbackMask a, CallbackMask b);
+{{binding.constexpr}} inline CallbackMask operator|(CallbackMask a, CallbackMask b);
 
 /**
 *  @brief
@@ -67,7 +67,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The compound CallbackMask
 */
-{{api.identifier|upper}}BINDING_CONSTEXPR inline CallbackMask operator&(CallbackMask a, CallbackMask b);
+{{binding.constexpr}} inline CallbackMask operator&(CallbackMask a, CallbackMask b);
 
 /**
 *  @brief
@@ -81,7 +81,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The compound CallbackMask
 */
-{{api.identifier|upper}}BINDING_CONSTEXPR inline CallbackMask operator^(CallbackMask a, CallbackMask b);
+{{binding.constexpr}} inline CallbackMask operator^(CallbackMask a, CallbackMask b);
 
 /**
 *  @brief
@@ -126,7 +126,7 @@ inline CallbackMask& operator&=(CallbackMask& a, CallbackMask b);
 inline CallbackMask& operator^=(CallbackMask& a, CallbackMask b);
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}
 
 
-#include <{{api.identifier}}binding/CallbackMask.inl>
+#include <{{binding.identifier}}/CallbackMask.inl>

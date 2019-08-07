@@ -5,7 +5,7 @@
 #include <ostream>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -26,4 +26,4 @@ std::ostream & operator<<(std::ostream & stream, const Value<T *> & value)
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

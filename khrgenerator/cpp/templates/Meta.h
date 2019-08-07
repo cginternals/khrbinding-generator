@@ -8,21 +8,21 @@
 #include <set>
 #include <cstdint>
 
-#include <{{api.identifier}}binding-aux/{{api.identifier}}binding-aux_api.h>
-#include <{{api.identifier}}binding-aux/{{api.identifier}}binding-aux_features.h>
+#include <{{binding.identifier}}-aux/{{binding.identifier}}-aux_api.h>
+#include <{{binding.identifier}}-aux/{{binding.identifier}}-aux_features.h>
 
-#include <{{api.identifier}}binding/{{api.identifier}}/types.h>
-#include <{{api.identifier}}binding/AbstractFunction.h>
+#include <{{binding.identifier}}/{{api.identifier}}/types.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
 class Version;
 
 
-namespace aux
+namespace {{binding.auxNamespace}}
 {
 
 
@@ -30,7 +30,7 @@ namespace aux
 *  @brief
 *    Provisioning of meta information about OpenGL extensions, functions and conversion of strings and symbols of the OpenGL API
 */
-class {{api.identifier|upper}}BINDING_AUX_API Meta
+class {{binding.auxApiExport}} Meta
 {
 public:
     /**
@@ -58,7 +58,7 @@ public:
     *  @return
     *    The symbol identified through the bitfield string, 0 if failed
     */
-    static {{api.identifier}}::{{profile.bitfieldType}} getBitfield(const std::string & bitfield);
+    static {{api.identifier}}::{{binding.bitfieldType}} getBitfield(const std::string & bitfield);
     
     /**
     *  @brief
@@ -67,11 +67,11 @@ public:
     *  @return
     *    The list of all bitfields known by the {{profile.inputfile}}
     */
-    static std::vector<{{api.identifier}}::{{profile.bitfieldType}}> bitfields();
+    static std::vector<{{api.identifier}}::{{binding.bitfieldType}}> bitfields();
 
     /**
     *  @brief
-    *    Converts a {{profile.enumType}} to a string
+    *    Converts a {{binding.enumType}} to a string
     *
     *  @param[in] {{api.identifier}}enum
     *    The enum to convert
@@ -82,7 +82,7 @@ public:
     *  @remark
     *    Beware, that some enums in the OpenGL API have different symbol names but identical enum values and that this function cannot differentiate between them
     */
-    static const std::string & getString({{api.identifier}}::{{profile.enumType}} {{api.identifier}}enum);
+    static const std::string & getString({{api.identifier}}::{{binding.enumType}} {{api.identifier}}enum);
     
     /**
     *  @brief
@@ -94,7 +94,7 @@ public:
     *  @return
     *    The symbol identified through the enum string, 0 if failed
     */
-    static {{api.identifier}}::{{profile.enumType}} getEnum(const std::string & {{api.identifier}}enum);
+    static {{api.identifier}}::{{binding.enumType}} getEnum(const std::string & {{api.identifier}}enum);
     
     /**
     *  @brief
@@ -103,38 +103,38 @@ public:
     *  @return
     *    The list of all enums known by the {{profile.inputfile}}
     */
-    static std::vector<{{api.identifier}}::{{profile.enumType}}> enums();
+    static std::vector<{{api.identifier}}::{{binding.enumType}}> enums();
 
     /**
     *  @brief
-    *    Converts a {{profile.booleanType}} to a string
+    *    Converts a {{binding.booleanType}} to a string
     *
     *  @param[in] {{api.identifier}}boolean
     *    The boolean to convert
     *
     *  @return
-    *    A string representation of the {{profile.booleanType}} symbol name
+    *    A string representation of the {{binding.booleanType}} symbol name
     *
     *  @remark
     *    Can either be `{{api.identifier|upper}}_TRUE` or `{{api.identifier|upper}}_FALSE`
     */
-    static const std::string & getString(const {{api.identifier}}::{{profile.booleanType}} & {{api.identifier}}boolean);
+    static const std::string & getString(const {{api.identifier}}::{{binding.booleanType}} & {{api.identifier}}boolean);
     
     /**
     *  @brief
-    *    Converts a string to a {{profile.booleanType}} symbol
+    *    Converts a string to a {{binding.booleanType}} symbol
     *
     *  @param[in] boolean
-    *    The string representation of the {{profile.booleanType}}
+    *    The string representation of the {{binding.booleanType}}
     *
     *  @return
     *    The symbol identified through the boolean string, `{{api.identifier|upper}}_FALSE` if failed
     */
-    static {{api.identifier}}::{{profile.booleanType}} getBoolean(const std::string & boolean);
+    static {{api.identifier}}::{{binding.booleanType}} getBoolean(const std::string & boolean);
 
     /**
     *  @brief
-    *    Converts a {{profile.extensionType}} to its string representation
+    *    Converts a {{binding.extensionType}} to its string representation
     *
     *  @param[in] {{api.identifier}}extension
     *    The extension to convert
@@ -142,11 +142,11 @@ public:
     *  @return
     *    The string representation of the extension
     */
-    static const std::string & getString({{api.identifier}}::{{profile.extensionType}} {{api.identifier}}extension);
+    static const std::string & getString({{api.identifier}}::{{binding.extensionType}} {{api.identifier}}extension);
     
     /**
     *  @brief
-    *    Converts a string to an {{profile.extensionType}}
+    *    Converts a string to an {{binding.extensionType}}
     *
     *  @param[in] extension
     *    The string representation of the extension
@@ -154,7 +154,7 @@ public:
     *  @return
     *    The symbol identified through the extension string, 'UNKNOWN' if failed
     */
-    static {{api.identifier}}::{{profile.extensionType}} getExtension(const std::string & extension);
+    static {{api.identifier}}::{{binding.extensionType}} getExtension(const std::string & extension);
 
     /**
     *  @brief
@@ -163,7 +163,7 @@ public:
     *  @return
     *    The set of all extensions known by the {{profile.inputfile}}
     */
-    static std::set<{{api.identifier}}::{{profile.extensionType}}> extensions();
+    static std::set<{{api.identifier}}::{{binding.extensionType}}> extensions();
     
     /**
     *  @brief
@@ -178,7 +178,7 @@ public:
     *    The set of extensions that should be supported for the given version.
     *    All non-versioned extensions can be queried by providing the null version
     */
-    static const std::set<{{api.identifier}}::{{profile.extensionType}}> extensions(const Version & version);
+    static const std::set<{{api.identifier}}::{{binding.extensionType}}> extensions(const Version & version);
 
     /**
     *  @brief
@@ -190,7 +190,7 @@ public:
     *  @return
     *    The set of extensions that are requiring a function
     */
-    static const std::set<{{api.identifier}}::{{profile.extensionType}}> extensions(const std::string & {{api.identifier}}function);
+    static const std::set<{{api.identifier}}::{{binding.extensionType}}> extensions(const std::string & {{api.identifier}}function);
 
     /**
     *  @brief
@@ -229,7 +229,7 @@ public:
     *  @return
     *    The set of functions that are required for the extension
     */
-    static const std::set<AbstractFunction *> functions({{api.identifier}}::{{profile.extensionType}} extension);
+    static const std::set<AbstractFunction *> functions({{api.identifier}}::{{binding.extensionType}} extension);
 
     /**
     *  @brief
@@ -241,7 +241,7 @@ public:
     *  @return
     *    The first Version (Feature) that required the extension
     */
-    static const Version & version({{api.identifier}}::{{profile.extensionType}} {{api.identifier}}extension);
+    static const Version & version({{api.identifier}}::{{binding.extensionType}} {{api.identifier}}extension);
     
     /**
     *  @brief
@@ -284,4 +284,4 @@ private:
 };
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

@@ -6,14 +6,14 @@
 #include <set>
 #include <vector>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
 
-#include <{{api.identifier}}binding/ProcAddress.h>
-#include <{{api.identifier}}binding/FunctionCall.h>
-#include <{{api.identifier}}binding/CallbackMask.h>
+#include <{{binding.identifier}}/ProcAddress.h>
+#include <{{binding.identifier}}/FunctionCall.h>
+#include <{{binding.identifier}}/CallbackMask.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -26,7 +26,7 @@ class Binding;
 *    The AbstractFunction represents an OpenGL API function by its name
 *    and entry point after dynamic address resolution.
 */
-class {{api.identifier|upper}}BINDING_API AbstractFunction
+class {{binding.apiExport}} AbstractFunction
 {
     friend class Binding;
 public:
@@ -262,4 +262,4 @@ protected:
 };
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

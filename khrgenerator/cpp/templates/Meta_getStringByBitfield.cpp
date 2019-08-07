@@ -1,7 +1,7 @@
 
-#include <{{api.identifier}}binding-aux/Meta.h>
+#include <{{binding.identifier}}-aux/Meta.h>
 
-#include <{{api.identifier}}binding/{{api.identifier}}/bitfield.h>
+#include <{{binding.identifier}}/{{api.identifier}}/bitfield.h>
 
 #include "Meta_Maps.h"
 
@@ -19,7 +19,7 @@ const auto none = std::string{};
 } // namespace
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
@@ -36,4 +36,4 @@ const std::string & Meta::getString(const {{group.identifier}} {{api.identifier}
 }
 
 {% endfor %}
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

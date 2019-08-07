@@ -2,10 +2,10 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -15,7 +15,7 @@ namespace {{api.identifier}}binding
 *
 *    This class and its subclasses Value<T> are mainly used when callbacks of functions are used.
 */
-class {{api.identifier|upper}}BINDING_API AbstractValue
+class {{binding.apiExport}} AbstractValue
 {
 public:
     /**
@@ -32,4 +32,4 @@ public:
 };
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

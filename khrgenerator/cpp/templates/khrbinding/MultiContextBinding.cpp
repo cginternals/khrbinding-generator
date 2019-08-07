@@ -1,15 +1,15 @@
 
-#include <{{api.identifier}}binding/Binding.h>
+#include <{{binding.identifier}}/Binding.h>
 
 #include <cassert>
 #include <iostream>
 
-#include <{{api.identifier}}binding/State.h>
-#include <{{api.identifier}}binding/AbstractFunction.h>
-#include <{{api.identifier}}binding/getProcAddress.h>
+#include <{{binding.identifier}}/State.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
+#include <{{binding.identifier}}/getProcAddress.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -152,14 +152,14 @@ size_t Binding::size()
     return Binding::functions().size() + s_additionalFunctions().size();
 }
 
-void Binding::initialize(const {{api.identifier}}binding::GetProcAddress functionPointerResolver, const bool resolveFunctions)
+void Binding::initialize(const {{binding.identifier}}::GetProcAddress functionPointerResolver, const bool resolveFunctions)
 {
     initialize(0, functionPointerResolver, true, resolveFunctions);
 }
 
 void Binding::initialize(
     const ContextHandle context
-,   const {{api.identifier}}binding::GetProcAddress functionPointerResolver
+,   const {{binding.identifier}}::GetProcAddress functionPointerResolver
 ,   const bool _useContext
 ,   const bool _resolveFunctions)
 {
@@ -172,7 +172,7 @@ void Binding::initialize(
         if (s_firstGetProcAddress() == nullptr)
         {
             s_firstGetProcAddress() = functionPointerResolver == nullptr
-                ? {{api.identifier}}binding::getProcAddress
+                ? {{binding.identifier}}::getProcAddress
                 : functionPointerResolver;
         }
 
@@ -402,7 +402,7 @@ Binding::FunctionLogCallback & Binding::s_logCallback()
 
 int & Binding::s_pos()
 {
-    {{api.identifier|upper}}BINDING_THREAD_LOCAL int pos = 0;
+    {{binding.threadlocal}} int pos = 0;
     //static int pos = 0;
 
     return pos;
@@ -410,16 +410,16 @@ int & Binding::s_pos()
 
 ContextHandle & Binding::s_context()
 {
-    {{api.identifier|upper}}BINDING_THREAD_LOCAL ContextHandle context = 0;
+    {{binding.threadlocal}} ContextHandle context = 0;
     //static ContextHandle context = 0;
 
     return context;
 }
 
-{{api.identifier}}binding::GetProcAddress & Binding::s_getProcAddress()
+{{binding.identifier}}::GetProcAddress & Binding::s_getProcAddress()
 {
-    {{api.identifier|upper}}BINDING_THREAD_LOCAL {{api.identifier}}binding::GetProcAddress getProcAddress = nullptr;
-    //static {{api.identifier}}binding::GetProcAddress getProcAddress = nullptr;
+    {{binding.threadlocal}} {{binding.identifier}}::GetProcAddress getProcAddress = nullptr;
+    //static {{binding.identifier}}::GetProcAddress getProcAddress = nullptr;
 
     return getProcAddress;
 }
@@ -438,12 +438,12 @@ std::unordered_map<ContextHandle, int> & Binding::s_bindings()
     return bindings;
 }
 
-{{api.identifier}}binding::GetProcAddress & Binding::s_firstGetProcAddress()
+{{binding.identifier}}::GetProcAddress & Binding::s_firstGetProcAddress()
 {
-    static {{api.identifier}}binding::GetProcAddress getProcAddress = nullptr;
+    static {{binding.identifier}}::GetProcAddress getProcAddress = nullptr;
 
     return getProcAddress;
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

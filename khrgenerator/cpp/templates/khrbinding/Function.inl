@@ -6,26 +6,26 @@
 #include <functional>
 #include <cassert>
 
-#include <{{api.identifier}}binding/Value.h>
-#include <{{api.identifier}}binding/FunctionCall.h>
-#include <{{api.identifier}}binding/CallbackMask.h>
+#include <{{binding.identifier}}/Value.h>
+#include <{{binding.identifier}}/FunctionCall.h>
+#include <{{binding.identifier}}/CallbackMask.h>
 {% if profile.booleanWidth == "8" %}
-#include <{{api.identifier}}binding/Boolean8.h>
+#include <{{binding.identifier}}/Boolean8.h>
 {% else %}
-#include <{{api.identifier}}binding/Boolean32.h>
+#include <{{binding.identifier}}/Boolean32.h>
 {% endif %}
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
 template <typename ReturnType, typename... Arguments>
 struct BasicCallHelper
 {
-    inline static ReturnType call(const {{api.identifier}}binding::Function<ReturnType, Arguments...> * function, Arguments&&... arguments)
+    inline static ReturnType call(const {{binding.identifier}}::Function<ReturnType, Arguments...> * function, Arguments&&... arguments)
     {
-        return reinterpret_cast<typename {{api.identifier}}binding::Function<ReturnType, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
+        return reinterpret_cast<typename {{binding.identifier}}::Function<ReturnType, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
     }
 };
 
@@ -34,20 +34,20 @@ struct BasicCallHelper
 
 {% if profile.booleanWidth == "8" %}
 template <typename... Arguments>
-struct BasicCallHelper<{{api.identifier}}binding::Boolean8, Arguments...>
+struct BasicCallHelper<{{binding.identifier}}::Boolean8, Arguments...>
 {
-    inline static {{api.identifier}}binding::Boolean8 call(const {{api.identifier}}binding::Function<{{api.identifier}}binding::Boolean8, Arguments...> * function, Arguments&&... arguments)
+    inline static {{binding.identifier}}::Boolean8 call(const {{binding.identifier}}::Function<{{binding.identifier}}::Boolean8, Arguments...> * function, Arguments&&... arguments)
     {
-        return reinterpret_cast<typename {{api.identifier}}binding::Function<{{api.identifier}}binding::Boolean8::underlying_type, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
+        return reinterpret_cast<typename {{binding.identifier}}::Function<{{binding.identifier}}::Boolean8::underlying_type, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
     }
 };
 {% else %}
 template <typename... Arguments>
-struct BasicCallHelper<{{api.identifier}}binding::Boolean32, Arguments...>
+struct BasicCallHelper<{{binding.identifier}}::Boolean32, Arguments...>
 {
-    inline static {{api.identifier}}binding::Boolean32 call(const {{api.identifier}}binding::Function<{{api.identifier}}binding::Boolean32, Arguments...> * function, Arguments&&... arguments)
+    inline static {{binding.identifier}}::Boolean32 call(const {{binding.identifier}}::Function<{{binding.identifier}}::Boolean32, Arguments...> * function, Arguments&&... arguments)
     {
-        return reinterpret_cast<typename {{api.identifier}}binding::Function<{{api.identifier}}binding::Boolean32::underlying_type, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
+        return reinterpret_cast<typename {{binding.identifier}}::Function<{{binding.identifier}}::Boolean32::underlying_type, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
     }
 };
 {% endif %}
@@ -56,16 +56,16 @@ struct BasicCallHelper<{{api.identifier}}binding::Boolean32, Arguments...>
 template <typename ReturnType, typename... Arguments>
 struct FunctionHelper
 {
-    inline static ReturnType call(const {{api.identifier}}binding::Function<ReturnType, Arguments...> * function, Arguments&&... arguments)
+    inline static ReturnType call(const {{binding.identifier}}::Function<ReturnType, Arguments...> * function, Arguments&&... arguments)
     {
-        {{api.identifier}}binding::FunctionCall functionCall(function);
+        {{binding.identifier}}::FunctionCall functionCall(function);
 
-        if (function->isAnyEnabled({{api.identifier}}binding::CallbackMask::Parameters))
+        if (function->isAnyEnabled({{binding.identifier}}::CallbackMask::Parameters))
         {
-            functionCall.parameters = {{api.identifier}}binding::createValues(std::forward<Arguments>(arguments)...);
+            functionCall.parameters = {{binding.identifier}}::createValues(std::forward<Arguments>(arguments)...);
         }
 
-        if (function->isEnabled({{api.identifier}}binding::CallbackMask::Before))
+        if (function->isEnabled({{binding.identifier}}::CallbackMask::Before))
         {
             AbstractFunction::before(functionCall);
 
@@ -77,12 +77,12 @@ struct FunctionHelper
 
         auto value = BasicCallHelper<ReturnType, Arguments ...>::call(function, std::forward<Arguments>(arguments)...);
 
-        if (function->isAnyEnabled({{api.identifier}}binding::CallbackMask::ReturnValue))
+        if (function->isAnyEnabled({{binding.identifier}}::CallbackMask::ReturnValue))
         {
-            functionCall.returnValue = {{api.identifier}}binding::createValue(value);
+            functionCall.returnValue = {{binding.identifier}}::createValue(value);
         }
 
-        if (function->isEnabled({{api.identifier}}binding::CallbackMask::After))
+        if (function->isEnabled({{binding.identifier}}::CallbackMask::After))
         {
             AbstractFunction::after(functionCall);
 
@@ -92,7 +92,7 @@ struct FunctionHelper
             }
         }
 
-        if (function->isEnabled({{api.identifier}}binding::CallbackMask::Logging))
+        if (function->isEnabled({{binding.identifier}}::CallbackMask::Logging))
         {
             AbstractFunction::log(std::move(functionCall));
         }
@@ -105,16 +105,16 @@ struct FunctionHelper
 template <typename... Arguments>
 struct FunctionHelper<void, Arguments...>
 {
-    inline static void call(const {{api.identifier}}binding::Function<void, Arguments...> * function, Arguments&&... arguments)
+    inline static void call(const {{binding.identifier}}::Function<void, Arguments...> * function, Arguments&&... arguments)
     {
-        {{api.identifier}}binding::FunctionCall functionCall(function);
+        {{binding.identifier}}::FunctionCall functionCall(function);
 
-        if (function->isAnyEnabled({{api.identifier}}binding::CallbackMask::Parameters))
+        if (function->isAnyEnabled({{binding.identifier}}::CallbackMask::Parameters))
         {
-            functionCall.parameters = {{api.identifier}}binding::createValues(std::forward<Arguments>(arguments)...);
+            functionCall.parameters = {{binding.identifier}}::createValues(std::forward<Arguments>(arguments)...);
         }
 
-        if (function->isEnabled({{api.identifier}}binding::CallbackMask::Before))
+        if (function->isEnabled({{binding.identifier}}::CallbackMask::Before))
         {
             AbstractFunction::before(functionCall);
 
@@ -126,7 +126,7 @@ struct FunctionHelper<void, Arguments...>
 
         BasicCallHelper<void, Arguments ...>::call(function, std::forward<Arguments>(arguments)...);
 
-        if (function->isEnabled({{api.identifier}}binding::CallbackMask::After))
+        if (function->isEnabled({{binding.identifier}}::CallbackMask::After))
         {
             AbstractFunction::after(functionCall);
 
@@ -136,7 +136,7 @@ struct FunctionHelper<void, Arguments...>
             }
         }
 
-        if (function->isEnabled({{api.identifier}}binding::CallbackMask::Logging))
+        if (function->isEnabled({{binding.identifier}}::CallbackMask::Logging))
         {
             AbstractFunction::log(std::move(functionCall));
         }
@@ -271,4 +271,4 @@ void Function<ReturnType, Arguments...>::resizeStates(int count)
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

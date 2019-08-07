@@ -1,11 +1,11 @@
 
-#include <{{api.identifier}}binding-aux/types_to_string.h>
+#include <{{binding.identifier}}-aux/types_to_string.h>
 
 #include <ostream>
 #include <bitset>
 #include <sstream>
 
-#include <{{api.identifier}}binding/Version.h>
+#include <{{binding.identifier}}/Version.h>
 #include <{{api}}binding-aux/Meta.h>
 
 #include "types_to_string_private.h"
@@ -23,7 +23,7 @@
 {{/types.items}}
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -37,7 +37,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{enumType
 }
 
 /*template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{profile.bitfieldType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{binding.bitfieldType}}> & value)
 {
     std::stringstream ss;
     ss << "0x" << std::hex << static_cast<unsigned>(value.value());
@@ -47,7 +47,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{profile.
 }*/
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{profile.booleanType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{binding.booleanType}}> & value)
 {
     auto name = aux::Meta::getString(value.value());
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
@@ -114,4 +114,4 @@ std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

@@ -1,22 +1,22 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api.identifier}}binding/{{api.identifier}}/enum.h>
+#include <{{binding.identifier}}/{{api.identifier}}/enum.h>
 
 
 using namespace {{api.identifier}};
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
-const std::unordered_map<{{profile.enumType}}, std::string> Meta_StringsByEnum =
+const std::unordered_map<{{binding.enumType}}, std::string> Meta_StringsByEnum =
 {
 {%- for constant in constants|sort(attribute='identifier') %}
-    { {{profile.enumType}}::{{constant.identifier}}, "{{constant.identifier}}" }{% if not loop.last %},{% endif %}
+    { {{binding.enumType}}::{{constant.identifier}}, "{{constant.identifier}}" }{% if not loop.last %},{% endif %}
 {%- endfor %}
 };
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

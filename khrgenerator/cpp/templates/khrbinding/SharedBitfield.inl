@@ -2,7 +2,7 @@
 #pragma once
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -249,4 +249,4 @@ operator^=(Enum & a, ConvertibleEnum b)
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

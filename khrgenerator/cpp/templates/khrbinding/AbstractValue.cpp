@@ -1,8 +1,8 @@
 
-#include <{{api.identifier}}binding/AbstractValue.h>
+#include <{{binding.identifier}}/AbstractValue.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -15,4 +15,4 @@ AbstractValue::~AbstractValue()
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

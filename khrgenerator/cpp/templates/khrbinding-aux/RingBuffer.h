@@ -6,7 +6,7 @@
 #include <vector>
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
@@ -53,7 +53,7 @@ protected:
 };
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}
 
 
-#include <{{api.identifier}}binding-aux/RingBuffer.inl>
+#include <{{binding.identifier}}-aux/RingBuffer.inl>

@@ -5,13 +5,13 @@
 #include <vector>
 #include <memory>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
-#include <{{api.identifier}}binding/AbstractValue.h>
+#include <{{binding.identifier}}/AbstractValue.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -26,7 +26,7 @@ namespace {{api.identifier}}binding
 *    This class is mainly used when callbacks of OpenGL functions are used
 */
 template <typename T>
-class {{api.identifier|upper}}BINDING_TEMPLATE_API Value : public AbstractValue
+class {{binding.apiTemplateExport}} Value : public AbstractValue
 {
 public:
     /**
@@ -36,7 +36,7 @@ public:
     *  @param[in] value
     *    The value that should be printed later
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Value(const T & value);
+    {{binding.constexpr}} inline Value(const T & value);
 
     /**
     *  @brief
@@ -54,7 +54,7 @@ public:
     *  @return
     *    The value
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline T value() const;
+    {{binding.constexpr}} inline T value() const;
 
 protected:
     const T m_value; ///< The value
@@ -89,7 +89,7 @@ template <typename... Arguments>
 inline std::vector<std::unique_ptr<AbstractValue>> createValues(Arguments&&... arguments);
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}
 
 
-#include <{{api.identifier}}binding/Value.inl>
+#include <{{binding.identifier}}/Value.inl>

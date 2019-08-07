@@ -7,14 +7,14 @@
 #include <functional>
 #include <string>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
-#include <{{api.identifier}}binding/CallbackMask.h>
-#include <{{api.identifier}}binding/ProcAddress.h>
+#include <{{binding.identifier}}/CallbackMask.h>
+#include <{{binding.identifier}}/ProcAddress.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -26,7 +26,7 @@ using SimpleFunctionCallback = std::function<void(const AbstractFunction &)>;
 using FunctionCallback = std::function<void(const FunctionCall &)>;
 using FunctionLogCallback = std::function<void(FunctionCall *)>;
 
-{{ucbinding}}_API void initialize({{api.identifier}}binding::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
+{{ucbinding}}_API void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
 {{ucbinding}}_API void registerAdditionalFunction(AbstractFunction * function);
 {{ucbinding}}_API ProcAddress resolveFunction(const char * name);
 {{ucbinding}}_API void resolveFunctions();
@@ -47,4 +47,4 @@ using FunctionLogCallback = std::function<void(FunctionCall *)>;
 {{ucbinding}}_API void setLogCallback(FunctionLogCallback callback);
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

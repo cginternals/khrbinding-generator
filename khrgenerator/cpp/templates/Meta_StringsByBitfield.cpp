@@ -1,13 +1,13 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api.identifier}}binding/{{api.identifier}}/bitfield.h>
+#include <{{binding.identifier}}/{{api.identifier}}/bitfield.h>
 
 
 using namespace {{api.identifier}};
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
@@ -20,4 +20,4 @@ const std::unordered_map<{{group.identifier}}, std::string> Meta_StringsBy{{grou
 };
 
 {% endfor %}
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

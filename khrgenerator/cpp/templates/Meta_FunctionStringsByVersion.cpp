@@ -1,13 +1,13 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api.identifier}}binding/Version.h>
+#include <{{binding.identifier}}/Version.h>
 
 
 using namespace {{api.identifier}};
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
@@ -21,4 +21,4 @@ const std::map<Version, std::set<std::string>> Meta_FunctionStringsByVersion =
 };
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

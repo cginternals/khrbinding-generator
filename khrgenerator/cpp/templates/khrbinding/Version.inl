@@ -2,23 +2,23 @@
 #pragma once
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
-{{api.identifier|upper}}BINDING_CONSTEXPR Version::Version()
+{{binding.constexpr}} Version::Version()
 : m_major(0)
 , m_minor(0)
 {
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR Version::Version(unsigned char majorVersion, unsigned char minorVersion)
+{{binding.constexpr}} Version::Version(unsigned char majorVersion, unsigned char minorVersion)
 : m_major(majorVersion)
 , m_minor(minorVersion)
 {
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR Version::Version(const Version & version)
+{{binding.constexpr}} Version::Version(const Version & version)
 : Version(version.m_major, version.m_minor)
 {
 }
@@ -29,12 +29,12 @@ Version::Version(Version && version)
 }
 
 
-{{api.identifier|upper}}BINDING_CONSTEXPR unsigned char Version::majorVersion() const
+{{binding.constexpr}} unsigned char Version::majorVersion() const
 {
     return m_major;
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR unsigned char Version::minorVersion() const
+{{binding.constexpr}} unsigned char Version::minorVersion() const
 {
     return m_minor;
 }
@@ -63,7 +63,7 @@ std::string Version::toString() const
     return std::to_string(static_cast<int>(m_major)) + '.'  + std::to_string(static_cast<int>(m_minor));
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR bool Version::isNull() const
+{{binding.constexpr}} bool Version::isNull() const
 {
     return m_major == 0;
 }
@@ -84,39 +84,39 @@ Version & Version::operator=(Version && version)
     return *this;
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR bool Version::operator<(const Version & version) const
+{{binding.constexpr}} bool Version::operator<(const Version & version) const
 {
     return m_major < version.m_major
         || (m_major == version.m_major && m_minor < version.m_minor);
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR bool Version::operator>(const Version & version) const
+{{binding.constexpr}} bool Version::operator>(const Version & version) const
 {
     return m_major > version.m_major
         || (m_major == version.m_major && m_minor > version.m_minor);
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR bool Version::operator==(const Version & version) const
+{{binding.constexpr}} bool Version::operator==(const Version & version) const
 {
     return m_major == version.m_major
         && m_minor == version.m_minor;
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR bool Version::operator!=(const Version & version) const
+{{binding.constexpr}} bool Version::operator!=(const Version & version) const
 {
     return m_major != version.m_major
         || m_minor != version.m_minor;
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR bool Version::operator>=(const Version & version) const
+{{binding.constexpr}} bool Version::operator>=(const Version & version) const
 {
     return *this > version || *this == version;
 }
 
-{{api.identifier|upper}}BINDING_CONSTEXPR bool Version::operator<=(const Version & version) const
+{{binding.constexpr}} bool Version::operator<=(const Version & version) const
 {
     return *this < version || *this == version;
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

@@ -12,7 +12,7 @@ struct ValueAdder;
 template <>
 struct ValueAdder<>
 {
-    inline static void add(std::vector<std::unique_ptr<{{api.identifier}}binding::AbstractValue>> &)
+    inline static void add(std::vector<std::unique_ptr<{{binding.identifier}}::AbstractValue>> &)
     {
     }
 };
@@ -20,15 +20,15 @@ struct ValueAdder<>
 template <typename Argument, typename... Arguments>
 struct ValueAdder<Argument, Arguments...>
 {
-    inline static void add(std::vector<std::unique_ptr<{{api.identifier}}binding::AbstractValue>> & values, Argument value, Arguments&&... rest)
+    inline static void add(std::vector<std::unique_ptr<{{binding.identifier}}::AbstractValue>> & values, Argument value, Arguments&&... rest)
     {
-        values.push_back({{api.identifier}}binding::createValue<Argument>(value));
+        values.push_back({{binding.identifier}}::createValue<Argument>(value));
         ValueAdder<Arguments...>::add(values, std::forward<Arguments>(rest)...);
     }
 };
 
 template <typename... Arguments>
-inline void addValuesTo(std::vector<std::unique_ptr<{{api.identifier}}binding::AbstractValue>> & values, Arguments&&... arguments)
+inline void addValuesTo(std::vector<std::unique_ptr<{{binding.identifier}}::AbstractValue>> & values, Arguments&&... arguments)
 {
     ValueAdder<Arguments...>::add(values, std::forward<Arguments>(arguments)...);
 }
@@ -37,18 +37,18 @@ inline void addValuesTo(std::vector<std::unique_ptr<{{api.identifier}}binding::A
 } // namespace
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
 template <typename T>
-{{api.identifier|upper}}BINDING_CONSTEXPR Value<T>::Value(const T & value)
+{{binding.constexpr}} Value<T>::Value(const T & value)
 : m_value(value)
 {
 }
 
 template <typename T>
-{{api.identifier|upper}}BINDING_CONSTEXPR T Value<T>::value() const
+{{binding.constexpr}} T Value<T>::value() const
 {
     return m_value;
 }
@@ -69,4 +69,4 @@ std::vector<std::unique_ptr<AbstractValue>> createValues(Arguments&&... argument
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

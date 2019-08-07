@@ -1,12 +1,12 @@
 
-#include <{{api.identifier}}binding/FunctionCall.h>
+#include <{{binding.identifier}}/FunctionCall.h>
 
-#include <{{api.identifier}}binding/AbstractFunction.h>
-#include <{{api.identifier}}binding/AbstractValue.h>
-#include <{{api.identifier}}binding/CallbackMask.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
+#include <{{binding.identifier}}/AbstractValue.h>
+#include <{{binding.identifier}}/CallbackMask.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -43,4 +43,4 @@ FunctionCall & FunctionCall::operator=(FunctionCall && other)
 }
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

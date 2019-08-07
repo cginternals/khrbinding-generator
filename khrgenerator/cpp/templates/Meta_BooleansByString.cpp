@@ -1,17 +1,17 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api.identifier}}binding/{{api.identifier}}/boolean.h>
+#include <{{binding.identifier}}/{{api.identifier}}/boolean.h>
 
 
 using namespace {{api.identifier}};
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
-const std::unordered_map<std::string, {{profile.booleanType}}> Meta_BooleansByString =
+const std::unordered_map<std::string, {{binding.booleanType}}> Meta_BooleansByString =
 {
 {%- for boolean in booleans|sort(attribute='identifier') %}
     { "{{boolean.identifier}}", {{api.identifier}}::{{boolean.identifier}} }{% if not loop.last %},{% endif %}
@@ -19,4 +19,4 @@ const std::unordered_map<std::string, {{profile.booleanType}}> Meta_BooleansBySt
 };
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

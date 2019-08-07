@@ -2,13 +2,13 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
 
-#include <{{api.identifier}}binding/ProcAddress.h>
-#include <{{api.identifier}}binding/CallbackMask.h>
+#include <{{binding.identifier}}/ProcAddress.h>
+#include <{{binding.identifier}}/CallbackMask.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -17,7 +17,7 @@ namespace {{api.identifier}}binding
 *    The State struct represents the configuration of a single OpenGL function for one thread.
 *    This includes the driver function pointer (is allowed to differ between contexts) and the callback mask
 */
-class {{api.identifier|upper}}BINDING_API AbstractState
+class {{binding.apiExport}} AbstractState
 {
 public:
     /**
@@ -93,4 +93,4 @@ protected:
 };
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

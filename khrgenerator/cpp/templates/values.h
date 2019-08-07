@@ -2,10 +2,10 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
-#include <{{api.identifier}}binding/no{{api.identifier}}.h>
-#include <{{api.identifier}}binding/{{api.identifier}}/types.h>
+#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/{{api.identifier}}/types.h>
 
 
 namespace {{api.identifier}}
@@ -13,7 +13,7 @@ namespace {{api.identifier}}
 
 
 {% for constant in values.values -%}
-{{api.identifier|upper}}BINDING_CONSTEXPR static const {{constant.type.identifier}} {{constant.identifier}} = {{constant.value}};
+{{binding.constexpr}} static const {{constant.type.identifier}} {{constant.identifier}} = {{constant.value}};
 {% endfor %}
 
 } // namespace {{api.identifier}}

@@ -4,10 +4,10 @@
 
 #include <functional>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -24,4 +24,4 @@ using ProcAddress = void(*)();
 using GetProcAddress = std::function<ProcAddress(const char*)>;
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

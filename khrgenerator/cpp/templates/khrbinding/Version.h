@@ -6,11 +6,11 @@
 #include <set>
 #include <utility>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -30,14 +30,14 @@ namespace {{api.identifier}}binding
 *  }
 *  @endcode
 */
-class {{api.identifier|upper}}BINDING_TEMPLATE_API Version
+class {{binding.apiTemplateExport}} Version
 {
 public:
     /**
     *  @brief
     *    Default constructor, resulting in an invalid Version object
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Version();
+    {{binding.constexpr}} inline Version();
 
     /**
     *  @brief
@@ -48,7 +48,7 @@ public:
     *  @param[in] minorVersion
     *    The minor version
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Version(unsigned char majorVersion, unsigned char minorVersion);
+    {{binding.constexpr}} inline Version(unsigned char majorVersion, unsigned char minorVersion);
 
     /**
     *  @brief
@@ -57,7 +57,7 @@ public:
     *  @param[in] version
     *    The Version the data is used from
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Version(const Version & version);
+    {{binding.constexpr}} inline Version(const Version & version);
 
     /**
     *  @brief
@@ -75,7 +75,7 @@ public:
     *  @return
     *    The major version
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline unsigned char majorVersion() const;
+    {{binding.constexpr}} inline unsigned char majorVersion() const;
 
     /**
     *  @brief
@@ -84,7 +84,7 @@ public:
     *  @return
     *    The minor version
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline unsigned char minorVersion() const;
+    {{binding.constexpr}} inline unsigned char minorVersion() const;
 
     /**
     *  @brief
@@ -123,7 +123,7 @@ public:
     *  @remark
     *    This method can be used to check if this Version was constructed using the default constructor or is otherwise malformed
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool isNull() const;
+    {{binding.constexpr}} inline bool isNull() const;
 
     /**
     *  @brief
@@ -159,7 +159,7 @@ public:
     *  @return
     *    `true` if this Version is lower than the other Version, else `false`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator<(const Version & version) const;
+    {{binding.constexpr}} inline bool operator<(const Version & version) const;
 
     /**
     *  @brief
@@ -171,7 +171,7 @@ public:
     *  @return
     *    `true` if this Version is greater than the other Version, else `false`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator>(const Version & version) const;
+    {{binding.constexpr}} inline bool operator>(const Version & version) const;
 
     /**
     *  @brief
@@ -183,7 +183,7 @@ public:
     *  @return
     *    `true` if this Version is equal to the other Version, else `false`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator==(const Version & version) const;
+    {{binding.constexpr}} inline bool operator==(const Version & version) const;
 
     /**
     *  @brief
@@ -195,7 +195,7 @@ public:
     *  @return
     *    `true` if this Version is not equal to the other Version, else `false`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator!=(const Version & version) const;
+    {{binding.constexpr}} inline bool operator!=(const Version & version) const;
 
     /**
     *  @brief
@@ -207,7 +207,7 @@ public:
     *  @return
     *    `true` if this Version is greater than or equal to the other Version, else `false`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator>=(const Version & version) const;
+    {{binding.constexpr}} inline bool operator>=(const Version & version) const;
 
     /**
     *  @brief
@@ -219,7 +219,7 @@ public:
     *  @return
     *    `true` if this Version is lower than or equal to the other Version, else `false`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator<=(const Version & version) const;
+    {{binding.constexpr}} inline bool operator<=(const Version & version) const;
 
 
 protected:
@@ -228,7 +228,7 @@ protected:
 };
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}
 
 
-#include <{{api.identifier}}binding/Version.inl>
+#include <{{binding.identifier}}/Version.inl>

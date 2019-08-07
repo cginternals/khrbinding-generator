@@ -5,17 +5,17 @@
 #include <set>
 #include <utility>
 
-#include <{{api.identifier}}binding/Version.h>
+#include <{{binding.identifier}}/Version.h>
 
-#include <{{api.identifier}}binding-aux/{{api.identifier}}binding-aux_api.h>
-#include <{{api.identifier}}binding-aux/{{api.identifier}}binding-aux_features.h>
+#include <{{binding.identifier}}-aux/{{binding.identifier}}-aux_api.h>
+#include <{{binding.identifier}}-aux/{{binding.identifier}}-aux_features.h>
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
-class {{api.identifier|upper}}BINDING_AUX_API ValidVersions
+class {{binding.auxApiExport}} ValidVersions
 {
 public:
     /**
@@ -79,4 +79,4 @@ protected:
 };
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

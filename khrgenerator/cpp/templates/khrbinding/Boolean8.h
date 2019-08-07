@@ -4,11 +4,11 @@
 
 #include <functional>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -16,7 +16,7 @@ namespace {{api.identifier}}binding
 *  @brief
 *    Boolean type based on an 8-bit integer
 */
-class {{api.identifier|upper}}BINDING_API Boolean8
+class {{binding.apiExport}} Boolean8
 {
 public:
     using underlying_type = unsigned char; ///< Type used for storing the value
@@ -29,7 +29,7 @@ public:
     *  @remark
     *    The value is set to `false`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Boolean8();
+    {{binding.constexpr}} inline Boolean8();
 
     /**
     *  @brief
@@ -38,7 +38,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Boolean8(bool on);
+    {{binding.constexpr}} inline Boolean8(bool on);
 
     /**
     *  @brief
@@ -47,7 +47,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Boolean8(char on);
+    {{binding.constexpr}} inline Boolean8(char on);
 
     /**
     *  @brief
@@ -56,7 +56,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Boolean8(unsigned char on);
+    {{binding.constexpr}} inline Boolean8(unsigned char on);
 
     /**
     *  @brief
@@ -65,7 +65,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Boolean8(int on);
+    {{binding.constexpr}} inline Boolean8(int on);
 
     /**
     *  @brief
@@ -74,7 +74,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline Boolean8(unsigned int on);
+    {{binding.constexpr}} inline Boolean8(unsigned int on);
 
     /**
     *  @brief
@@ -83,7 +83,7 @@ public:
     *  @return
     *    %Value as `bool`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline explicit operator bool() const;
+    {{binding.constexpr}} inline explicit operator bool() const;
 
     /**
     *  @brief
@@ -92,7 +92,7 @@ public:
     *  @return
     *    %Value as `char`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline explicit operator char() const;
+    {{binding.constexpr}} inline explicit operator char() const;
 
     /**
     *  @brief
@@ -101,7 +101,7 @@ public:
     *  @return
     *    %Value as `unsigned char`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline explicit operator unsigned char() const;
+    {{binding.constexpr}} inline explicit operator unsigned char() const;
 
     /**
     *  @brief
@@ -110,7 +110,7 @@ public:
     *  @return
     *    %Value as `int`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline explicit operator int() const;
+    {{binding.constexpr}} inline explicit operator int() const;
 
     /**
     *  @brief
@@ -119,7 +119,7 @@ public:
     *  @return
     *    %Value as `unsigned int`
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline explicit operator unsigned int() const;
+    {{binding.constexpr}} inline explicit operator unsigned int() const;
 
     /**
     *  @brief
@@ -146,7 +146,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator<(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator<(const Boolean8 & other) const;
 
     /**
     *  @brief
@@ -161,7 +161,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator>(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator>(const Boolean8 & other) const;
 
     /**
     *  @brief
@@ -176,7 +176,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator<=(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator<=(const Boolean8 & other) const;
 
     /**
     *  @brief
@@ -191,7 +191,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator>=(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator>=(const Boolean8 & other) const;
 
     /**
     *  @brief
@@ -206,7 +206,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator==(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator==(const Boolean8 & other) const;
 
     /**
     *  @brief
@@ -221,7 +221,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{api.identifier|upper}}BINDING_CONSTEXPR inline bool operator!=(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator!=(const Boolean8 & other) const;
 
 public:
     underlying_type m_value; ///< %Value
@@ -231,4 +231,4 @@ public:
 } // namespace gl
 
 
-#include <{{api.identifier}}binding/Boolean8.inl>
+#include <{{binding.identifier}}/Boolean8.inl>

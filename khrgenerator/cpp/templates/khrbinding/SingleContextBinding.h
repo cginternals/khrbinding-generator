@@ -9,7 +9,7 @@
 #include <functional>
 #include <unordered_map>
 
-#ifdef {{api.identifier|upper}}BINDING_USE_BOOST_THREAD
+#ifdef {{binding.useboostthread}}
 #include <boost/thread.hpp>
 namespace std_boost = boost;
 #else
@@ -17,20 +17,20 @@ namespace std_boost = boost;
 namespace std_boost = std;
 #endif
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
-#include <{{api.identifier}}binding/AbstractFunction.h>
-#include <{{api.identifier}}binding/ContextHandle.h>
-#include <{{api.identifier}}binding/Function.h>
-#include <{{api.identifier}}binding/CallbackMask.h>
-#include <{{api.identifier}}binding/FunctionCall.h>
-#include <{{api.identifier}}binding/ProcAddress.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
+#include <{{binding.identifier}}/ContextHandle.h>
+#include <{{binding.identifier}}/Function.h>
+#include <{{binding.identifier}}/CallbackMask.h>
+#include <{{binding.identifier}}/FunctionCall.h>
+#include <{{binding.identifier}}/ProcAddress.h>
 
-#include <{{api.identifier}}binding/{{api}}/types.h>
+#include <{{binding.identifier}}/{{api}}/types.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -41,7 +41,7 @@ namespace {{api.identifier}}binding
 *  Additional features include binding initialization (even for multi-threaded environments), additional function registration,
 *  context switches (for multi-context environments) and basic reflection in form of accessors to the full list of functions
 */
-class {{api.identifier|upper}}BINDING_API Binding
+class {{binding.apiExport}} Binding
 {
 public:
     /**
@@ -86,7 +86,7 @@ public:
     *    A functionPointerResolver with value 'nullptr' will get initialized with the function
     *    pointer from the initial thread.
     */
-    static void initialize({{api.identifier}}binding::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
+    static void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
 
     /**
     *  @brief
@@ -288,9 +288,9 @@ protected:
     static FunctionCallback & s_beforeCallback();
     static FunctionCallback & s_afterCallback();
     static FunctionLogCallback & s_logCallback();
-    static {{api.identifier}}binding::GetProcAddress & s_getProcAddress();
+    static {{binding.identifier}}::GetProcAddress & s_getProcAddress();
     static std_boost::recursive_mutex & s_mutex();
 };
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}

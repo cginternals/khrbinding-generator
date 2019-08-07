@@ -7,7 +7,7 @@
 #include <cmath>
 
 
-namespace {{api.identifier}}binding { namespace aux
+namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 {
 
 
@@ -249,4 +249,4 @@ typename RingBuffer<T>::SizeType RingBuffer<T>::size(SizeType head, SizeType tai
 }
 
 
-} } // namespace {{api.identifier}}binding::aux
+} } // namespace {{binding.bindingAuxNamespace}}

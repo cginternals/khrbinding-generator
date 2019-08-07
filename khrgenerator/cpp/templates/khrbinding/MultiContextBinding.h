@@ -9,7 +9,7 @@
 #include <functional>
 #include <unordered_map>
 
-#ifdef {{api.identifier|upper}}BINDING_USE_BOOST_THREAD
+#ifdef {{binding.useboostthread}}
 #include <boost/thread.hpp>
 namespace std_boost = boost;
 #else
@@ -17,20 +17,20 @@ namespace std_boost = boost;
 namespace std_boost = std;
 #endif
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_api.h>
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
-#include <{{api.identifier}}binding/AbstractFunction.h>
-#include <{{api.identifier}}binding/ContextHandle.h>
-#include <{{api.identifier}}binding/Function.h>
-#include <{{api.identifier}}binding/CallbackMask.h>
-#include <{{api.identifier}}binding/FunctionCall.h>
-#include <{{api.identifier}}binding/ProcAddress.h>
+#include <{{binding.identifier}}/AbstractFunction.h>
+#include <{{binding.identifier}}/ContextHandle.h>
+#include <{{binding.identifier}}/Function.h>
+#include <{{binding.identifier}}/CallbackMask.h>
+#include <{{binding.identifier}}/FunctionCall.h>
+#include <{{binding.identifier}}/ProcAddress.h>
 
-#include <{{api.identifier}}binding/{{api}}/types.h>
+#include <{{binding.identifier}}/{{api}}/types.h>
 
 
-namespace {{api.identifier}}binding
+namespace {{binding.namespace}}
 {
 
 
@@ -41,7 +41,7 @@ namespace {{api.identifier}}binding
 *  Additional features include binding initialization (even for multi-threaded environments), additional function registration,
 *  context switches (for multi-context environments) and basic reflection in form of accessors to the full list of functions.
 */
-class {{api.identifier|upper}}BINDING_API Binding
+class {{binding.apiExport}} Binding
 {
 public:
     /**
@@ -80,7 +80,7 @@ public:
     *
     *  @param[in] functionPointerResolver
     *    A function pointer to resolve binding functions for this context.
-    *    If `nullptr` is passed for first time initialization, `{{api.identifier}}binding::getProcAddress` is used for convenience.
+    *    If `nullptr` is passed for first time initialization, `{{binding.identifier}}::getProcAddress` is used for convenience.
     *  @param[in] resolveFunctions (optional)
     *    Whether to resolve function pointers lazy (\a resolveFunctions = `false`) or immediately
     *
@@ -92,14 +92,14 @@ public:
     *    pointer from the initial thread.
     *
     *  @remark
-    *    Using {{api.identifier}}binding::getProcAddress is provided for convenience only. Please don't use this in new code.
+    *    Using {{binding.identifier}}::getProcAddress is provided for convenience only. Please don't use this in new code.
     *    Instead, use an external function resolution callback, e.g.,
     *     * wglGetProcAddress
     *     * glxGetProcAddress
     *     * glfwGetProcAddress
     *     * QOpenGlContext::getProcAddress
     */
-    static void initialize({{api.identifier}}binding::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
+    static void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
 
     /**
     *  @brief
@@ -118,7 +118,7 @@ public:
     *    A functionPointerResolver with value 'nullptr' will get initialized with the function
     *    pointer from the initial thread.
     */
-    static void initialize(ContextHandle context, {{api.identifier}}binding::GetProcAddress functionPointerResolver, bool useContext = true, bool resolveFunctions = true);
+    static void initialize(ContextHandle context, {{binding.identifier}}::GetProcAddress functionPointerResolver, bool useContext = true, bool resolveFunctions = true);
 
     /**
     *  @brief
@@ -146,7 +146,7 @@ public:
 
     /**
     *  @brief
-    *    Update the current context state in {{api.identifier}}binding
+    *    Update the current context state in {{binding.identifier}}
     *
     *  @remark
     *    This function queries the driver for the current OpenGL context
@@ -155,7 +155,7 @@ public:
 
     /**
     *  @brief
-    *    Update the current context state in {{api.identifier}}binding
+    *    Update the current context state in {{binding.identifier}}
     *
     *  @param[in] context
     *    The context handle of the context to set current
@@ -164,7 +164,7 @@ public:
 
     /**
     *  @brief
-    *    Removes the current context from the state of {{api.identifier}}binding
+    *    Removes the current context from the state of {{binding.identifier}}
     *
     *  @remark
     *    This function queries the driver for the current OpenGL context
@@ -173,7 +173,7 @@ public:
 
     /**
     *  @brief
-    *    Removes the current context from the state of {{api.identifier}}binding
+    *    Removes the current context from the state of {{binding.identifier}}
     *
     *  @param[in] context
     *    The context handle of the context to remove
@@ -490,11 +490,11 @@ protected:
     static FunctionLogCallback & s_logCallback();                           ///< Callback for logging a function call
     static int & s_pos();                                                   ///< Position of current State
     static ContextHandle & s_context();                                     ///< Handle of current context
-    static {{api.identifier}}binding::GetProcAddress & s_getProcAddress();                  ///< Current address of function resolution method
+    static {{binding.identifier}}::GetProcAddress & s_getProcAddress();                  ///< Current address of function resolution method
     static std_boost::recursive_mutex & s_mutex();                          ///< Mutex
     static std::unordered_map<ContextHandle, int> & s_bindings();           ///< Map (handle->position) of initialized contexts
-    static {{api.identifier}}binding::GetProcAddress & s_firstGetProcAddress();             ///< First address of function resolution method
+    static {{binding.identifier}}::GetProcAddress & s_firstGetProcAddress();             ///< First address of function resolution method
 };
 
 
-} // namespace {{api.identifier}}binding
+} // namespace {{binding.namespace}}
