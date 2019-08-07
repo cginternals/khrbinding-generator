@@ -302,6 +302,9 @@ class GLParser(XMLParser):
         binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
         binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
+
+        binding.platformIncludes = profile.platformIncludes
+        binding.additionalTypes = ""
         
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement

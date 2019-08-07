@@ -26,3 +26,4 @@ class Profile:
         self.booleanType = jsonObject["booleanType"]
         self.headerGuardMacro = jsonObject["headerGuardMacro"]
         self.headerReplacement = jsonObject["headerReplacement"]
+        self.platformIncludes = jsonObject["platformIncludes"]

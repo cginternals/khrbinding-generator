@@ -2,33 +2,33 @@
 #pragma once
 
 
-#include <{{api}}binding/no{{api}}.h>
-#include <{{api}}binding/{{api}}binding_api.h>
-#include <{{api}}binding/{{api}}binding_features.h>
-#include <{{api}}binding/{{api}}/boolean.h>
+#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
+#include <{{binding.identifier}}/{{api.identifier}}/boolean.h>
 
 #include <cstddef>
 #include <cstdint>
 #include <array>
-{{additionalTypeIncludes}}
-
 #include <string>
 
-
+{% for include in binding.platformIncludes -%}
+#include <{{include}}>
+{% endfor %}
 #ifdef _MSC_VER
-#define {{ucapi}}_APIENTRY __stdcall
+#define {{api.identifier|upper}}_APIENTRY __stdcall
 #else
-#define {{ucapi}}_APIENTRY
+#define {{api.identifier|upper}}_APIENTRY
 #endif
 
 
-namespace {{api}}
+namespace {{api.identifier}}
 {
 
-{{additionalTypes}}
-{{#types.items}}
-{{item.definition}}
-{{/types.items}}
+{{binding.additionalTypes}}
+{% for type in types %}
+{{type.definition}}
+{% endfor %}
 
 } // namespace {{api}}
 

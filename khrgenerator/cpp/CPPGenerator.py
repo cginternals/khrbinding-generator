@@ -49,7 +49,9 @@ class CPPGenerator:
         cls.render(template_engine, "values.h", includedir_api+"values.h", api=api, profile=profile, binding=binding,
             values=api.typeByIdentifier("SpecialValues")
         )
-#       cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,
+            types=api.types
+        )
         cls.render(template_engine, "bitfield.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,
             groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ],
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
