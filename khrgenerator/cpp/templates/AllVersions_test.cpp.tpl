@@ -1,9 +1,9 @@
 
 #include <gmock/gmock.h>
 
-{{#apiMemberSets.items}}
-#include <{{api}}binding/{{api}}{{item.memberSet}}/{{api}}.h>
-{{/apiMemberSets.items}}
+{% for version in versions|sort(attribute='identifier') %}
+#include <{{api.identifier}}binding/{{ version.identifier }}/{{api.identifier}}.h>
+{%- endfor %}
 
 
 TEST(AllVersions, Compilation)

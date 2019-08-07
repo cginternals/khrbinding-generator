@@ -4,6 +4,7 @@ import re
 from khrparser.XMLParser import XMLParser
 
 from khrapi.Version import Version
+from khrapi.FeatureSet import FeatureSet
 from khrapi.Extension import Extension
 
 from khrapi.Import import Import
@@ -176,7 +177,7 @@ class GLParser(XMLParser):
         # Versions
         for feature in registry.iter("feature"):
 
-            version = Version(api, feature.attrib["name"], feature.attrib["number"])
+            version = Version(api, feature.attrib["api"], feature.attrib["number"])
 
             for require in feature.findall("require"):
                 comment = require.attrib.get("comment", "")
@@ -258,6 +259,14 @@ class GLParser(XMLParser):
             
                 ungroupedType.values.append(constant)
                 constant.groups.append(ungroupedType)
+        
+        # Add generic Feature Sets
+        allFeatureSet = FeatureSet(api, "gl")
+        allFeatureSet.requiredExtensions = api.extensions
+        allFeatureSet.requiredFunctions = api.functions
+        allFeatureSet.requiredConstants = api.constants
+        allFeatureSet.requiredTypes = api.types
+        api.versions.append(allFeatureSet)
         
         return api
 

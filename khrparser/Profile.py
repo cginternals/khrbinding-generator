@@ -22,3 +22,5 @@ class Profile:
         self.extensionType = jsonObject["extensionType"]
         self.noneBitfieldValue = jsonObject["noneBitfieldValue"]
         self.enumType = jsonObject["enumType"]
+        self.bitfieldType = jsonObject["bitfieldType"]
+        self.booleanType = jsonObject["booleanType"]

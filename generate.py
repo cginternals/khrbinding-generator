@@ -57,6 +57,8 @@ def main(argv):
         print("Generator " + profile.generatorIdentifier + " not registered")
         sys.exit(1)
 
+    print("Start parsing")
+
     parseBegin = time.time()
 
     api = khrParser.parse(profile)
@@ -64,16 +66,18 @@ def main(argv):
     api = khrParser.patch(profile, api)
 
     parseEnd = time.time()
-    print("parsing took {:.3f} seconds".format(parseEnd - parseBegin))
+    print("Parsing took {:.3f} seconds".format(parseEnd - parseBegin))
     
     # api.printSummary()
+
+    print("Start generation")
 
     generateBegin = time.time()
 
     khrGenerator.generate(profile, api)
 
     generateEnd = time.time()
-    print("generation took {:.3f} seconds".format(generateEnd - generateBegin))
+    print("Generation took {:.3f} seconds".format(generateEnd - generateBegin))
 
 if __name__ == "__main__":
     main(sys.argv)

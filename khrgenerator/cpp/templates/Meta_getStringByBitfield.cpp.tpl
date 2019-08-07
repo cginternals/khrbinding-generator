@@ -1,12 +1,12 @@
 
-#include <{{api}}binding-aux/Meta.h>
+#include <{{api.identifier}}binding-aux/Meta.h>
 
-#include <{{api}}binding/{{api}}/bitfield.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/bitfield.h>
 
 #include "Meta_Maps.h"
 
 
-using namespace {{api}};
+using namespace {{api.identifier}};
 
 
 namespace
@@ -19,22 +19,21 @@ const auto none = std::string{};
 } // namespace
 
 
-namespace {{api}}binding { namespace aux
+namespace {{api.identifier}}binding { namespace aux
 {
 
 
-{{#bitfieldGroups.items}}
+{% for group in groups|sort(attribute='identifier') -%}
 
-const std::string & Meta::getString(const {{item}} bitfield)
+const std::string & Meta::getString(const {{group.identifier}} {{api.identifier}}bitfield)
 {
-    const auto i = Meta_StringsBy{{item}}.find(bitfield);
-    if (i != Meta_StringsBy{{item}}.end())
+    const auto i = Meta_StringsBy{{group.identifier}}.find({{api.identifier}}bitfield);
+    if (i != Meta_StringsBy{{group.identifier}}.end())
     {
         return i->second;
     }
     return none;
 }
 
-{{/bitfieldGroups.items}}
-
-} } // namespace {{api}}binding::aux
+{% endfor %}
+} } // namespace {{api.identifier}}binding::aux

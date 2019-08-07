@@ -8,14 +8,14 @@
 #include <set>
 #include <cstdint>
 
-#include <{{api}}binding-aux/{{api}}binding-aux_api.h>
-#include <{{api}}binding-aux/{{api}}binding-aux_features.h>
+#include <{{api.identifier}}binding-aux/{{api.identifier}}binding-aux_api.h>
+#include <{{api.identifier}}binding-aux/{{api.identifier}}binding-aux_features.h>
 
-#include <{{api}}binding/{{api}}/types.h>
-#include <{{api}}binding/AbstractFunction.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/types.h>
+#include <{{api.identifier}}binding/AbstractFunction.h>
 
 
-namespace {{api}}binding
+namespace {{api.identifier}}binding
 {
 
 
@@ -30,7 +30,7 @@ namespace aux
 *  @brief
 *    Provisioning of meta information about OpenGL extensions, functions and conversion of strings and symbols of the OpenGL API
 */
-class {{ucapi}}BINDING_AUX_API Meta
+class {{api.identifier|upper}}BINDING_AUX_API Meta
 {
 public:
     /**
@@ -41,12 +41,12 @@ public:
 
     /**
     *  @brief
-    *    Returns the revision of the parsed gl.xml file
+    *    Returns the revision of the parsed {{profile.inputfile}} file
     *
     *  @return
-    *    The revision of the parsed gl.xml file
+    *    The revision of the parsed {{profile.inputfile}} file
     */
-    static int {{api}}Revision();
+    static int {{api.identifier}}Revision();
 
     /**
     *  @brief
@@ -58,95 +58,95 @@ public:
     *  @return
     *    The symbol identified through the bitfield string, 0 if failed
     */
-    static {{api}}::{{bitfieldType}} getBitfield(const std::string & bitfield);
+    static {{api.identifier}}::{{profile.bitfieldType}} getBitfield(const std::string & bitfield);
     
     /**
     *  @brief
-    *    Returns the list of all bitfields known by the gl.xml
+    *    Returns the list of all bitfields known by the {{profile.inputfile}}
     *
     *  @return
-    *    The list of all bitfields known by the gl.xml
+    *    The list of all bitfields known by the {{profile.inputfile}}
     */
-    static std::vector<{{api}}::{{bitfieldType}}> bitfields();
+    static std::vector<{{api.identifier}}::{{profile.bitfieldType}}> bitfields();
 
     /**
     *  @brief
-    *    Converts a {{enumType}} to a string
+    *    Converts a {{profile.enumType}} to a string
     *
-    *  @param[in] enum
+    *  @param[in] {{api.identifier}}enum
     *    The enum to convert
     *
     *  @return
     *    A string representation of the GLenum symbol name
     *
-    *  @remarks
+    *  @remark
     *    Beware, that some enums in the OpenGL API have different symbol names but identical enum values and that this function cannot differentiate between them
     */
-    static const std::string & getString({{api}}::{{enumType}} {{api}}enum);
+    static const std::string & getString({{api.identifier}}::{{profile.enumType}} {{api.identifier}}enum);
     
     /**
     *  @brief
-    *    Converts a string to a enum symbol
+    *    Converts a string to an enum symbol
     *
-    *  @param[in] enum
+    *  @param[in] {{api.identifier}}enum
     *    The string representation of the enum
     *
     *  @return
     *    The symbol identified through the enum string, 0 if failed
     */
-    static {{api}}::{{enumType}} getEnum(const std::string & {{api}}enum);
+    static {{api.identifier}}::{{profile.enumType}} getEnum(const std::string & {{api.identifier}}enum);
     
     /**
     *  @brief
-    *    Returns the list of all enums known by the {{api}}.xml
+    *    Returns the list of all enums known by the {{profile.inputfile}}
     *
     *  @return
-    *    The list of all enums known by the {{api}}.xml
+    *    The list of all enums known by the {{profile.inputfile}}
     */
-    static std::vector<{{api}}::{{enumType}}> enums();
+    static std::vector<{{api.identifier}}::{{profile.enumType}}> enums();
 
     /**
     *  @brief
-    *    Converts a {{booleanType}} to a string
+    *    Converts a {{profile.booleanType}} to a string
     *
-    *  @param[in] boolean
+    *  @param[in] {{api.identifier}}boolean
     *    The boolean to convert
     *
     *  @return
-    *    A string representation of the {{booleanType}} symbol name
+    *    A string representation of the {{profile.booleanType}} symbol name
     *
-    *  @remarks
-    *    Can either be '{{ucapi}}_TRUE' or '{{ucapi}}_FALSE'
+    *  @remark
+    *    Can either be `{{api.identifier|upper}}_TRUE` or `{{api.identifier|upper}}_FALSE`
     */
-    static const std::string & getString(const {{api}}::{{booleanType}} & boolean);
+    static const std::string & getString(const {{api.identifier}}::{{profile.booleanType}} & {{api.identifier}}boolean);
     
     /**
     *  @brief
-    *    Converts a string to a {{booleanType}} symbol
+    *    Converts a string to a {{profile.booleanType}} symbol
     *
-    *  @param[in] glboolean
-    *    The string representation of the {{booleanType}}
+    *  @param[in] boolean
+    *    The string representation of the {{profile.booleanType}}
     *
     *  @return
-    *    The symbol identified through the boolean string, '{{ucapi}}_FALSE' if failed
+    *    The symbol identified through the boolean string, `{{api.identifier|upper}}_FALSE` if failed
     */
-    static {{api}}::{{booleanType}} getBoolean(const std::string & boolean);
+    static {{api.identifier}}::{{profile.booleanType}} getBoolean(const std::string & boolean);
 
     /**
     *  @brief
-    *    Converts a {{extensionType}} to its string representation
+    *    Converts a {{profile.extensionType}} to its string representation
     *
-    *  @param[in] extension
+    *  @param[in] {{api.identifier}}extension
     *    The extension to convert
     *
     *  @return
     *    The string representation of the extension
     */
-    static const std::string & getString({{api}}::{{extensionType}} extension);
+    static const std::string & getString({{api.identifier}}::{{profile.extensionType}} {{api.identifier}}extension);
     
     /**
     *  @brief
-    *    Converts a string to an extension
+    *    Converts a string to an {{profile.extensionType}}
     *
     *  @param[in] extension
     *    The string representation of the extension
@@ -154,16 +154,16 @@ public:
     *  @return
     *    The symbol identified through the extension string, 'UNKNOWN' if failed
     */
-    static {{api}}::{{extensionType}} getExtension(const std::string & extension);
+    static {{api.identifier}}::{{profile.extensionType}} getExtension(const std::string & extension);
 
     /**
     *  @brief
-    *    Returns the set of all extensions known by the {{api}}.xml
+    *    Returns the set of all extensions known by the {{profile.inputfile}}
     *
     *  @return
-    *    The set of all extensions known by the {{api}}.xml
+    *    The set of all extensions known by the {{profile.inputfile}}
     */
-    static std::set<{{api}}::{{extensionType}}> extensions();
+    static std::set<{{api.identifier}}::{{profile.extensionType}}> extensions();
     
     /**
     *  @brief
@@ -176,33 +176,33 @@ public:
     *
     *  @return
     *    The set of extensions that should be supported for the given version.
-    *    All non versioned extensions can be queried by providing the null version
+    *    All non-versioned extensions can be queried by providing the null version
     */
-    static const std::set<{{api}}::{{extensionType}}> extensions(const Version & version);
+    static const std::set<{{api.identifier}}::{{profile.extensionType}}> extensions(const Version & version);
 
     /**
     *  @brief
-    *    Returns the list of extensions that are requiring an OpenGL function
+    *    Returns the list of extensions that are requiring a function
     *
     *  @param[in] function
-    *    The name of the function, including the '{{api}}' prefix
+    *    The name of the function, including the '{{api.identifier}}' prefix
     *
     *  @return
-    *    The set of extensions that are requiring an OpenGL function
+    *    The set of extensions that are requiring a function
     */
-    static const std::set<{{api}}::{{extensionType}}> extensions(const std::string & {{api}}function);
+    static const std::set<{{api.identifier}}::{{profile.extensionType}}> extensions(const std::string & {{api.identifier}}function);
 
     /**
     *  @brief
-    *    Returns the list of features that are requiring an OpenGL function
+    *    Returns the list of features that are requiring a function
     *
     *  @param[in] function
-    *    The name of the function, including the '{{api}}' prefix
+    *    The name of the function, including the '{{api.identifier}}' prefix
     *
     *  @return
-    *    The set of features that are requiring an OpenGL function
+    *    The set of features that are requiring a function
     */
-    static const std::set<Version> versions(const std::string & {{api}}function);
+    static const std::set<Version> versions(const std::string & {{api.identifier}}function);
     
     /**
     *  @brief
@@ -214,7 +214,7 @@ public:
     *  @return
     *    The set of functions that are required for the version
     *
-    *  @remarks
+    *  @remark
     *    This is exclusive (preceeding versions are ignored)
     */
     static const std::set<AbstractFunction *> functions(const Version & version);
@@ -229,32 +229,33 @@ public:
     *  @return
     *    The set of functions that are required for the extension
     */
-    static const std::set<AbstractFunction *> functions({{api}}::{{extensionType}} extension);
+    static const std::set<AbstractFunction *> functions({{api.identifier}}::{{profile.extensionType}} extension);
 
     /**
     *  @brief
-    *    Returns the first OpenGL Version (Feature) that required the extension
+    *    Returns the first Version (Feature) that required the extension
     *
-    *  @param[in] extension
+    *  @param[in] {{api.identifier}}extension
     *    The extension
     *
     *  @return
-    *    The first {{ucapi}} Version (Feature) that required the extension
+    *    The first Version (Feature) that required the extension
     */
-    static const Version & version({{api}}::{{extensionType}} glextension);
+    static const Version & version({{api.identifier}}::{{profile.extensionType}} {{api.identifier}}extension);
     
     /**
     *  @brief
-    *    Returns the list of all Versions (Features) known by the {{api}}.xml
+    *    Returns the list of all Versions (Features) known by the {{profile.inputfile}}
     *
     *  @return
-    *    The list of all Versions (Features) known by the {{api}}.xml
+    *    The list of all Versions (Features) known by the {{profile.inputfile}}
     */
     static const std::set<Version> & versions();
 
-{{#bitfieldGroups.items}}
+{% for group in groups|sort(attribute='identifier') %}
     /**
-    *  @brief convert bitfield to symbol name string representation
+    *  @brief
+    *    Convert bitfield to symbol name string representation
     *
     *  @param[in] glbitfield
     *    The bitfield value
@@ -262,26 +263,25 @@ public:
     *  @return
     *    The string representation of the value
     */
-    static const std::string & getString({{api}}::{{item}} bitfield);
-
-{{/bitfieldGroups.items}}
+    static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}bitfield);
+{% endfor %}
 
 private:
     /**
     *  @brief
-    *    Returns the bucket index of an OpenGL identifier used for the actual lookup into the compile-time maps
+    *    Returns the bucket index of an identifier used for the actual lookup into the compile-time maps
     *
     *  @param[in] identifier
     *    The identifier for the bucket lookup
     *
     *  @param[in] prefixLength
-    *    The length of the prefix (e.g., '{{api}}' or '{{ucapi}}_') to omit to get the actual first character of the identifier
+    *    The length of the prefix (e.g., '{{api.identifier}}' or '{{api.identifier|upper}}_') to omit to get the actual first character of the identifier
     *
     *  @return
-    *    The bucket index of an OpenGL identifier
+    *    The bucket index of an identifier
     */
     static size_t alphabeticalGroupIndex(const std::string & identifier, std::uint8_t prefixLength);
 };
 
 
-} } // namespace {{api}}binding::aux
+} } // namespace {{api.identifier}}binding::aux

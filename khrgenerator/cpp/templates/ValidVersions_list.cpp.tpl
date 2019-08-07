@@ -1,12 +1,13 @@
 
-#include <{{api}}binding-aux/ValidVersions.h>
+#include <{{api.identifier}}binding-aux/ValidVersions.h>
 
 
-const std::set<{{binding}}::Version> {{binding}}::aux::ValidVersions::s_validVersions =
+const std::set<{{api.identifier}}binding::Version> {{api.identifier}}binding::aux::ValidVersions::s_validVersions =
 {
-{{#features.items}}
-    { {{item.major}}, {{item.minor}} }{{^last}},{{/last}}
-{{/features.items}}
+{%- for version in versions %}
+    { {{version.majorVersion}}, {{version.minorVersion}} }{% if not loop.last %},{% endif %}
+{%- endfor %}
 };
 
-const {{binding}}::Version {{binding}}::aux::ValidVersions::s_latest { {{latestFeature.major}}, {{latestFeature.minor}} };
+{% set latestVersion = versions[-1] -%}
+const {{api.identifier}}binding::Version {{api.identifier}}binding::aux::ValidVersions::s_latest { {{latestVersion.majorVersion}}, {{latestVersion.minorVersion}} };

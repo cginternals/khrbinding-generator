@@ -1,26 +1,23 @@
 
 #include "Meta_Maps.h"
 
-#include <{{api}}binding/{{api}}/bitfield.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/bitfield.h>
 
 
-using namespace {{api}};
+using namespace {{api.identifier}};
 
 
-namespace {{api}}binding { namespace aux
+namespace {{api.identifier}}binding { namespace aux
 {
 
 
-{{#bitfieldsByGroup.groups}}
-const std::unordered_map<{{name}}, std::string> Meta_StringsBy{{name}} =
+{% for group in groups|sort(attribute='identifier') -%}
+const std::unordered_map<{{group.identifier}}, std::string> Meta_StringsBy{{group.identifier}} =
 {
-{{#items}}
-    { {{name}}::{{item.identifier}}, "{{item.name}}" }{{^last}},{{/last}}
-{{/items}}
+{%- for value in group.values|sort(attribute='identifier') %}
+    { {{group.identifier}}::{{value.identifier}}, "{{value.identifier}}" }{% if not loop.last %},{% endif %}
+{%- endfor %}
 };
 
-
-{{/bitfieldsByGroup.groups}}
-
-
-} } // namespace {{api}}binding::aux
+{% endfor %}
+} } // namespace {{api.identifier}}binding::aux

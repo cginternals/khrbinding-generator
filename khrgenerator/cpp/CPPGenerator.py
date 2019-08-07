@@ -8,10 +8,18 @@ from jinja2 import Environment, PackageLoader, Template
 
 from khrapi.BitfieldGroup import BitfieldGroup
 from khrapi.Enumerator import Enumerator
-
-# execDir = os.path.dirname(os.path.abspath(sys.argv[0])) + "/"
+from khrapi.Version import Version
 
 class CPPGenerator:
+
+    @classmethod
+    def render(cls, engine, template, target, **kwargs):
+        templateFilename = Template(template).render(**kwargs)
+        targetFilename = Template(target).render(**kwargs)
+        print("Generate %s" % (targetFilename))
+        t = engine.get_template(templateFilename)
+        t.stream(**kwargs).dump(targetFilename)
+
     @classmethod
     def generate(cls, profile, api):
         baseNamespace = profile.baseNamespace
@@ -59,15 +67,30 @@ class CPPGenerator:
         # cls.render(template_engine, "functions.h.tpl", includedir_api+"functions.h", api=api, profile=profile,
         #     functions=[ function for function in api.functions ]
         # )
-        cls.render(template_engine, "{{profile.baseNamespace}}.h.tpl", includedir_api+"{{profile.baseNamespace}}.h", api=api, profile=profile)
+        # cls.render(template_engine, "{{profile.baseNamespace}}.h.tpl", includedir_api+"{{profile.baseNamespace}}.h", api=api, profile=profile)
 
-        #Generator.generate(generalContext, pjoin(testdir, "AllVersions_test.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "ValidVersions_list.cpp"))
+        # cls.render(template_engine, "AllVersions_test.cpp.tpl", testdir+"AllVersions_test.cpp", api=api, profile=profile,
+        #     versions=api.versions
+        # )
+        # cls.render(template_engine, "ValidVersions_list.cpp.tpl", sourcedir_aux+"ValidVersions_list.cpp", api=api, profile=profile,
+        #     versions=[ version for version in api.versions if isinstance(version, Version) ]
+        # )
 
-        #Generator.generate(generalContext, pjoin(includedir_aux, "Meta.h"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_Maps.h"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_getStringByBitfield.cpp"))
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_StringsByBitfield.cpp"))
+        # cls.render(template_engine, "Meta.h.tpl", includedir_aux+"Meta.h", api=api, profile=profile,
+        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        # )
+        # cls.render(template_engine, "Meta_Maps.h.tpl", sourcedir_aux+"Meta_Maps.h", api=api, profile=profile,
+        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        # )
+        # cls.render(template_engine, "Meta_getStringByBitfield.cpp.tpl", sourcedir_aux+"Meta_getStringByBitfield.cpp", api=api, profile=profile,
+        #     groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        # )
+        cls.render(template_engine, "Meta_StringsByBitfield.cpp.tpl", sourcedir_aux+"Meta_StringsByBitfield.cpp", api=api, profile=profile,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+
+        # TODO
+
         #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_BitfieldsByString.cpp"))
         #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_StringsByBoolean.cpp"))
         #Generator.generate(generalContext, pjoin(sourcedir_aux, "Meta_BooleansByString.cpp"))
@@ -167,8 +190,3 @@ class CPPGenerator:
         #    Generator.generate(specificContext, pjoin(includedir_api, "enum.h"), "enumF.h")
         #    Generator.generate(specificContext, pjoin(includedir_api, "functions.h"), "functionsF.h")
         #    Generator.generate(specificContext, pjoin(includedir_api, "{api}.h"), "{api}F.h")
-
-    @classmethod
-    def render(cls, engine, template, target, **kwargs):
-        t = engine.get_template(Template(template).render(**kwargs))
-        t.stream(**kwargs).dump(Template(target).render(**kwargs))
