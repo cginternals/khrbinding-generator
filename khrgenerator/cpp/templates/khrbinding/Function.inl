@@ -9,7 +9,7 @@
 #include <{{binding.identifier}}/Value.h>
 #include <{{binding.identifier}}/FunctionCall.h>
 #include <{{binding.identifier}}/CallbackMask.h>
-{% if profile.booleanWidth == "8" %}
+{% if binding.booleanWidth == 8 %}
 #include <{{binding.identifier}}/Boolean8.h>
 {% else %}
 #include <{{binding.identifier}}/Boolean32.h>
@@ -32,7 +32,7 @@ struct BasicCallHelper
 
 // Special case for booleans because of MSVC differing behavior
 
-{% if profile.booleanWidth == "8" %}
+{% if binding.booleanWidth == 8 %}
 template <typename... Arguments>
 struct BasicCallHelper<{{binding.identifier}}::Boolean8, Arguments...>
 {

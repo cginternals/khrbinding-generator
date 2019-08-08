@@ -133,12 +133,11 @@ class GLParser(XMLParser):
             for command in C.iter("command"):
                 protoTag = command.find("proto")
                 returnTypeTag = protoTag.find("ptype")
-                if returnTypeTag:
-                    print(returnTypeTag.text)
                 returnTypeName = returnTypeTag.text.strip() if returnTypeTag is not None else protoTag.text.strip()
                 name = protoTag.find("name").text.strip()
 
                 function = Function(api, name)
+                function.namespaceLessIdentifier = function.identifier[len(profile.lowercasePrefix):]
                 returnType = api.typeByIdentifier(returnTypeName)
                 if returnType is None:
                     returnType = NativeType(api, returnTypeName, returnTypeName)

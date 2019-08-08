@@ -96,7 +96,7 @@ class CPPGenerator:
             groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
         )
         cls.render(template_engine, "Meta_BitfieldsByString.cpp", sourcedir_aux+"Meta_BitfieldsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], 3)
+            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_StringsByBoolean.cpp", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile, binding=binding,
             booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
@@ -108,13 +108,13 @@ class CPPGenerator:
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
         )
         cls.render(template_engine, "Meta_EnumsByString.cpp", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ], 3)
+            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ], len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_StringsByExtension.cpp", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile, binding=binding,
             extensions=api.extensions
         )
         cls.render(template_engine, "Meta_ExtensionsByString.cpp", sourcedir_aux+"Meta_ExtensionsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, api.extensions, 3)
+            groups=cls.identifierPrefixGroups(api, api.extensions, len(profile.lowercasePrefix))
         )
         cls.render(template_engine, "Meta_ReqVersionsByExtension.cpp", sourcedir_aux+"Meta_ReqVersionsByExtension.cpp", api=api, profile=profile, binding=binding,
             extensionsInCore=api.extensionsByCoreVersion()
@@ -126,7 +126,7 @@ class CPPGenerator:
             versions=[ version for version in api.versions if isinstance(version, Version) ]
         )
         cls.render(template_engine, "Meta_ExtensionsByFunctionString.cpp", sourcedir_aux+"Meta_ExtensionsByFunctionString.cpp", api=api, profile=profile, binding=binding,
-            extensionsByFunction=cls.identifierPrefixGroupsDict(api, api.extensionsByFunction(), 2)
+            extensionsByFunction=cls.identifierPrefixGroupsDict(api, api.extensionsByFunction(), len(profile.lowercasePrefix))
         )
 
         ## KHR binding
@@ -176,24 +176,6 @@ class CPPGenerator:
         cls.render(template_engine, "khrbinding/Value.inl", includedir+"Value.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding/Version.h", includedir+"Version.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding/Version.inl", includedir+"Version.inl", api=api, profile=profile, binding=binding)
-
-        #Generator.generate(generalContext, pjoin(includedir, "AbstractFunction.h"), "khrbinding/AbstractFunction.h")
-        #Generator.generate(generalContext, pjoin(includedir, "AbstractState.h"), "khrbinding/AbstractState.h")
-        #Generator.generate(generalContext, pjoin(includedir, "AbstractValue.h"), "khrbinding/AbstractValue.h")
-        #Generator.generate(generalContext, pjoin(includedir, "CallbackMask.h"), "khrbinding/CallbackMask.h")
-        #Generator.generate(generalContext, pjoin(includedir, "CallbackMask.inl"), "khrbinding/CallbackMask.inl")
-        #Generator.generate(generalContext, pjoin(includedir, "ContextHandle.h"), "khrbinding/ContextHandle.h")
-        #Generator.generate(generalContext, pjoin(includedir, "Function.h"), "khrbinding/Function.h")
-        #Generator.generate(generalContext, pjoin(includedir, "Function.inl"), "khrbinding/Function.inl")
-        #Generator.generate(generalContext, pjoin(includedir, "FunctionCall.h"), "khrbinding/FunctionCall.h")
-        #Generator.generate(generalContext, pjoin(includedir, "ProcAddress.h"), "khrbinding/ProcAddress.h")
-        #Generator.generate(generalContext, pjoin(includedir, "SharedBitfield.h"), "khrbinding/SharedBitfield.h")
-        #Generator.generate(generalContext, pjoin(includedir, "SharedBitfield.inl"), "khrbinding/SharedBitfield.inl")
-        #Generator.generate(generalContext, pjoin(includedir, "State.h"), "khrbinding/State.h")
-        #Generator.generate(generalContext, pjoin(includedir, "Value.h"), "khrbinding/Value.h")
-        #Generator.generate(generalContext, pjoin(includedir, "Value.inl"), "khrbinding/Value.inl")
-        #Generator.generate(generalContext, pjoin(includedir, "Version.h"), "khrbinding/Version.h")
-        #Generator.generate(generalContext, pjoin(includedir, "Version.inl"), "khrbinding/Version.inl")
 
         #Generator.generate(generalContext, pjoin(sourcedir, "AbstractFunction.cpp"), "khrbinding/AbstractFunction.cpp")
         #Generator.generate(generalContext, pjoin(sourcedir, "AbstractState.cpp"), "khrbinding/AbstractState.cpp")

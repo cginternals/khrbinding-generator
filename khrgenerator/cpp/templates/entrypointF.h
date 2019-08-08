@@ -2,12 +2,12 @@
 #pragma once
 
 
-#include <{{api}}binding/no{{api}}.h>
+#include <{{api.identifer}}binding/no{{api.identifer}}.h>
 
-#include <{{api}}binding/{{api}}/extension.h>
-#include <{{api}}binding/{{api}}{{memberSet}}/types.h>
-#include <{{api}}binding/{{api}}{{memberSet}}/boolean.h>
-#include <{{api}}binding/{{api}}{{memberSet}}/values.h>
-#include <{{api}}binding/{{api}}{{memberSet}}/bitfield.h>
-#include <{{api}}binding/{{api}}{{memberSet}}/enum.h>
-#include <{{api}}binding/{{api}}{{memberSet}}/functions.h>
+#include <{{api.identifer}}binding/{{api.identifer}}/extension.h>
+#include <{{api.identifer}}binding/{{api.identifer}}{{memberSet}}/types.h>
+#include <{{api.identifer}}binding/{{api.identifer}}{{memberSet}}/boolean.h>
+#include <{{api.identifer}}binding/{{api.identifer}}{{memberSet}}/values.h>
+#include <{{api.identifer}}binding/{{api.identifer}}{{memberSet}}/bitfield.h>
+#include <{{api.identifer}}binding/{{api.identifer}}{{memberSet}}/enum.h>
+#include <{{api.identifer}}binding/{{api.identifer}}{{memberSet}}/functions.h>

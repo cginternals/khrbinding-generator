@@ -2,20 +2,20 @@
 #pragma once
 
 
-#include <{{api}}binding/no{{api}}.h>
+#include <{{api.identifer}}binding/no{{api.identifer}}.h>
 
-#include <{{api}}binding/{{api}}/boolean.h>
+#include <{{api.identifer}}binding/{{api.identifer}}/boolean.h>
 
 
-namespace {{api}}{{memberSet}}
+namespace {{api.identifer}}{{memberSet}}
 {
 
 
 // import booleans to namespace
 
 {{#booleans.items}}
-using {{api}}::{{item.identifier}};
+using {{api.identifer}}::{{item.identifier}};
 {{/booleans.items}}
 
 
-} // namespace {{api}}{{memberSet}}
+} // namespace {{api.identifer}}{{memberSet}}

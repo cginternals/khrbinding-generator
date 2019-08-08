@@ -12,7 +12,7 @@ namespace {{binding.namespace}}
 const Binding::array_t Binding::s_functions =
 {{ "{{" }}
 {%- for function in functions|sort(attribute='identifier') %}
-    &{{function.identifier}}{{ "," if not loop.last }}
+    &{{function.namespaceLessIdentifier}}{{ "," if not loop.last }}
 {%- endfor %}
 {{ "}}" }};
 

@@ -2,18 +2,18 @@
 #pragma once
 
 
-#include <{{api}}binding/no{{api}}.h>
+#include <{{api.identifer}}binding/no{{api.identifer}}.h>
 
-#include <{{api}}binding/{{api}}/bitfield.h>
+#include <{{api.identifer}}binding/{{api.identifer}}/bitfield.h>
 
 
-namespace {{api}}{{memberSet}}
+namespace {{api.identifer}}{{memberSet}}
 {
 
 
 // import bitfields to namespace
-{{#bitfields.multipleItems}}{{#bitfields.items}}using {{api}}::{{item.identifier}};
+{{#bitfields.multipleItems}}{{#bitfields.items}}using {{api.identifer}}::{{item.identifier}};
 {{/bitfields.items}}{{/bitfields.multipleItems}}{{! test for multiple items to avoid using GL_NONE_BIT alone}}
 
 
-} // namespace {{api}}{{memberSet}}
+} // namespace {{api.identifer}}{{memberSet}}

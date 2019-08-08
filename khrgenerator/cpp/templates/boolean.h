@@ -2,12 +2,12 @@
 #pragma once
 
 
-#include <{{api}}binding/no{{api}}.h>
+#include <{{api.identifer}}binding/no{{api.identifer}}.h>
 
-#include <{{api}}binding/{{api}}binding_features.h>
+#include <{{api.identifer}}binding/{{api.identifer}}binding_features.h>
 
 
-namespace {{api}}
+namespace {{api.identifer}}
 {
 
 
@@ -25,4 +25,4 @@ enum class GLboolean : unsigned char
 {{/booleans.items}}
 
 
-} // namespace {{api}}
+} // namespace {{api.identifer}}

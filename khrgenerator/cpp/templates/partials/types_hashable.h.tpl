@@ -4,11 +4,11 @@ namespace std
 
 
 template<>
-struct hash<{{api}}::{{identifier}}>
+struct hash<{{api.identifer}}::{{identifier}}>
 {
-    hash<std::underlying_type<{{api}}::{{identifier}}>::type>::result_type operator()(const {{api}}::{{identifier}} & t) const
+    hash<std::underlying_type<{{api.identifer}}::{{identifier}}>::type>::result_type operator()(const {{api.identifer}}::{{identifier}} & t) const
     {
-        return hash<std::underlying_type<{{api}}::{{identifier}}>::type>()(static_cast<std::underlying_type<{{api}}::{{identifier}}>::type>(t));
+        return hash<std::underlying_type<{{api.identifer}}::{{identifier}}>::type>()(static_cast<std::underlying_type<{{api.identifer}}::{{identifier}}>::type>(t));
     }
 };
 

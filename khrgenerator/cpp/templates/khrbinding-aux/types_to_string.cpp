@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include <{{binding.identifier}}/Version.h>
-#include <{{api}}binding-aux/Meta.h>
+#include <{{api.identifer}}binding-aux/Meta.h>
 
 #include "types_to_string_private.h"
 
@@ -28,7 +28,7 @@ namespace {{binding.namespace}}
 
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{enumType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{enumType}}> & value)
 {
     const auto name = aux::Meta::getString(value.value());
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
@@ -37,7 +37,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{enumType
 }
 
 /*template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{binding.bitfieldType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{binding.bitfieldType}}> & value)
 {
     std::stringstream ss;
     ss << "0x" << std::hex << static_cast<unsigned>(value.value());
@@ -47,7 +47,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{binding.
 }*/
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{binding.booleanType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{binding.booleanType}}> & value)
 {
     auto name = aux::Meta::getString(value.value());
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
@@ -57,25 +57,25 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{binding.
 
 {{#glapi}}
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::GLubyte *> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLubyte *> & value)
 {
-    auto s = {{api}}binding::aux::wrapString(reinterpret_cast<const char*>(value.value()));
+    auto s = {{api.identifer}}binding::aux::wrapString(reinterpret_cast<const char*>(value.value()));
     stream.write(s.c_str(), static_cast<std::streamsize>(s.size()));
 
     return stream;
 }
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::GLchar *> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLchar *> & value)
 {
-    auto s = {{api}}binding::aux::wrapString(reinterpret_cast<const char*>(value.value()));
+    auto s = {{api.identifer}}binding::aux::wrapString(reinterpret_cast<const char*>(value.value()));
     stream.write(s.c_str(), static_cast<std::streamsize>(s.size()));
 
     return stream;
 }
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::GLuint_array_2> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLuint_array_2> & value)
 {
     std::stringstream ss;
     ss << "{ " << value.value()[0] << ", " << value.value()[1] << " }";
@@ -100,9 +100,9 @@ std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
     }
 
 {{#glapi}}
-    if (typeid(*value) == typeid(Value<{{api}}::GLvoid *>))
+    if (typeid(*value) == typeid(Value<{{api.identifer}}::GLvoid *>))
     {
-        return stream << *reinterpret_cast<const Value<{{api}}::GLvoid *>*>(value);
+        return stream << *reinterpret_cast<const Value<{{api.identifer}}::GLvoid *>*>(value);
     }
 {{/glapi}}
 

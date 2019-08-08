@@ -1,13 +1,13 @@
 
 #include "../Binding_pch.h"
 
-#include <{{api}}binding/{{api}}/functions.h>
+#include <{{api.identifer}}binding/{{api.identifer}}/functions.h>
 
 
-using namespace {{api}}binding;
+using namespace {{api.identifer}}binding;
 
 
-namespace {{api}}
+namespace {{api.identifer}}
 {
 
 
@@ -19,4 +19,4 @@ namespace {{api}}
 {{/item}}{{/currentFunctionGroup.items}}
 
 
-} // namespace {{api}}
+} // namespace {{api.identifer}}

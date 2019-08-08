@@ -1,5 +1,5 @@
 
-namespace {{api}}
+namespace {{api.identifer}}
 {
 
 
@@ -14,4 +14,4 @@ namespace {{api}}
 }
 
 
-} // namespace {{api}}
+} // namespace {{api.identifer}}

@@ -8,7 +8,7 @@
 #include <{{binding.identifier}}-aux/{{binding.identifier}}-aux_api.h>
 #include <{{binding.identifier}}-aux/{{binding.identifier}}-aux_features.h>
 
-#include <{{binding.identifier}}/{{api}}/types.h>
+#include <{{binding.identifier}}/{{api.identifer}}/types.h>
 #include <{{binding.identifier}}/Value.h>
 
 
@@ -42,21 +42,21 @@ template <typename T>
 *    A specialized ostream operator for the gl::GLenum Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{enumType}}> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{enumType}}> & value);
 
 /**
 *  @brief
 *    A specialized ostream operator for the gl::GLbitfield Value template
 */
 /*template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{bitfieldType}}> & value);*/
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{bitfieldType}}> & value);*/
 
 /**
 *  @brief
 *    A specialized ostream operator for the gl::GLenum Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::{{booleanType}}> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{booleanType}}> & value);
 
 {{#glapi}}
 /**
@@ -64,21 +64,21 @@ template <>
 *    A specialized ostream operator for the gl::GLubyte * Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::GLubyte *> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLubyte *> & value);
 
 /**
 *  @brief
 *    A specialized ostream operator for the gl::GLchar * Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::GLchar *> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLchar *> & value);
 
 /**
 *  @brief
 *    A specialized ostream operator for the gl::GLuint_array_2 Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api}}::GLuint_array_2> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLuint_array_2> & value);
 {{/glapi}}
 
 /**

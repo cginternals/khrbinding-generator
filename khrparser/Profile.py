@@ -9,6 +9,9 @@ class Profile:
         self.parserIdentifier = jsonObject["parser"]
         self.generatorIdentifier = jsonObject["generator"]
 
+        self.lowercasePrefix = jsonObject["lowercasePrefix"]
+        self.uppercasePrefix = jsonObject["uppercasePrefix"]
+
         self.api = jsonObject["baseNamespace"]
         self.baseNamespace = jsonObject["baseNamespace"]
         self.inputfilepath = jsonObject["sourceFile"]

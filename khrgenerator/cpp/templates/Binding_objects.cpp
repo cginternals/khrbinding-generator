@@ -2,7 +2,7 @@
 #include "Binding_pch.h"
 
 
-using namespace {{api}};
+using namespace {{api.identifer}};
 
 
 namespace {{binding}}

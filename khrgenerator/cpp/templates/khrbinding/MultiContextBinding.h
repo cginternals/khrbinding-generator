@@ -446,7 +446,7 @@ public:
 
 public:
 {%- for function in functions|sort(attribute='identifier') %}
-    static Function<{{function.returnType.identifier}}{{ ", " if function.parameters|length > 0 }}{% for param in function.parameters %}{{ param.type.identifier }}{{ ", " if not loop.last }}{% endfor %}> {{function.identifier}}; ///< Wrapper for {{function.identifier}}
+    static Function<{{function.returnType.identifier}}{{ ", " if function.parameters|length > 0 }}{% for param in function.parameters %}{{ param.type.identifier }}{{ ", " if not loop.last }}{% endfor %}> {{function.namespaceLessIdentifier}}; ///< Wrapper for {{function.identifier}}
 {%- endfor %}
 
 
