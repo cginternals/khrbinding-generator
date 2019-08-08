@@ -1,22 +1,17 @@
 
 #include "../Binding_pch.h"
 
-#include <{{api.identifer}}binding/{{api.identifer}}/functions.h>
+#include <{{binding.identifier}}/{{api.identifier}}/functions.h>
 
 
-using namespace {{api.identifer}}binding;
-
-
-namespace {{api.identifer}}
+namespace {{api.identifier}}
 {
 
-
-{{#currentFunctionGroup.items}}{{#item}}{{>partials/general_type}} {{identifier}}({{>partials/general_params}})
+{% for function in functions %}
+{{function.returnType.identifier}} {{function.identifier}}({% for parameter in function.parameters %}{{parameter.type.identifier}} {{parameter.name}}{{ ", " if not loop.last }}{% endfor %})
 {
-    return Binding::{{identifierNoGl}}({{#params.items}}{{item.name}}{{^last}}, {{/last}}{{/params.items}});
+    return {{binding.namespace}}::Binding::{{function.namespaceLessIdentifier}}({% for parameter in function.parameters %}{{parameter.name}}{{ ", " if not loop.last }}{% endfor %});
 }
+{% endfor %}
 
-{{/item}}{{/currentFunctionGroup.items}}
-
-
-} // namespace {{api.identifer}}
+} // namespace {{api.identifier}}

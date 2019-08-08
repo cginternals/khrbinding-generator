@@ -2,8 +2,8 @@
 #pragma once
 
 
-#include <{{api.identifer}}binding/no{{api.identifer}}.h>
-#include <{{api.identifer}}binding/{{api.identifer}}/functions.h>
+#include <{{binding.identifer}}/no{{api.identifer}}.h>
+#include <{{binding.identifer}}/{{api.identifer}}/functions.h>
 
 
 namespace {{api.identifer}}{{memberSet}}

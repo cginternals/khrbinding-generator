@@ -204,16 +204,18 @@ class CPPGenerator:
         cls.render(template_engine, "khrbinding-aux/ValidVersions.h", includedir_aux+"ValidVersions.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/ValidVersions.cpp", sourcedir_aux+"ValidVersions.cpp", api=api, profile=profile, binding=binding)
 
-        ## Generate function-related files with specific contexts for each initial letter of the function name
-        #for functionGroup in generalContext["functionsByInitial"]["groups"]:
-        #    specificContext = generalContext.copy()
-        #    specificContext["currentFunctionGroup"] = functionGroup
-        #    specificContext["currentFunctionInitial"] = functionGroup["name"].lower()
+        # Caching source files
 
-        #    Generator.generate(specificContext, pjoin(sourcedir_api, "functions_{currentFunctionInitial}.cpp"),
-        #                       "functions.cpp")
-        #    Generator.generate(specificContext, pjoin(sourcedir, "Binding_objects_{currentFunctionInitial}.cpp"),
-        #                       "Binding_objects.cpp")
+        groupedFunctions = cls.identifierPrefixGroups(api, api.functions, len(profile.lowercasePrefix))
+        for prefix in cls.prefixes(api):
+            cls.render(template_engine, "functions.cpp", sourcedir_api+"functions_{{prefix}}.cpp", api=api, profile=profile, binding=binding,
+                prefix=prefix,
+                functions=groupedFunctions[prefix]
+            )
+            cls.render(template_engine, "Binding_objects.cpp", sourcedir+"Binding_objects_{{prefix}}.cpp", api=api, profile=profile, binding=binding,
+                prefix=prefix,
+                functions=groupedFunctions[prefix]
+            )
 
         ## Generate files with ApiMemberSet-specific contexts
         #for feature, core, ext in context.apiMemberSets():
@@ -228,17 +230,19 @@ class CPPGenerator:
         #    Generator.generate(specificContext, pjoin(includedir_api, "{api}.h"), "entrypointF.h")
 
     @classmethod
+    def prefixes(cls, api):
+        return [ "0" ] + [ chr(alpha) for alpha in range(ord('A'), ord('Z')+1) ]
+
+    @classmethod
     def identifierPrefixGroups(cls, api, values, lookupOffset):
-        result = { chr(alpha):[] for alpha in range(ord('A'), ord('Z')+1) }
-        result["0"] = []
+        result = { prefix:[] for prefix in cls.prefixes(api) }
         for value in values:
             result[value.identifier[lookupOffset].upper() if value.identifier[lookupOffset].isalpha() else '0'].append(value)
         return result
 
     @classmethod
     def identifierPrefixGroupsDict(cls, api, dictionary, lookupOffset):
-        result = { chr(alpha):{} for alpha in range(ord('A'), ord('Z')+1) }
-        result["0"] = {}
+        result = { prefix:{} for prefix in cls.prefixes(api) }
         for key, values in dictionary.items():
             result[key.identifier[lookupOffset].upper() if key.identifier[lookupOffset].isalpha() else '0'][key] = values
         return result

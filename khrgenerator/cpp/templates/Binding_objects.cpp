@@ -8,9 +8,8 @@ using namespace {{api.identifer}};
 namespace {{binding.namespace}}
 {
 
-
-{{#currentFunctionGroup.items}}{{#item}}Function<{{>partials/general_type}}{{^params.empty}}, {{>partials/general_paramSignature}}{{/params.empty}}> Binding::{{identifierNoGl}}("{{identifier}}");
-{{/item}}{{/currentFunctionGroup.items}}
-
+{% for function in functions %}
+Function<{{function.returnType.identifier}}{{ ", " if function.parameters|length > 0 }}{% for parameter in function.parameters %}{{parameter.type.identifier}}{{ ", " if not loop.last }}{% endfor %}> Binding::{{function.namespaceLessIdentifier}}("{{function.identifier}}");
+{% endfor %}
 
 } // namespace {{binding.namespace}}
