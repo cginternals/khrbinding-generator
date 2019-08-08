@@ -1,5 +1,5 @@
 
-#include <{{binding.identifier}}-aux/ValidVersions.h>
+#include <{{binding.bindingAuxIdentifier}}/ValidVersions.h>
 
 
 const std::set<{{binding.identifier}}::Version> {{binding.identifier}}::aux::ValidVersions::s_validVersions =

@@ -1,26 +1,35 @@
 
-#include <{{binding.identifier}}-aux/types_to_string.h>
+#include <{{binding.bindingAuxIdentifier}}/types_to_string.h>
 
 #include <ostream>
 #include <bitset>
 #include <sstream>
 
 #include <{{binding.identifier}}/Version.h>
-#include <{{api.identifer}}binding-aux/Meta.h>
+#include <{{binding.bindingAuxIdentifier}}/Meta.h>
 
 #include "types_to_string_private.h"
 
 
-{{#types.items}}
-{{#item.integrations.streamable}}
-{{#item}}{{>partials/types_streamable.cpp}}{{/item}}
+namespace {{api.identifier}}
+{
 
-{{/item.integrations.streamable}}
-{{#item.integrations.bitfieldStreamable}}
-{{#item}}{{>partials/types_bitfieldStreamable.cpp}}{{/item}}
+{% for group in enumerators|sort(attribute='identifier') %}
+std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value)
+{
+    stream << {{binding.bindingAuxNamespace}}::Meta::getString(value);
+    return stream;
+}
+{% endfor -%}
+{% for group in bitfields|sort(attribute='identifier') %}
+std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value)
+{
+    stream << {{binding.bindingAuxNamespace}}::bitfieldString<{{group.identifier}}>(value);
+    return stream;
+}
+{% endfor %}
 
-{{/item.integrations.bitfieldStreamable}}
-{{/types.items}}
+} // namespace {{api.identifier}}
 
 
 namespace {{binding.namespace}}
@@ -28,16 +37,16 @@ namespace {{binding.namespace}}
 
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{enumType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.enumType}}> & value)
 {
-    const auto name = aux::Meta::getString(value.value());
+    const auto & name = {{binding.auxNamespace}}::Meta::getString(value.value());
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
 
     return stream;
 }
 
 /*template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{binding.bitfieldType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.bitfieldType}}> & value)
 {
     std::stringstream ss;
     ss << "0x" << std::hex << static_cast<unsigned>(value.value());
@@ -47,43 +56,24 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::
 }*/
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::{{binding.booleanType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.booleanType}}> & value)
 {
-    auto name = aux::Meta::getString(value.value());
+    const auto & name = {{binding.auxNamespace}}::Meta::getString(value.value());
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
 
     return stream;
 }
 
-{{#glapi}}
+{% for cStringType in cStringTypes|sort %}
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLubyte *> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{cStringType}} *> & value)
 {
-    auto s = {{api.identifer}}binding::aux::wrapString(reinterpret_cast<const char*>(value.value()));
+    auto s = {{binding.auxNamespace}}::wrapString(reinterpret_cast<const char*>(value.value()));
     stream.write(s.c_str(), static_cast<std::streamsize>(s.size()));
 
     return stream;
 }
-
-template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLchar *> & value)
-{
-    auto s = {{api.identifer}}binding::aux::wrapString(reinterpret_cast<const char*>(value.value()));
-    stream.write(s.c_str(), static_cast<std::streamsize>(s.size()));
-
-    return stream;
-}
-
-template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifer}}::GLuint_array_2> & value)
-{
-    std::stringstream ss;
-    ss << "{ " << value.value()[0] << ", " << value.value()[1] << " }";
-    stream << ss.str();
-
-    return stream;
-}
-{{/glapi}}
+{% endfor %}
 
 std::ostream & operator<<(std::ostream & stream, const Version & version)
 {
@@ -98,17 +88,23 @@ std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
     {
         return stream << reinterpret_cast<const void*>(value);
     }
-
-{{#glapi}}
-    if (typeid(*value) == typeid(Value<{{api.identifer}}::GLvoid *>))
+{% for cPointerType in cPointerTypes|sort %}
+    if (typeid(*value) == typeid(Value<{{api.identifier}}::{{cPointerType}} *>))
     {
-        return stream << *reinterpret_cast<const Value<{{api.identifer}}::GLvoid *>*>(value);
+        return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{cPointerType}} *>*>(value);
     }
-{{/glapi}}
-
-{{#types.items}}
-{{#item}}{{>partials/types_value_output.cpp}}{{/item}}
-{{/types.items}}
+{% endfor %}
+{% for type in types|sort(attribute='identifier') %}
+    if (typeid(*value) == typeid(Value<{{api.identifier}}::{{type.identifier}}>))
+    {
+        return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{type.identifier}}>*>(value);
+    }
+    
+    if (typeid(*value) == typeid(Value<{{api.identifier}}::{{type.identifier}} *>))
+    {
+        return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{type.identifier}} *>*>(value);
+    }
+{% endfor %}
     // expect an AbstractValue with a pointer in first member
     return stream << *reinterpret_cast<const Value<void *>*>(value);
 }

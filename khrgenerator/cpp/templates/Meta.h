@@ -8,8 +8,8 @@
 #include <set>
 #include <cstdint>
 
-#include <{{binding.identifier}}-aux/{{binding.identifier}}-aux_api.h>
-#include <{{binding.identifier}}-aux/{{binding.identifier}}-aux_features.h>
+#include <{{binding.bindingAuxIdentifier}}/{{binding.bindingAuxIdentifier}}_api.h>
+#include <{{binding.bindingAuxIdentifier}}/{{binding.bindingAuxIdentifier}}_features.h>
 
 #include <{{binding.identifier}}/{{api.identifier}}/types.h>
 #include <{{binding.identifier}}/AbstractFunction.h>

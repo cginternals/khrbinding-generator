@@ -1,5 +1,5 @@
 
-#include <{{binding.identifier}}-aux/Meta.h>
+#include <{{binding.bindingAuxIdentifier}}/Meta.h>
 
 #include <{{binding.identifier}}/{{api.identifier}}/bitfield.h>
 

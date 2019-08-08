@@ -45,9 +45,8 @@ class CPPGenerator:
 
         # TEMPLATE APPLICATION
 
-        # Generate files with common context
+        # API binding
 
-        cls.render(template_engine, "revision.h", sourcedir_aux+"{{binding.baseNamespace}}revision.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "extension.h", includedir_api+"extension.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "values.h", includedir_api+"values.h", api=api, profile=profile, binding=binding,
             values=api.typeByIdentifier("SpecialValues")
@@ -79,59 +78,9 @@ class CPPGenerator:
         cls.render(template_engine, "AllVersions_test.cpp", testdir+"AllVersions_test.cpp", api=api, profile=profile, binding=binding,
             versions=api.versions
         )
-        cls.render(template_engine, "ValidVersions_list.cpp", sourcedir_aux+"ValidVersions_list.cpp", api=api, profile=profile, binding=binding,
-            versions=[ version for version in api.versions if isinstance(version, Version) ]
-        )
-
-        cls.render(template_engine, "Meta.h", includedir_aux+"Meta.h", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
-        )
-        cls.render(template_engine, "Meta_Maps.h", sourcedir_aux+"Meta_Maps.h", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
-        )
-        cls.render(template_engine, "Meta_getStringByBitfield.cpp", sourcedir_aux+"Meta_getStringByBitfield.cpp", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
-        )
-        cls.render(template_engine, "Meta_StringsByBitfield.cpp", sourcedir_aux+"Meta_StringsByBitfield.cpp", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
-        )
-        cls.render(template_engine, "Meta_BitfieldsByString.cpp", sourcedir_aux+"Meta_BitfieldsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], len(profile.uppercasePrefix))
-        )
-        cls.render(template_engine, "Meta_StringsByBoolean.cpp", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile, binding=binding,
-            booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
-        )
-        cls.render(template_engine, "Meta_BooleansByString.cpp", sourcedir_aux+"Meta_BooleansByString.cpp", api=api, profile=profile, binding=binding,
-            booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
-        )
-        cls.render(template_engine, "Meta_StringsByEnum.cpp", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile, binding=binding,
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
-        )
-        cls.render(template_engine, "Meta_EnumsByString.cpp", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ], len(profile.uppercasePrefix))
-        )
-        cls.render(template_engine, "Meta_StringsByExtension.cpp", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile, binding=binding,
-            extensions=api.extensions
-        )
-        cls.render(template_engine, "Meta_ExtensionsByString.cpp", sourcedir_aux+"Meta_ExtensionsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, api.extensions, len(profile.lowercasePrefix))
-        )
-        cls.render(template_engine, "Meta_ReqVersionsByExtension.cpp", sourcedir_aux+"Meta_ReqVersionsByExtension.cpp", api=api, profile=profile, binding=binding,
-            extensionsInCore=api.extensionsByCoreVersion()
-        )
-        cls.render(template_engine, "Meta_FunctionStringsByExtension.cpp", sourcedir_aux+"Meta_FunctionStringsByExtension.cpp", api=api, profile=profile, binding=binding,
-            extensions=api.extensions
-        )
-        cls.render(template_engine, "Meta_FunctionStringsByVersion.cpp", sourcedir_aux+"Meta_FunctionStringsByVersion.cpp", api=api, profile=profile, binding=binding,
-            versions=[ version for version in api.versions if isinstance(version, Version) ]
-        )
-        cls.render(template_engine, "Meta_ExtensionsByFunctionString.cpp", sourcedir_aux+"Meta_ExtensionsByFunctionString.cpp", api=api, profile=profile, binding=binding,
-            extensionsByFunction=cls.identifierPrefixGroupsDict(api, api.extensionsByFunction(), len(profile.lowercasePrefix))
-        )
+        cls.render(template_engine, "exclusion.h", includedir+"no{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding)
 
         ## KHR binding
-
-        cls.render(template_engine, "exclusion.h", includedir+"no{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding)
 
         if binding.multiContextBinding:
             cls.render(template_engine, "khrbinding/MultiContextBinding.h", includedir+"Binding.h", api=api, profile=profile, binding=binding,
@@ -185,17 +134,75 @@ class CPPGenerator:
 
         ## KHR binding AUX
 
+        cls.render(template_engine, "revision.h", sourcedir_aux+"{{binding.baseNamespace}}revision.h", api=api, profile=profile, binding=binding)
+
+        cls.render(template_engine, "ValidVersions_list.cpp", sourcedir_aux+"ValidVersions_list.cpp", api=api, profile=profile, binding=binding,
+            versions=[ version for version in api.versions if isinstance(version, Version) ]
+        )
+
+        cls.render(template_engine, "Meta.h", includedir_aux+"Meta.h", api=api, profile=profile, binding=binding,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+        cls.render(template_engine, "Meta_Maps.h", sourcedir_aux+"Meta_Maps.h", api=api, profile=profile, binding=binding,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+        cls.render(template_engine, "Meta_getStringByBitfield.cpp", sourcedir_aux+"Meta_getStringByBitfield.cpp", api=api, profile=profile, binding=binding,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+        cls.render(template_engine, "Meta_StringsByBitfield.cpp", sourcedir_aux+"Meta_StringsByBitfield.cpp", api=api, profile=profile, binding=binding,
+            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+        )
+        cls.render(template_engine, "Meta_BitfieldsByString.cpp", sourcedir_aux+"Meta_BitfieldsByString.cpp", api=api, profile=profile, binding=binding,
+            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], len(profile.uppercasePrefix))
+        )
+        cls.render(template_engine, "Meta_StringsByBoolean.cpp", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile, binding=binding,
+            booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
+        )
+        cls.render(template_engine, "Meta_BooleansByString.cpp", sourcedir_aux+"Meta_BooleansByString.cpp", api=api, profile=profile, binding=binding,
+            booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
+        )
+        cls.render(template_engine, "Meta_StringsByEnum.cpp", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile, binding=binding,
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
+        )
+        cls.render(template_engine, "Meta_EnumsByString.cpp", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile, binding=binding,
+            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ], len(profile.uppercasePrefix))
+        )
+        cls.render(template_engine, "Meta_StringsByExtension.cpp", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile, binding=binding,
+            extensions=api.extensions
+        )
+        cls.render(template_engine, "Meta_ExtensionsByString.cpp", sourcedir_aux+"Meta_ExtensionsByString.cpp", api=api, profile=profile, binding=binding,
+            groups=cls.identifierPrefixGroups(api, api.extensions, len(profile.lowercasePrefix))
+        )
+        cls.render(template_engine, "Meta_ReqVersionsByExtension.cpp", sourcedir_aux+"Meta_ReqVersionsByExtension.cpp", api=api, profile=profile, binding=binding,
+            extensionsInCore=api.extensionsByCoreVersion()
+        )
+        cls.render(template_engine, "Meta_FunctionStringsByExtension.cpp", sourcedir_aux+"Meta_FunctionStringsByExtension.cpp", api=api, profile=profile, binding=binding,
+            extensions=api.extensions
+        )
+        cls.render(template_engine, "Meta_FunctionStringsByVersion.cpp", sourcedir_aux+"Meta_FunctionStringsByVersion.cpp", api=api, profile=profile, binding=binding,
+            versions=[ version for version in api.versions if isinstance(version, Version) ]
+        )
+        cls.render(template_engine, "Meta_ExtensionsByFunctionString.cpp", sourcedir_aux+"Meta_ExtensionsByFunctionString.cpp", api=api, profile=profile, binding=binding,
+            extensionsByFunction=cls.identifierPrefixGroupsDict(api, api.extensionsByFunction(), len(profile.lowercasePrefix))
+        )
+
         cls.render(template_engine, "khrbinding-aux/RingBuffer.h", includedir_aux+"RingBuffer.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/RingBuffer.inl", includedir_aux+"RingBuffer.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.h", includedir_aux+"types_to_string.h", api=api, profile=profile, binding=binding,
             enumerators=[ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ],
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ]
         )
-        # cls.render(template_engine, "khrbinding-aux/types_to_string.inl", includedir_aux+"types_to_string.inl", api=api, profile=profile, binding=binding)
-        # cls.render(template_engine, "khrbinding-aux/ValidVersions.h", includedir_aux+"ValidVersions.h", api=api, profile=profile, binding=binding)
-
-        # cls.render(template_engine, "khrbinding-aux/types_to_string.cpp", sourcedir_aux+"types_to_string.cpp", api=api, profile=profile, binding=binding)
-        # cls.render(template_engine, "khrbinding-aux/ValidVersions.cpp", sourcedir_aux+"ValidVersions.cpp", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding-aux/types_to_string.inl", includedir_aux+"types_to_string.inl", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding-aux/types_to_string.cpp", sourcedir_aux+"types_to_string.cpp", api=api, profile=profile, binding=binding,
+            enumerators=[ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ],
+            bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
+            cStringTypes=[ "GLubyte", "GLchar" ],
+            cPointerTypes=[ "GLvoid" ],
+            types=[ type for type in api.types if not type.hideDeclaration ]
+        )
+        
+        cls.render(template_engine, "khrbinding-aux/ValidVersions.h", includedir_aux+"ValidVersions.h", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding-aux/ValidVersions.cpp", sourcedir_aux+"ValidVersions.cpp", api=api, profile=profile, binding=binding)
 
         ## Generate function-related files with specific contexts for each initial letter of the function name
         #for functionGroup in generalContext["functionsByInitial"]["groups"]:
