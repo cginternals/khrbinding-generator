@@ -7,6 +7,7 @@ class Type(object):
         self.require = None
         self.declaration = self.identifier
         self.definition = self.identifier
+        self.hideDeclaration = False
 
     def __lt__(self, other):
         return self.identifier < other.identifier

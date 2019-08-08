@@ -10,6 +10,9 @@ from jinja2 import Environment, PackageLoader, Template
 from khrapi.BitfieldGroup import BitfieldGroup
 from khrapi.Enumerator import Enumerator
 from khrapi.Version import Version
+from khrapi.NativeType import NativeType
+from khrapi.TypeAlias import TypeAlias
+from khrapi.Import import Import
 
 class CPPGenerator:
 
@@ -50,7 +53,13 @@ class CPPGenerator:
             values=api.typeByIdentifier("SpecialValues")
         )
         cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,
-            types=api.types
+            platform_includes=[ type.moduleName for type in api.types if isinstance(type, Import) ],
+            declarations=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in api.types ] if len(declaration) > 0 ]
+        )
+        cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding,
+            basic_enumerators=[ api.typeByIdentifier(binding.extensionType) ],
+            generic_enumerators=[ api.typeByIdentifier(binding.enumType) ],
+            bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ]
         )
         cls.render(template_engine, "bitfield.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,
             groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ],
@@ -231,3 +240,19 @@ class CPPGenerator:
         for key, values in dictionary.items():
             result[key.identifier[lookupOffset].upper() if key.identifier[lookupOffset].isalpha() else '0'][key] = values
         return result
+
+    @classmethod
+    def getDeclaration(cls, type, resolveAliases=True):
+        if type.hideDeclaration:
+            return ""
+
+        if isinstance(type, NativeType):
+            return type.declaration
+        if isinstance(type, TypeAlias):
+            return "using %s = %s;" % (type.identifier, type.aliasedType.identifier)
+        if isinstance(type, Enumerator):
+            return "enum class %s : %s;" % (type.identifier, "unsigned int" if type.unsigned else "int")
+        if isinstance(type, BitfieldGroup):
+            return "enum class %s : unsigned int;" % (type.identifier)
+        
+        return ""

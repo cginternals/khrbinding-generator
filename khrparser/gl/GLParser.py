@@ -31,9 +31,9 @@ class GLParser(XMLParser):
                 text = type.text
                 if apiEntryTag is not None and apiEntryTag.tail is not None:
                     if text is None:
-                        text = apiEntryTag.tail.strip()
+                        text = "{{binding.apientry}} " + apiEntryTag.tail.strip()
                     else:
-                        text = text + apiEntryTag.tail.strip()
+                        text = text + "{{binding.apientry}} " + apiEntryTag.tail.strip()
 
                 if nameTag is not None and nameTag.tail is not None:
                     if text is None:
@@ -48,11 +48,11 @@ class GLParser(XMLParser):
                         text = text + type.tail.strip()
 
                 if text is None:
-                    declaration = type.find("name").text
+                    text = type.find("name").text
 
-                    if declaration.startswith("struct"):
-                        name = re.search('%s(.*)%s' % ("struct ", ""), declaration).group(1).strip()
-                        api.types.append(NativeType(api, name, declaration))
+                if nameTag is not None and nameTag.text.startswith("struct"):
+                    name = re.search('%s(.*)%s' % ("struct ", ""), nameTag.text).group(1).strip()
+                    api.types.append(NativeType(api, name, nameTag.text + text))
 
                 elif text.startswith("#include"):
                     importName = re.search('%s(.*)%s' % ("<", ">"), text).group(1).strip()
@@ -88,8 +88,10 @@ class GLParser(XMLParser):
                     type = BitfieldGroup(api, name)
                 elif name.find("Boolean") >= 0:
                     type = ValueGroup(api, name)
+                    type.hideDeclaration = True
                 else:
                     type = Enumerator(api, name)
+                    type.hideDeclaration = True
                 
                 for enum in group.findall("enum"):
                     constant = api.constantByIdentifier(enum.attrib["name"])
@@ -112,9 +114,11 @@ class GLParser(XMLParser):
                     api.types.append(type)
                 elif type is None and name.find("Boolean") >= 0:
                     type = ValueGroup(api, name)
+                    type.hideDeclaration = True
                     api.types.append(type)
                 elif type is None:
                     type = Enumerator(api, name)
+                    type.hideDeclaration = True
                     api.types.append(type)
 
                 for enum in E.findall("enum"):
@@ -138,6 +142,7 @@ class GLParser(XMLParser):
                 returnType = api.typeByIdentifier(returnTypeName)
                 if returnType is None:
                     returnType = NativeType(api, returnTypeName, returnTypeName)
+                    returnType.hideDeclaration = True
                     api.types.append(returnType)
                 function.returnType = returnType
 
@@ -158,6 +163,7 @@ class GLParser(XMLParser):
                     type = api.typeByIdentifier(typeName)
                     if type is None:
                         type = NativeType(api, typeName, typeName)
+                        type.hideDeclaration = True
                         api.types.append(type)
 
                     function.parameters.append(Parameter(function, name, type))
@@ -231,6 +237,19 @@ class GLParser(XMLParser):
     @classmethod
     def patch(cls, profile, api):
 
+        # Add GLextension type
+        extensionType = Enumerator(api, profile.extensionType)
+        extensionType.unsigned = False
+        api.types.insert(0, extensionType)
+
+        # Fix GLenum type
+        api.types.remove(api.typeByIdentifier(profile.enumType))
+        api.types.insert(1, Enumerator(api, profile.enumType))
+
+        # Remove boolean type
+        ppp = next((t for t in api.types if isinstance(t, TypeAlias) and t.identifier == "GLboolean"), None)
+        api.types.remove(ppp)
+
         # Generic None Bit
         genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
         genericNoneBit.generic = True
@@ -254,6 +273,7 @@ class GLParser(XMLParser):
             if len(constant.groups) == 1 and constant.groups[0].identifier == "SpecialNumbers" and constant.type is not None:
                 if specialNumbersType is None:
                     specialNumbersType = SpecialValues(api, "SpecialValues")
+                    specialNumbersType.hideDeclaration = True
                     api.types.append(specialNumbersType)
             
                 specialNumbersType.values.append(constant)
@@ -265,10 +285,19 @@ class GLParser(XMLParser):
             if len(constant.groups) == 0 and constant.type is None:
                 if ungroupedType is None:
                     ungroupedType = Enumerator(api, "UNGROUPED")
+                    ungroupedType.hideDeclaration = True
                     api.types.append(ungroupedType)
             
                 ungroupedType.values.append(constant)
                 constant.groups.append(ungroupedType)
+        
+        # Add unused mask bitfield
+        unusedMaskType = BitfieldGroup(api, "UnusedMask")
+        unusedBitConstant = Constant(api, "GL_UNUSED_BIT", "0x00000000")
+        unusedMaskType.values.append(unusedBitConstant)
+        unusedBitConstant.groups.append(unusedMaskType)
+        api.types.append(unusedMaskType)
+        api.constants.append(unusedBitConstant)
         
         # Add generic Feature Sets
         allFeatureSet = FeatureSet(api, "gl")
@@ -302,6 +331,7 @@ class GLParser(XMLParser):
         binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
         binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
+        binding.apientry = api.identifier.upper()+"_APIENTRY"
 
         binding.platformIncludes = profile.platformIncludes
         binding.additionalTypes = ""
