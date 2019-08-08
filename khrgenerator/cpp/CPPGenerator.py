@@ -148,16 +148,16 @@ class CPPGenerator:
             cls.render(template_engine, "khrbinding/singlecontextinterface.h", includedir+"{{binding.namespace}}.h", api=api, profile=profile, binding=binding)
             cls.render(template_engine, "khrbinding/singlecontextinterface.cpp", sourcedir+"{{binding.namespace}}.cpp", api=api, profile=profile, binding=binding)
 
-        # TODO
+        cls.render(template_engine, "Binding_list.cpp", sourcedir+"Binding_list.cpp", api=api, profile=profile, binding=binding,
+            functions=api.functions
+        )
 
-        #Generator.generate(generalContext, pjoin(sourcedir, "Binding_list.cpp"))
-
-        #if binding.booleanWidth == 8:
-        #    Generator.generate(generalContext, pjoin(includedir, "Boolean8.h"), "khrbinding/Boolean8.h")
-        #    Generator.generate(generalContext, pjoin(includedir, "Boolean8.inl"), "khrbinding/Boolean8.inl")
-        #else:
-        #    Generator.generate(generalContext, pjoin(includedir, "Boolean32.h"), "khrbinding/Boolean32.h")
-        #    Generator.generate(generalContext, pjoin(includedir, "Boolean32.inl"), "khrbinding/Boolean32.inl")
+        if binding.booleanWidth == 8:
+            cls.render(template_engine, "khrbinding/Boolean8.h", includedir+"Boolean8.h", api=api, profile=profile, binding=binding)
+            cls.render(template_engine, "khrbinding/Boolean8.inl", includedir+"Boolean8.inl", api=api, profile=profile, binding=binding)
+        else:
+            cls.render(template_engine, "khrbinding/Boolean32.h", includedir+"Boolean32.h", api=api, profile=profile, binding=binding)
+            cls.render(template_engine, "khrbinding/Boolean32.inl", includedir+"Boolean32.inl", api=api, profile=profile, binding=binding)
 
         #Generator.generate(generalContext, pjoin(includedir, "AbstractFunction.h"), "khrbinding/AbstractFunction.h")
         #Generator.generate(generalContext, pjoin(includedir, "AbstractState.h"), "khrbinding/AbstractState.h")

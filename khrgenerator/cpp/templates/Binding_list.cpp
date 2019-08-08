@@ -2,19 +2,19 @@
 #include "Binding_pch.h"
 
 
-using namespace {{api}};
+using namespace {{api.identifier}};
 
 
-namespace {{api}}binding
+namespace {{binding.namespace}}
 {
 
 
 const Binding::array_t Binding::s_functions =
-{{=| |=}}{{|={{ }}=|
-{{#functions.items}}
-    &{{item.identifierNoGl}}{{^last}},{{/last}}
-{{/functions.items}}
-{{=| |=}}}}|={{ }}=|;
+{{ "{{" }}
+{%- for function in functions|sort(attribute='identifier') %}
+    &{{function.identifier}}{{ "," if not loop.last }}
+{%- endfor %}
+{{ "}}" }};
 
 
-} // namespace {{api}}binding
+} // namespace {{binding.namespace}}
