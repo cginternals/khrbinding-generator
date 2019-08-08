@@ -27,7 +27,7 @@ namespace std_boost = std;
 #include <{{binding.identifier}}/FunctionCall.h>
 #include <{{binding.identifier}}/ProcAddress.h>
 
-#include <{{binding.identifier}}/{{api}}/types.h>
+#include <{{binding.identifier}}/{{api.identifier}}/types.h>
 
 
 namespace {{binding.namespace}}
@@ -64,7 +64,7 @@ public:
 
     using ContextSwitchCallback = std::function<void(ContextHandle)>;   ///< The signature of the context switch callback
     
-    using array_t = std::array<AbstractFunction *, {{functions.count}}>; ///< The type of the build-in functions collection
+    using array_t = std::array<AbstractFunction *, {{functions|count}}>; ///< The type of the build-in functions collection
 
 
 public:
@@ -445,9 +445,9 @@ public:
 
 
 public:
-{{#functions.items}}
-    {{#item}}static Function<{{>partials/general_typeNs}}{{^params.empty}}, {{>partials/general_paramSignatureNs}}{{/params.empty}}> {{identifierNoGl}}; ///< Wrapper for {{identifier}}{{/item}}
-{{/functions.items}}
+{%- for function in functions|sort(attribute='identifier') %}
+    static Function<{{function.returnType.identifier}}{{ ", " if function.parameters|length > 0 }}{% for param in function.parameters %}{{ param.type.identifier }}{{ ", " if not loop.last }}{% endfor %}> {{function.identifier}}; ///< Wrapper for {{function.identifier}}
+{%- endfor %}
 
 
 protected:

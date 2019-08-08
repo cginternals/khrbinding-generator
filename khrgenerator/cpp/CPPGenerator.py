@@ -134,23 +134,19 @@ class CPPGenerator:
         cls.render(template_engine, "exclusion.h", includedir+"no{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding)
 
         if binding.multiContextBinding:
-        #    cls.render(template_engine, "khrbinding/MultiContextBinding.h", includedir+"Binding.h", api=api, profile=profile, binding=binding,
-        #        functions=api.functions
-        #    )
-            pass
-        #    Generator.generate(generalContext, pjoin(sourcedir, "Binding.cpp"), "khrbinding/MultiContextBinding.cpp")
-        #    Generator.generate(generalContext, pjoin(includedir, bindingNamespace + ".h"),
-        #                       "khrbinding/multicontextinterface.h")
-        #    Generator.generate(generalContext, pjoin(sourcedir, bindingNamespace + ".cpp"),
-        #                       "khrbinding/multicontextinterface.cpp")
+            cls.render(template_engine, "khrbinding/MultiContextBinding.h", includedir+"Binding.h", api=api, profile=profile, binding=binding,
+                functions=api.functions
+            )
+            cls.render(template_engine, "khrbinding/MultiContextBinding.cpp", sourcedir+"Binding.cpp", api=api, profile=profile, binding=binding)
+            cls.render(template_engine, "khrbinding/multicontextinterface.h", includedir+"{{binding.namespace}}.h", api=api, profile=profile, binding=binding)
+            cls.render(template_engine, "khrbinding/multicontextinterface.cpp", sourcedir+"{{binding.namespace}}.cpp", api=api, profile=profile, binding=binding)
         else:
-            pass
-        #    Generator.generate(generalContext, pjoin(includedir, "Binding.h"), "khrbinding/SingleContextBinding.h")
-        #    Generator.generate(generalContext, pjoin(sourcedir, "Binding.cpp"), "khrbinding/SingleContextBinding.cpp")
-        #    Generator.generate(generalContext, pjoin(includedir, bindingNamespace + ".h"),
-        #                       "khrbinding/singlecontextinterface.h")
-        #    Generator.generate(generalContext, pjoin(sourcedir, bindingNamespace + ".cpp"),
-        #                       "khrbinding/singlecontextinterface.cpp")
+            cls.render(template_engine, "khrbinding/SingleContextBinding.h", includedir+"Binding.h", api=api, profile=profile, binding=binding,
+                functions=api.functions
+            )
+            cls.render(template_engine, "khrbinding/SingleContextBinding.cpp", sourcedir+"Binding.cpp", api=api, profile=profile, binding=binding)
+            cls.render(template_engine, "khrbinding/singlecontextinterface.h", includedir+"{{binding.namespace}}.h", api=api, profile=profile, binding=binding)
+            cls.render(template_engine, "khrbinding/singlecontextinterface.cpp", sourcedir+"{{binding.namespace}}.cpp", api=api, profile=profile, binding=binding)
 
         # TODO
 
