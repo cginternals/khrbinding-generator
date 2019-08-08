@@ -246,8 +246,11 @@ class GLParser(XMLParser):
         api.types.insert(1, Enumerator(api, profile.enumType))
 
         # Remove boolean type
-        ppp = next((t for t in api.types if isinstance(t, TypeAlias) and t.identifier == "GLboolean"), None)
-        api.types.remove(ppp)
+        booleanType = next((t for t in api.types if isinstance(t, TypeAlias) and t.identifier == profile.booleanType), None)
+        api.types.remove(booleanType)
+        booleanType = Enumerator(api, profile.booleanType)
+        booleanType.hideDeclaration = True
+        api.types.insert(2, booleanType)
 
         # Generic None Bit
         genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")

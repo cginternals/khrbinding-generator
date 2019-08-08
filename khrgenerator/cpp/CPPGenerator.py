@@ -177,26 +177,25 @@ class CPPGenerator:
         cls.render(template_engine, "khrbinding/Version.h", includedir+"Version.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding/Version.inl", includedir+"Version.inl", api=api, profile=profile, binding=binding)
 
-        #Generator.generate(generalContext, pjoin(sourcedir, "AbstractFunction.cpp"), "khrbinding/AbstractFunction.cpp")
-        #Generator.generate(generalContext, pjoin(sourcedir, "AbstractState.cpp"), "khrbinding/AbstractState.cpp")
-        #Generator.generate(generalContext, pjoin(sourcedir, "AbstractValue.cpp"), "khrbinding/AbstractValue.cpp")
-        #Generator.generate(generalContext, pjoin(sourcedir, "FunctionCall.cpp"), "khrbinding/FunctionCall.cpp")
-        #Generator.generate(generalContext, pjoin(sourcedir, "State.cpp"), "khrbinding/State.cpp")
+        cls.render(template_engine, "khrbinding/AbstractFunction.cpp", sourcedir+"AbstractFunction.cpp", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding/AbstractState.cpp", sourcedir+"AbstractState.cpp", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding/AbstractValue.cpp", sourcedir+"AbstractValue.cpp", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding/FunctionCall.cpp", sourcedir+"FunctionCall.cpp", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding/State.cpp", sourcedir+"State.cpp", api=api, profile=profile, binding=binding)
 
         ## KHR binding AUX
 
-        #Generator.generate(generalContext, pjoin(includedir_aux, "RingBuffer.h"), "khrbinding-aux/RingBuffer.h")
-        #Generator.generate(generalContext, pjoin(includedir_aux, "RingBuffer.inl"), "khrbinding-aux/RingBuffer.inl")
-        #Generator.generate(generalContext, pjoin(includedir_aux, "types_to_string.h"),
-        #                   "khrbinding-aux/types_to_string.h")
-        #Generator.generate(generalContext, pjoin(includedir_aux, "types_to_string.inl"),
-        #                   "khrbinding-aux/types_to_string.inl")
-        #Generator.generate(generalContext, pjoin(includedir_aux, "ValidVersions.h"), "khrbinding-aux/ValidVersions.h")
+        cls.render(template_engine, "khrbinding-aux/RingBuffer.h", includedir_aux+"RingBuffer.h", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding-aux/RingBuffer.inl", includedir_aux+"RingBuffer.inl", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "khrbinding-aux/types_to_string.h", includedir_aux+"types_to_string.h", api=api, profile=profile, binding=binding,
+            enumerators=[ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ],
+            bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ]
+        )
+        # cls.render(template_engine, "khrbinding-aux/types_to_string.inl", includedir_aux+"types_to_string.inl", api=api, profile=profile, binding=binding)
+        # cls.render(template_engine, "khrbinding-aux/ValidVersions.h", includedir_aux+"ValidVersions.h", api=api, profile=profile, binding=binding)
 
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "ValidVersions.cpp"),
-        #                   "khrbinding-aux/ValidVersions.cpp")
-        #Generator.generate(generalContext, pjoin(sourcedir_aux, "types_to_string.cpp"),
-        #                   "khrbinding-aux/types_to_string.cpp")
+        # cls.render(template_engine, "khrbinding-aux/types_to_string.cpp", sourcedir_aux+"types_to_string.cpp", api=api, profile=profile, binding=binding)
+        # cls.render(template_engine, "khrbinding-aux/ValidVersions.cpp", sourcedir_aux+"ValidVersions.cpp", api=api, profile=profile, binding=binding)
 
         ## Generate function-related files with specific contexts for each initial letter of the function name
         #for functionGroup in generalContext["functionsByInitial"]["groups"]:

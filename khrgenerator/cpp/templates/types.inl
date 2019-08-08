@@ -1,5 +1,5 @@
 
-{% for group in basic_enumerators -%}
+{% for group in basic_enumerators|sort(attribute='identifier') -%}
 namespace std
 {
 
@@ -18,7 +18,7 @@ struct hash<{{api.identifier}}::{{group.identifier}}>
 {%- endfor %}
 
 
-{% for group in generic_enumerators -%}
+{% for group in generic_enumerators|sort(attribute='identifier') -%}
 namespace std
 {
 
@@ -115,7 +115,7 @@ namespace {{api.identifier}}
 {%- endfor %}
 
 
-{% for group in bitfields -%}
+{% for group in bitfields|sort(attribute='identifier') -%}
 namespace std
 {
 
