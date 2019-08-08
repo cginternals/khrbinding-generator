@@ -9,10 +9,9 @@
 namespace {{api.identifer}}{{memberSet}}
 {
 
-
-{{#functions.items}}
-using {{api.identifer}}::{{item.identifier}};
-{{/functions.items}}
-
+// import functions
+{%- for function in functions %}
+using {{api.identifer}}::{{function.identifier}};
+{%- endfor %}
 
 } // namespace {{api.identifer}}{{memberSet}}

@@ -12,21 +12,8 @@ namespace {{api.identifer}}{{memberSet}}
 
 
 // import enums to namespace
-
-
-{{#enumsByGroup.groups}}
-// {{name}}
-
-{{#items}}
-{{#isPrimary}}
-using {{api.identifer}}::{{item.identifier}};
-{{/isPrimary}}
-{{#isSecondary}}
-// using {{api.identifer}}::{{item.identifier}}; // reuse {{item.primaryGroup}}
-{{/isSecondary}}
-{{/items}}
-
-{{/enumsByGroup.groups}}
-
+{%- for constant in constants %}
+using {{api.identifer}}::{{constant.identifier}};
+{%- endfor %}
 
 } // namespace {{api.identifer}}{{memberSet}}

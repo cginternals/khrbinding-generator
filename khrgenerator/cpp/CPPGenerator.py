@@ -217,17 +217,23 @@ class CPPGenerator:
                 functions=groupedFunctions[prefix]
             )
 
-        ## Generate files with ApiMemberSet-specific contexts
-        #for feature, core, ext in context.apiMemberSets():
-        #    specificContext = context.apiMemberSetSpecific(feature, core, ext)
+        # Generate files with ApiMemberSet-specific contexts
+        for feature, core, ext in cls.apiMemberSets(api, profile, [ version for version in api.versions if isinstance(version, Version) ]):
+            memberSet = "%i%i%s%s" % (feature.majorVersion, feature.minorVersion, "core" if core else "", "ext" if ext else "")
 
-        #    Generator.generate(specificContext, pjoin(includedir_api, "boolean.h"), "booleanF.h")
-        #    Generator.generate(specificContext, pjoin(includedir_api, "values.h"), "valuesF.h")
-        #    Generator.generate(specificContext, pjoin(includedir_api, "types.h"), "typesF.h")
-        #    Generator.generate(specificContext, pjoin(includedir_api, "bitfield.h"), "bitfieldF.h")
-        #    Generator.generate(specificContext, pjoin(includedir_api, "enum.h"), "enumF.h")
-        #    Generator.generate(specificContext, pjoin(includedir_api, "functions.h"), "functionsF.h")
-        #    Generator.generate(specificContext, pjoin(includedir_api, "{api}.h"), "entrypointF.h")
+            cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,
+                types=[ type for type in api.types if not type.hideDeclaration ]
+            )
+            cls.render(template_engine, "bitfieldF.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,memberSet=memberSet,
+                constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
+            )
+            cls.render(template_engine, "enumF.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding,memberSet=memberSet,
+                constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
+            )
+            cls.render(template_engine, "functionsF.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,memberSet=memberSet,
+                functions=[ function for function in api.functions ]
+            )
+            cls.render(template_engine, "entrypointF.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding,memberSet=memberSet)
 
     @classmethod
     def prefixes(cls, api):
@@ -262,3 +268,17 @@ class CPPGenerator:
             return "enum class %s : unsigned int;" % (type.identifier)
         
         return ""
+
+    @classmethod
+    def apiMemberSets(cls, api, profile, versions):
+        result = []
+        for version in versions:
+            if version.majorVersion < profile.minCoreVersion[0] or (version.majorVersion == profile.minCoreVersion[0] and version.minorVersion < profile.minCoreVersion[1]):
+                result.append([ version, False, False])
+                result.append([ version, False, True])
+            else:
+                result.append([ version, False, False])
+                result.append([ version, True, False])
+                result.append([ version, False, True])
+
+        return result

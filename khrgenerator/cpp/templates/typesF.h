@@ -10,9 +10,9 @@ namespace {{api.identifer}}{{memberSet}}
 {
 
 
-{{#types.items}}
-using {{api.identifer}}::{{item.identifier}};
-{{/types.items}}
+{% for type in types|sort(attribute='identifier') %}
+using {{api.identifer}}::{{type.identifier}};
+{% endfor %}
 
 
 } // namespace {{api.identifer}}{{memberSet}}
