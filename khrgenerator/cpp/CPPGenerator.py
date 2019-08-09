@@ -69,12 +69,12 @@ class CPPGenerator:
         cls.render(template_engine, "bitfield.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ],
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
-            max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ]))
+            max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ] + [ 0 ]))
         )
         cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 and type.identifier != profile.booleanType ],
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ],
-            max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]))
+            max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ] + [ 0 ]))
         )
         cls.render(template_engine, "functions.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             functions=[ function for function in api.functions ]
@@ -203,7 +203,7 @@ class CPPGenerator:
             enumerators=[ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ],
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
             cStringTypes=[ "GLubyte", "GLchar" ],
-            cPointerTypes=[ "GLvoid" ],
+            cPointerTypes=[ type.identifier for type in api.types if type.identifier == "GLvoid" ],
             types=[ type for type in api.types if not type.hideDeclaration ]
         )
         
@@ -233,6 +233,7 @@ class CPPGenerator:
         removedConstants = set()
         removedFunctions = set()
         currentFeature = None
+        specialValueType = api.typeByIdentifier("SpecialValues")
         for feature, core, ext in cls.apiMemberSets(api, profile, api.versions):
             if currentFeature != feature: # apply changes
                 currentConstants |= set(feature.requiredConstants)
@@ -268,10 +269,10 @@ class CPPGenerator:
                 constants=[ constant for constant in constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
             )
             cls.render(template_engine, "enumF.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                constants=[ constant for constant in constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
+                constants=[ constant for constant in constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.groups[0].identifier != profile.booleanType ],
             )
             cls.render(template_engine, "valuesF.h", includedir_api+"values.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                values=[ constant for constant in constants if constant.identifier in [ value.identifier for value in api.typeByIdentifier("SpecialValues").values ] ],
+                values=[ constant for constant in constants if specialValueType is not None and constant.identifier in [ value.identifier for value in specialValueType.values ] ],
             )
             cls.render(template_engine, "functionsF.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 functions=[ function for function in functions ]
@@ -315,7 +316,7 @@ class CPPGenerator:
     @classmethod
     def apiMemberSets(cls, api, profile, versions):
         for version in versions:
-            if version.majorVersion < profile.minCoreVersion[0] or (version.majorVersion == profile.minCoreVersion[0] and version.minorVersion < profile.minCoreVersion[1]):
+            if profile.minCoreVersion is None or version.majorVersion < profile.minCoreVersion[0] or (version.majorVersion == profile.minCoreVersion[0] and version.minorVersion < profile.minCoreVersion[1]):
                 yield version, False, False
                 yield version, False, True
             else:

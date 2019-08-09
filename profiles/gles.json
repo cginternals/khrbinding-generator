@@ -1,9 +1,7 @@
 {
 	"": "API specification",
-	"apiIdentifier": "gles2",
 	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/master/xml/gl.xml",
 	"sourceFile": "gl.xml",
-	"patchFile": "glpatch.xml",
 
     "": "Parser configuration",
     "parser": "gl",
@@ -18,16 +16,15 @@
 	"baseNamespace": "gles",
 	"generateFeatures": true,
 	"generateProfiles": true,
-	"coreProfileSince": false,
+	"coreProfileSince": null,
 	"multiContext": true,
-	"featureBlacklist": [],
-	"extensionBlacklist": [],
 	"generateStringLookup": true,
 	"generateStringConversion": true,
 	"generateCallbacks": true,
 	"generateLogging": true,
 	"generateHeaderGuard": true,
 	"headerGuardMacro": [ "__gles2_h_", "__gles3_h_" ],
+	"headerReplacement": [ "gles2.h", "gles3.h" ],
 
 	"": "Types",
 	"extensionType": "GLextension",
@@ -35,8 +32,13 @@
 	"booleanWidth": 32,
 	"enumType": "GLenum",
 	"bitfieldType": "GLbitfield",
+	"noneBitfieldValue": "GL_NONE_BIT",
 
 	"": "API Feature management",
+	"apiIdentifier": "gles2",
+	"versions": [],
+	"featureBlacklist": [],
+	"extensionBlacklist": [],
 	"useBitfieldGroups": true,
 	"useEnumGroups": false,
 	"generateNoneBits": true,
@@ -45,4 +47,3 @@
 
 	"": "File patterns"
 }
-

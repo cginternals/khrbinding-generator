@@ -3,7 +3,6 @@
 	"apiIdentifier": "webgl",
 	"sourceUrl": "https://www.khronos.org/registry/webgl/specs/latest/2.0/webgl2.idl",
 	"sourceFile": "webgl2.idl",
-	"patchFile": null,
     
     "": "Parser configuration",
     "parser": "idl",

@@ -65,7 +65,9 @@ def main(argv):
 
     api = khrParser.parse(profile)
 
-    api = khrParser.patch(profile, api)
+    api = khrParser.patch(api, profile)
+
+    api = khrParser.filterAPI(api, profile)
 
     parseEnd = time.time()
     print("Parsing took {:.3f} seconds".format(parseEnd - parseBegin))

@@ -21,7 +21,6 @@ class XMLParser:
         tree = xml.etree.ElementTree.parse(xmlFile)
 
         cls.parseXML(api, profile, tree.getroot())
-        cls.filterAPI(api, profile)
 
         return api
 

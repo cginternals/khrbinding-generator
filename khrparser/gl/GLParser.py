@@ -176,6 +176,7 @@ class GLParser(XMLParser):
                         typeName = typeName.strip()
                     name = param.find("name").text
                     type = api.typeByIdentifier(typeName)
+                    nativeType = typeName
                     if type is None:
                         typeParts = typeName.split(" ")
                         if "struct" in typeParts:
@@ -188,17 +189,21 @@ class GLParser(XMLParser):
                             if typeParts[1] == "void":
                                 pass
                             else:
+                                nativeType = typeParts[1]
                                 typeParts[1] = profile.baseNamespace + "::" + typeParts[1]
                         else:
                             if typeParts[0] == "void":
                                 pass
                             else:
+                                nativeType = typeParts[0]
                                 typeParts[0] = profile.baseNamespace + "::" + typeParts[0]
 
                         type.namespacedIdentifier = " ".join(typeParts)
                         api.types.append(type)
 
-                    function.parameters.append(Parameter(function, name, type))
+                    parameter = Parameter(function, name, type)
+                    parameter.nativeType = api.typeByIdentifier(nativeType)
+                    function.parameters.append(parameter)
 
                 api.functions.append(function)
 
@@ -269,7 +274,87 @@ class GLParser(XMLParser):
         return api
 
     @classmethod
-    def patch(cls, profile, api):
+    def patch(cls, api, profile):
+
+        # Fix Special Values
+        specialNumbersType = None
+        oldSpecialNumbersType = api.typeByIdentifier("SpecialNumbers")
+        if oldSpecialNumbersType is not None:
+            api.types.remove(oldSpecialNumbersType)
+
+        for constant in api.constants:
+            if "SpecialNumbers" in [ group.identifier for group in constant.groups ] and len(constant.groups) == 1 and constant.type is not None:
+                if specialNumbersType is None:
+                    specialNumbersType = SpecialValues(api, "SpecialValues")
+                    specialNumbersType.hideDeclaration = True
+                    api.types.append(specialNumbersType)
+            
+                specialNumbersType.values.append(constant)
+                constant.groups = [specialNumbersType]
+
+        return api
+    
+    @classmethod
+    def filterAPI(cls, api, profile):
+
+        featureSets = []
+
+        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+        featureSets += api.versions
+
+        api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
+        featureSets += api.extensions
+
+        api.constants = [ constant for constant in api.constants if
+            any((featureSet for featureSet in featureSets if constant in featureSet.requiredConstants))
+        ]
+        
+        api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
+        
+        api.types = [ type for type in api.types if
+            any((featureSet for featureSet in featureSets if type in featureSet.requiredTypes)) or
+            any((constant for constant in api.constants if type == constant.type or type in constant.groups)) or
+            any((function for function in api.functions if type == function.returnType or type in ([ parameter.type for parameter in function.parameters ] + [ parameter.nativeType for parameter in function.parameters ]))) or
+            type.identifier in [ "GLuint64", "GLchar", "GLubyte", profile.bitfieldType, "SpecialValues" ]
+        ]
+        for type in api.types:
+            if isinstance(type, BitfieldGroup):
+                type.values = [ value for value in type.values if value in api.constants ]
+            if isinstance(type, Enumerator):
+                type.values = [ value for value in type.values if value in api.constants ]
+
+        api.types = [ type for type in api.types if ((not isinstance(type, BitfieldGroup) and not isinstance(type, Enumerator)) or len(type.values) > 0) ]
+
+        for constant in api.constants:
+            constant.groups = [ group for group in constant.groups if group in api.types ]
+            # print(constant.identifier, [group.identifier for group in constant.groups ])
+        
+        # api.printSummary()
+
+        return api
+
+    @classmethod
+    def deriveBinding(cls, api, profile):
+
+        # Remove shared enum and bitfield GL_NONE
+        noneBit = api.constantByIdentifier("GL_NONE")
+        if noneBit is not None:
+            for group in noneBit.groups[:]:
+                if isinstance(group, BitfieldGroup):
+                    group.values.remove(noneBit)
+                    noneBit.groups.remove(group)
+            if len(group.values) == 0:
+                api.types.remove(group)
+            if len(noneBit.groups) == 0:
+                api.constants.remove(noneBit)
+
+        # Generic None Bit
+        genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+        genericNoneBit.generic = True
+        api.constants.append(genericNoneBit)
+        for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
+            group.values.append(genericNoneBit)
+            genericNoneBit.groups.append(group)
 
         # Add GLextension type
         extensionType = Enumerator(api, profile.extensionType)
@@ -286,9 +371,6 @@ class GLParser(XMLParser):
 
         # Remove boolean values from GLenum
         for constant in api.constants:
-            for group in [ group for group in constant.groups if group.identifier == profile.enumType ]:
-                group.values.remove(constant)
-                constant.groups.remove(group)
             if constant.identifier in [ "GL_TRUE", "GL_FALSE" ]:
                 for group in constant.groups:
                     group.values.remove(constant)
@@ -296,47 +378,17 @@ class GLParser(XMLParser):
                 booleanType.values.append(constant)
 
         # Remove boolean type
-        oldBooleanType = next((t for t in api.types if isinstance(t, TypeAlias) and t.identifier == profile.booleanType), None)
+        oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
         api.types.remove(oldBooleanType)
         
         # Finally add boolean type
 
         api.types.insert(2, booleanType)
 
-        # Generic None Bit
-        genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
-        genericNoneBit.generic = True
-        api.constants.append(genericNoneBit)
-        for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
-            group.values.append(genericNoneBit)
-            genericNoneBit.groups.append(group)
-
-        # Remove shared enum and bitfield GL_NONE
-        noneBit = api.constantByIdentifier("GL_NONE")
-        if noneBit is not None:
-            for group in noneBit.groups:
-                if isinstance(group, BitfieldGroup):
-                    group.values.remove(noneBit)
-            if len(noneBit.groups) == 0:
-                api.constants.remove(noneBit)
-
-        # Fix Special Values
-        specialNumbersType = None
-        api.types.remove(api.typeByIdentifier("SpecialNumbers"))
-        for constant in api.constants:
-            if len(constant.groups) == 1 and constant.groups[0].identifier == "SpecialNumbers" and constant.type is not None:
-                if specialNumbersType is None:
-                    specialNumbersType = SpecialValues(api, "SpecialValues")
-                    specialNumbersType.hideDeclaration = True
-                    api.types.append(specialNumbersType)
-            
-                specialNumbersType.values.append(constant)
-                constant.groups = [specialNumbersType]
-
         # Assign Ungrouped
         ungroupedType = None
         for constant in api.constants:
-            if len(constant.groups) == 0 and constant.type is None:
+            if len(constant.groups) == 0:
                 if ungroupedType is None:
                     ungroupedType = Enumerator(api, "UNGROUPED")
                     ungroupedType.hideDeclaration = True
@@ -361,27 +413,6 @@ class GLParser(XMLParser):
                 else:
                     constant.value = "static_cast<std::underlying_type<%s>::type>(%s)" % (constant.groups[0].identifier, constant.value)
         
-        return api
-    
-    @classmethod
-    def filterAPI(cls, api, profile):
-
-        featureSets = []
-
-        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
-        featureSets += api.versions
-
-        api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
-        featureSets += api.extensions
-
-        api.constants = [ constant for constant in api.constants if any((featureSet for featureSet in featureSets if constant in featureSet.requiredConstants)) ]
-        api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
-        # api.types = api.types
-
-        return api
-
-    @classmethod
-    def deriveBinding(cls, api, profile):
         binding = super(cls, GLParser).deriveBinding(api, profile)
 
         binding.baseNamespace = profile.baseNamespace
@@ -389,8 +420,8 @@ class GLParser(XMLParser):
         binding.multiContextBinding = profile.multiContextBinding
         binding.minCoreVersion = profile.minCoreVersion
         
-        binding.identifier = api.identifier+"binding"
-        binding.namespace = api.identifier+"binding"
+        binding.identifier = profile.bindingNamespace
+        binding.namespace = profile.bindingNamespace
         binding.auxIdentifier = "aux"
         binding.auxNamespace = "aux"
         binding.bindingAuxIdentifier = binding.identifier + "-" + binding.auxIdentifier
@@ -404,7 +435,10 @@ class GLParser(XMLParser):
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
         binding.apientry = api.identifier.upper()+"_APIENTRY"
 
-        binding.additionalTypes = ""
+        if profile.apiIdentifier == "gles2":
+            binding.additionalTypes = "using EGLint = int;\nusing EGLchar = char;\nusing EGLNativeDisplayType = void*;\nusing EGLNativePixmapType = void*;\nusing EGLNativeWindowType = void*;"
+        else:
+            binding.additionalTypes = ""
         
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement

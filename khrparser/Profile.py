@@ -16,12 +16,11 @@ class Profile:
         self.baseNamespace = jsonObject["baseNamespace"]
         self.inputfilepath = jsonObject["sourceFile"]
         self.inputfile = os.path.basename(self.inputfilepath)
-        self.patchfile = jsonObject["patchFile"]
         self.apiIdentifier = jsonObject["apiIdentifier"]
         self.multiContextBinding = jsonObject["multiContext"]
         self.booleanWidth = jsonObject["booleanWidth"]
         self.bindingNamespace = jsonObject["bindingNamespace"]
-        self.minCoreVersion = [ int(number) for number in jsonObject["coreProfileSince"].split(".") ] if jsonObject["coreProfileSince"] else False
+        self.minCoreVersion = [ int(number) for number in jsonObject["coreProfileSince"].split(".") ] if jsonObject["coreProfileSince"] is not None else None
         self.extensionType = jsonObject["extensionType"]
         self.noneBitfieldValue = jsonObject["noneBitfieldValue"]
         self.enumType = jsonObject["enumType"]

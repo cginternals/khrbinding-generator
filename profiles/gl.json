@@ -2,7 +2,6 @@
 	"": "API specification",
 	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/master/xml/gl.xml",
 	"sourceFile": "gl.xml",
-	"patchFile": "glpatch.xml",
 
     "": "Parser configuration",
     "parser": "gl",
@@ -24,8 +23,8 @@
 	"generateCallbacks": true,
 	"generateLogging": true,
 	"generateHeaderGuard": true,
-	"headerGuardMacro": "__gl_h_",
-	"headerReplacement": "gl.h",
+	"headerGuardMacro": [ "__gl_h_" ],
+	"headerReplacement": [ "gl.h" ],
 
 	"": "Types",
 	"extensionType": "GLextension",

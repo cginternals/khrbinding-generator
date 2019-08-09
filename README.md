@@ -43,7 +43,6 @@ The currently supported tags are:
 * API specification
   * `sourceUrl`: The url to download the API specification
   * `sourceFile`: The intermediate file name to store the API specification
-  * `patchFile`: A local file for patching the downloaded specification (optional)
   * `apiIdentifier`: For multi-API specification files, specifies the one API to select
 * Code Generation
   * `bindingNamespace`: The identifier for the subdirectories and C++ binding namespace
@@ -62,7 +61,6 @@ More options are subject to future development. Ideas and requirements are welco
   "apiIdentifier": "gl",
   "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/master/xml/gl.xml",
   "sourceFile": "gl.xml",
-  "patchFile": "glpatch.xml",
 
   "": "Code Generation",
   "bindingNamespace": "glbinding",
