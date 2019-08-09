@@ -35,7 +35,6 @@
 	"booleanWidth": 8,
 	"enumType": "VKenum",
 	"bitfieldType": "VKbitfield",
-	"platformIncludes": [],
 
 	"": "API Feature management",
 	"useBitfieldGroups": true,

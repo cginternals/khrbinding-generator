@@ -10,7 +10,7 @@ namespace {{api.identifier}}{{memberSet}}
 {
 
 // import functions
-{%- for function in functions %}
+{%- for function in functions|sort(attribute='identifier') %}
 using {{api.identifier}}::{{function.identifier}};
 {%- endfor %}
 

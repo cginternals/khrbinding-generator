@@ -12,7 +12,7 @@ namespace {{api.identifier}}
 {
 
 
-{% for constant in values.values -%}
+{% for constant in values.values|sort(attribute='identifier') -%}
 {{binding.constexpr}} static const {{constant.type.identifier}} {{constant.identifier}} = {{constant.value}};
 {% endfor %}
 

@@ -1,6 +1,5 @@
 {
 	"": "API specification",
-	"apiIdentifier": "gl",
 	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/master/xml/gl.xml",
 	"sourceFile": "gl.xml",
 	"patchFile": "glpatch.xml",
@@ -20,8 +19,6 @@
 	"generateProfiles": true,
 	"coreProfileSince": "3.2",
 	"multiContext": true,
-	"featureBlacklist": [],
-	"extensionBlacklist": [],
 	"generateStringLookup": true,
 	"generateStringConversion": true,
 	"generateCallbacks": true,
@@ -37,11 +34,12 @@
 	"enumType": "GLenum",
 	"bitfieldType": "GLbitfield",
 	"noneBitfieldValue": "GL_NONE_BIT",
-	"platformIncludes": [
-		"KHR/khr_platform.h"
-	],
 
 	"": "API Feature management",
+	"apiIdentifier": "gl",
+	"versions": [],
+	"featureBlacklist": [],
+	"extensionBlacklist": [],
 	"useBitfieldGroups": true,
 	"useEnumGroups": false,
 	"generateNoneBits": true,

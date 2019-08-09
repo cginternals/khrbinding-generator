@@ -12,7 +12,6 @@ from khrapi.Enumerator import Enumerator
 from khrapi.Version import Version
 from khrapi.NativeType import NativeType
 from khrapi.TypeAlias import TypeAlias
-from khrapi.Import import Import
 
 class CPPGenerator:
 
@@ -59,7 +58,7 @@ class CPPGenerator:
             values=api.typeByIdentifier("SpecialValues")
         )
         cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
-            platform_includes=[ type.moduleName for type in api.types if isinstance(type, Import) ],
+            platform_includes=[ type.moduleName for type in api.dependencies ],
             declarations=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in api.types ] if len(declaration) > 0 ]
         )
         cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
@@ -72,7 +71,7 @@ class CPPGenerator:
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
             max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ]))
         )
-        cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding,
+        cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 and type.identifier != profile.booleanType ],
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ],
             max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]))
@@ -178,7 +177,7 @@ class CPPGenerator:
             extensions=api.extensions
         )
         cls.render(template_engine, "Meta_ExtensionsByString.cpp", sourcedir_aux+"Meta_ExtensionsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, api.extensions, len(profile.lowercasePrefix))
+            groups=cls.identifierPrefixGroups(api, api.extensions, len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_ReqVersionsByExtension.cpp", sourcedir_aux+"Meta_ReqVersionsByExtension.cpp", api=api, profile=profile, binding=binding,
             extensionsInCore=api.extensionsByCoreVersion()
@@ -205,7 +204,7 @@ class CPPGenerator:
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
             cStringTypes=[ "GLubyte", "GLchar" ],
             cPointerTypes=[ "GLvoid" ],
-            types=[ type for type in api.types if not type.hideDeclaration and not isinstance(type, Import) ]
+            types=[ type for type in api.types if not type.hideDeclaration ]
         )
         
         cls.render(template_engine, "khrbinding-aux/ValidVersions.h", includedir_aux+"ValidVersions.h", api=api, profile=profile, binding=binding)
@@ -225,20 +224,57 @@ class CPPGenerator:
             )
 
         # Generate files with ApiMemberSet-specific contexts
-        for feature, core, ext in cls.apiMemberSets(api, profile, [ version for version in api.versions if isinstance(version, Version) ]):
+        availableConstants = set(api.constants)
+        availableFunctions = set(api.functions)
+        currentConstants = set()
+        currentFunctions = set()
+        deprecatedConstants = set()
+        deprecatedFunctions = set()
+        removedConstants = set()
+        removedFunctions = set()
+        currentFeature = None
+        for feature, core, ext in cls.apiMemberSets(api, profile, api.versions):
+            if currentFeature != feature: # apply changes
+                currentConstants |= set(feature.requiredConstants)
+                currentFunctions |= set(feature.requiredFunctions)
+                currentConstants -= set(feature.deprecatedConstants)
+                currentFunctions -= set(feature.deprecatedFunctions)
+                currentConstants -= set(feature.removedConstants)
+                currentFunctions -= set(feature.removedFunctions)
+                deprecatedConstants |= set(feature.deprecatedConstants)
+                deprecatedFunctions |= set(feature.deprecatedFunctions)
+                deprecatedConstants -= set(feature.removedConstants)
+                deprecatedFunctions -= set(feature.removedFunctions)
+                removedConstants |= set(feature.removedConstants)
+                removedFunctions |= set(feature.removedFunctions)
+                currentFeature = feature
+            
             memberSet = "%i%i%s%s" % (feature.majorVersion, feature.minorVersion, "core" if core else "", "ext" if ext else "")
 
+            if core:
+                constants = currentConstants
+                functions = currentFunctions
+            elif ext:
+                constants = availableConstants - currentConstants - deprecatedConstants - removedConstants
+                functions = availableFunctions - currentFunctions - deprecatedFunctions - removedFunctions
+            else: # normal
+                constants = currentConstants | deprecatedConstants
+                functions = currentFunctions | deprecatedFunctions
+
             cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                types=[ type for type in api.types if not type.hideDeclaration and not isinstance(type, Import) ]
+                types=[ type for type in api.types if not type.hideDeclaration ]
             )
             cls.render(template_engine, "bitfieldF.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
+                constants=[ constant for constant in constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
             )
             cls.render(template_engine, "enumF.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
+                constants=[ constant for constant in constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
+            )
+            cls.render(template_engine, "valuesF.h", includedir_api+"values.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
+                values=[ constant for constant in constants if constant.identifier in [ value.identifier for value in api.typeByIdentifier("SpecialValues").values ] ],
             )
             cls.render(template_engine, "functionsF.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                functions=[ function for function in api.functions ]
+                functions=[ function for function in functions ]
             )
             cls.render(template_engine, "entrypointF.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString)
 
@@ -278,14 +314,11 @@ class CPPGenerator:
 
     @classmethod
     def apiMemberSets(cls, api, profile, versions):
-        result = []
         for version in versions:
             if version.majorVersion < profile.minCoreVersion[0] or (version.majorVersion == profile.minCoreVersion[0] and version.minorVersion < profile.minCoreVersion[1]):
-                result.append([ version, False, False])
-                result.append([ version, False, True])
+                yield version, False, False
+                yield version, False, True
             else:
-                result.append([ version, False, False])
-                result.append([ version, True, False])
-                result.append([ version, False, True])
-
-        return result
+                yield version, False, False
+                yield version, True, False
+                yield version, False, True

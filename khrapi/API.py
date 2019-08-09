@@ -6,6 +6,7 @@ class API(object):
     def __init__(self, identifier, revision):
         self.identifier = identifier
         self.revision = revision
+        self.apis = []
         self.versions = []
         self.extensions = []
         self.types = []
@@ -37,7 +38,7 @@ class API(object):
     def extensionsByFunction(self):
         result = {}
         for function in self.functions:
-            result[function] = [ extension for extension in function.requiringFeatureSets if isinstance(extension, Extension) ]
+            result[function] = [ extension for extension in function.requiringFeatureSets if isinstance(extension, Extension) and extension in self.extensions ]
         return result
 
     def printSummary(self):

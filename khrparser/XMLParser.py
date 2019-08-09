@@ -12,7 +12,6 @@ class XMLParser:
     @classmethod
     def parse(cls, profile):
         xmlFile = profile.inputfilepath
-        apiRequire = profile.apiRequire
 
         revision_date = datetime.datetime.fromtimestamp(os.path.getmtime(xmlFile))
         revision_string = revision_date.strftime('%Y%m%d')
@@ -22,6 +21,7 @@ class XMLParser:
         tree = xml.etree.ElementTree.parse(xmlFile)
 
         cls.parseXML(api, profile, tree.getroot())
+        cls.filterAPI(api, profile)
 
         return api
 
@@ -29,6 +29,10 @@ class XMLParser:
     def parseXML(cls, api, profile, registry):
         pass
     
+    @classmethod
+    def filterAPI(cls, api, profile):
+        pass
+
     @classmethod
     def patch(cls, api, profile):
         pass

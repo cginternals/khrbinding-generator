@@ -4,7 +4,7 @@
 
 const std::set<{{binding.identifier}}::Version> {{binding.identifier}}::aux::ValidVersions::s_validVersions =
 {
-{%- for version in versions %}
+{%- for version in versions|sort %}
     { {{version.majorVersion}}, {{version.minorVersion}} }{% if not loop.last %},{% endif %}
 {%- endfor %}
 };

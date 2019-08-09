@@ -12,7 +12,7 @@ namespace {{api.identifier}}{{memberSet}}
 
 {% for type in types|sort(attribute='identifier') %}
 using {{api.identifier}}::{{type.identifier}};
-{% endfor %}
+{%- endfor %}
 
 
 } // namespace {{api.identifier}}{{memberSet}}

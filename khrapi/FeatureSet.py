@@ -3,6 +3,7 @@ class FeatureSet(object):
     def __init__(self, api, identifier):
         self.api = api
         self.identifier = identifier
+        self.supportedAPIs = []
         self.requiredExtensions = []
         self.requiredFunctions = []
         self.requiredConstants = []

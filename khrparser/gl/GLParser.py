@@ -58,7 +58,7 @@ class GLParser(XMLParser):
 
                 elif text.startswith("#include"):
                     importName = re.search('%s(.*)%s' % ("<", ">"), text).group(1).strip()
-                    api.types.append(Import(api, type.attrib["name"], importName))
+                    api.dependencies.append(Import(api, type.attrib["name"], importName))
 
                 elif text.startswith("#if"):
                     newType = NativeType(api, type.attrib["name"], text)
@@ -206,6 +206,7 @@ class GLParser(XMLParser):
         for E in registry.iter("extensions"):
             for xmlExtension in E.findall("extension"):
                 extension = Extension(api, xmlExtension.attrib["name"])
+                extension.supportedAPIs = xmlExtension.attrib["supported"].split("|")
 
                 for require in xmlExtension.findall("require"):
                     for child in require:
@@ -224,6 +225,7 @@ class GLParser(XMLParser):
         for feature in registry.iter("feature"):
 
             version = Version(api, feature.attrib["api"], feature.attrib["number"])
+            version.supportedAPIs = feature.attrib["api"].split("|")
 
             for require in feature.findall("require"):
                 comment = require.attrib.get("comment", "")
@@ -320,6 +322,7 @@ class GLParser(XMLParser):
 
         # Fix Special Values
         specialNumbersType = None
+        api.types.remove(api.typeByIdentifier("SpecialNumbers"))
         for constant in api.constants:
             if len(constant.groups) == 1 and constant.groups[0].identifier == "SpecialNumbers" and constant.type is not None:
                 if specialNumbersType is None:
@@ -358,14 +361,23 @@ class GLParser(XMLParser):
                 else:
                     constant.value = "static_cast<std::underlying_type<%s>::type>(%s)" % (constant.groups[0].identifier, constant.value)
         
-        # Add generic Feature Sets
-        allFeatureSet = FeatureSet(api, "gl")
-        allFeatureSet.requiredExtensions = api.extensions
-        allFeatureSet.requiredFunctions = api.functions
-        allFeatureSet.requiredConstants = api.constants
-        allFeatureSet.requiredTypes = api.types
-        api.versions.append(allFeatureSet)
-        
+        return api
+    
+    @classmethod
+    def filterAPI(cls, api, profile):
+
+        featureSets = []
+
+        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+        featureSets += api.versions
+
+        api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
+        featureSets += api.extensions
+
+        api.constants = [ constant for constant in api.constants if any((featureSet for featureSet in featureSets if constant in featureSet.requiredConstants)) ]
+        api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
+        # api.types = api.types
+
         return api
 
     @classmethod
@@ -392,7 +404,6 @@ class GLParser(XMLParser):
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
         binding.apientry = api.identifier.upper()+"_APIENTRY"
 
-        binding.platformIncludes = profile.platformIncludes
         binding.additionalTypes = ""
         
         binding.headerGuardMacro = profile.headerGuardMacro

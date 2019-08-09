@@ -17,7 +17,7 @@ const std::unordered_map<std::string, {{binding.extensionType}}> Meta_Extensions
 {% else -%}
 const std::unordered_map<std::string, {{binding.extensionType}}> Meta_ExtensionsByString_{{groupname}} =
 {
-{%- for extension in extensions %}
+{%- for extension in extensions|sort(attribute='identifier') %}
     { "{{extension.identifier}}", {{binding.extensionType}}::{{extension.identifier}} }{{ "," if not loop.last }}
 {%- endfor %}
 };

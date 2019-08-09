@@ -251,7 +251,6 @@ public:
     *    The list of all Versions (Features) known by the {{profile.inputfile}}
     */
     static const std::set<Version> & versions();
-
 {% for group in groups|sort(attribute='identifier') %}
     /**
     *  @brief

@@ -53,7 +53,7 @@ class EGLParser(XMLParser):
 
                 elif text.startswith("#include"):
                     importName = re.search('%s(.*)%s' % ("<", ">"), text).group(1).strip()
-                    api.types.append(Import(api, type.attrib["name"], importName))
+                    api.dependencies.append(Import(api, type.attrib["name"], importName))
 
                 elif text.startswith("#if"):
                     api.types.append(NativeType(api, type.attrib["name"], text))

@@ -35,7 +35,6 @@
 	"booleanWidth": 8,
 	"enumType": "GLenum",
 	"bitfieldType": "GLbitfield",
-	"platformIncludes": [],
 
 	"": "API Feature management",
 	"useBitfieldGroups": true,

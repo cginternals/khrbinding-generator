@@ -12,8 +12,9 @@ namespace {{api.identifier}}{{memberSet}}
 
 
 // import enums to namespace
-{%- for constant in constants %}
+{%- for constant in constants|sort(attribute='identifier') %}
 using {{api.identifier}}::{{constant.identifier}};
 {%- endfor %}
+
 
 } // namespace {{api.identifier}}{{memberSet}}

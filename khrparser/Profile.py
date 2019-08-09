@@ -17,7 +17,7 @@ class Profile:
         self.inputfilepath = jsonObject["sourceFile"]
         self.inputfile = os.path.basename(self.inputfilepath)
         self.patchfile = jsonObject["patchFile"]
-        self.apiRequire = jsonObject["apiIdentifier"]
+        self.apiIdentifier = jsonObject["apiIdentifier"]
         self.multiContextBinding = jsonObject["multiContext"]
         self.booleanWidth = jsonObject["booleanWidth"]
         self.bindingNamespace = jsonObject["bindingNamespace"]
@@ -29,4 +29,3 @@ class Profile:
         self.booleanType = jsonObject["booleanType"]
         self.headerGuardMacro = jsonObject["headerGuardMacro"]
         self.headerReplacement = jsonObject["headerReplacement"]
-        self.platformIncludes = jsonObject["platformIncludes"]

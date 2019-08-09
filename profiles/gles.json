@@ -35,9 +35,6 @@
 	"booleanWidth": 32,
 	"enumType": "GLenum",
 	"bitfieldType": "GLbitfield",
-	"platformIncludes": [
-		"KHR/khr_platform.h"
-	],
 
 	"": "API Feature management",
 	"useBitfieldGroups": true,

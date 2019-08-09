@@ -3,8 +3,9 @@ from .FeatureSet import FeatureSet
 
 class Version(FeatureSet):
     def __init__(self, api, identifier, versionString):
-        identifier = "".join([c for c in identifier if not c.isdigit() ] + [ c for c in versionString if c.isdigit() ])
-        super(Version, self).__init__(api, identifier)
+        internalIdentifier = "".join([c for c in identifier if not c.isdigit() ] + [ c for c in versionString if c.isdigit() ])
+        super(Version, self).__init__(api, internalIdentifier)
+        self.nativeIdentifier = identifier
         self.apiString = "".join([c for c in identifier if not c.isdigit() ])
         self.majorVersion, self.minorVersion = [ int(val) for val in versionString.split(".")[0:2] ]
         self.isCore = False

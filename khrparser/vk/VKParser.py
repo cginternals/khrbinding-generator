@@ -354,9 +354,9 @@ class VKParser(XMLParser):
     def handleIncludeType(cls, api, type, name, text):
         if type.text is not None:
             importName = re.search('%s(.*)%s' % ('"', '"'), text).group(1).strip()
-            api.types.append(Import(api, name, importName))
+            api.dependencies.append(Import(api, name, importName))
         else:
-            api.types.append(Import(api, name, name))
+            api.dependencies.append(Import(api, name, name))
 
     @classmethod
     def handleDefineType(cls, api, type, name, text):

@@ -3,6 +3,7 @@
 
 
 #include <{{api.identifier}}binding/no{{api.identifier}}.h>
+
 #include <{{api.identifier}}binding/{{api.identifier}}/values.h>
 
 
@@ -10,15 +11,10 @@ namespace {{api.identifier}}{{memberSet}}
 {
 
 
-{{#valuesByType.groups}}
-{{#items}}
-using {{api.identifier}}::{{item.identifier}};
-{{/items}}
+// import values to namespace
+{%- for value in values|sort(attribute='identifier') %}
+using {{api.identifier}}::{{value.identifier}};
+{%- endfor %}
 
-{{/valuesByType.groups}}
-{{#valuesByType.empty}}
-
-
-{{/valuesByType.empty}}
 
 } // namespace {{api.identifier}}{{memberSet}}

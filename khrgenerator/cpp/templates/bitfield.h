@@ -28,7 +28,7 @@ enum class {{group.identifier}} : unsigned int
 
 {% for constant in constants|sort(attribute="identifier") -%}
 {% if constant.groups|length > 1 -%}
-{{binding.constexpr}} static const {{binding.identifier}}::SharedBitfield<{% for group in constant.groups %}{{group.identifier}}{{ ", " if not loop.last }}{% endfor %}> {{constant.identifier}} = {{constant.groups[0].identifier}}::{{constant.identifier}};
+{{binding.constexpr}} static const {{binding.identifier}}::SharedBitfield<{% for group in constant.groups|sort(attribute='identifier') %}{{group.identifier}}{{ ", " if not loop.last }}{% endfor %}> {{constant.identifier}} = {{constant.groups[0].identifier}}::{{constant.identifier}};
 {%- else -%}
 {{binding.constexpr}} static const {{constant.groups[0].identifier}} {{constant.identifier}} = {{constant.groups[0].identifier}}::{{constant.identifier}};
 {%- endif %}

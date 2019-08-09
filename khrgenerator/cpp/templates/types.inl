@@ -1,4 +1,10 @@
 
+#pragma once
+
+
+#include <{{binding.identifier}}/{{api.identifier}}/types.h>
+
+
 {% for group in basic_enumerators|sort(attribute='identifier') -%}
 namespace std
 {

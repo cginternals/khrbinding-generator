@@ -12,7 +12,7 @@ namespace {{api.identifier}}{{memberSet}}
 
 
 // import bitfields to namespace
-{%- for constant in constants %}
+{%- for constant in constants|sort(attribute='identifier') %}
 using {{api.identifier}}::{{constant.identifier}};
 {%- endfor %}
 
