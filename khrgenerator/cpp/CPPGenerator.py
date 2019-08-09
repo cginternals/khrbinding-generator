@@ -54,20 +54,20 @@ class CPPGenerator:
 
         # API binding
 
-        cls.render(template_engine, "extension.h", includedir_api+"extension.h", api=api, profile=profile, binding=binding)
-        cls.render(template_engine, "values.h", includedir_api+"values.h", api=api, profile=profile, binding=binding,
+        cls.render(template_engine, "extension.h", includedir_api+"extension.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace)
+        cls.render(template_engine, "values.h", includedir_api+"values.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             values=api.typeByIdentifier("SpecialValues")
         )
-        cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,
+        cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             platform_includes=[ type.moduleName for type in api.types if isinstance(type, Import) ],
             declarations=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in api.types ] if len(declaration) > 0 ]
         )
-        cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding,
+        cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             basic_enumerators=[ api.typeByIdentifier(binding.extensionType) ],
             generic_enumerators=[ api.typeByIdentifier(binding.enumType) ],
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ]
         )
-        cls.render(template_engine, "bitfield.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,
+        cls.render(template_engine, "bitfield.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ],
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
             max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ]))
@@ -77,10 +77,10 @@ class CPPGenerator:
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ],
             max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]))
         )
-        cls.render(template_engine, "functions.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,
+        cls.render(template_engine, "functions.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             functions=[ function for function in api.functions ]
         )
-        cls.render(template_engine, "entrypoint.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding)
+        cls.render(template_engine, "entrypoint.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace)
 
         cls.render(template_engine, "AllVersions_test.cpp", testdir+"AllVersions_test.cpp", api=api, profile=profile, binding=binding,
             versions=api.versions
