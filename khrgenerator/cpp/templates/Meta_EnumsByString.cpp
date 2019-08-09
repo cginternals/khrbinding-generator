@@ -17,7 +17,7 @@ const std::unordered_map<std::string, {{binding.enumType}}> Meta_EnumsByString_{
 const std::unordered_map<std::string, {{binding.enumType}}> Meta_EnumsByString_{{groupname}} =
 {
 {%- for constant in constants|sort(attribute='identifier') %}
-    { "{{constant.identifier}}", static_cast<{{binding.enumType}}>({{constant.groups[0].identifier}}::{{constant.identifier}}) }{% if not loop.last %},{% endif %}
+    { "{{constant.identifier}}", {{binding.enumType}}::{{constant.identifier}} }{% if not loop.last %},{% endif %}
 {%- endfor %}
 };
 {%- endif %}

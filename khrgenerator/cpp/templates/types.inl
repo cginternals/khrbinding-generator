@@ -115,7 +115,9 @@ namespace {{api.identifier}}
 {%- endfor %}
 
 
-{% for group in bitfields|sort(attribute='identifier') -%}
+{%- for group in bitfields|sort(attribute='identifier') %}
+
+
 namespace std
 {
 

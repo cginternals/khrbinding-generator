@@ -2,17 +2,17 @@
 #pragma once
 
 
-#include <{{api.identifer}}binding/no{{api.identifer}}.h>
-#include <{{api.identifer}}binding/{{api.identifer}}/types.h>
+#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/types.h>
 
 
-namespace {{api.identifer}}{{memberSet}}
+namespace {{api.identifier}}{{memberSet}}
 {
 
 
 {% for type in types|sort(attribute='identifier') %}
-using {{api.identifer}}::{{type.identifier}};
+using {{api.identifier}}::{{type.identifier}};
 {% endfor %}
 
 
-} // namespace {{api.identifer}}{{memberSet}}
+} // namespace {{api.identifier}}{{memberSet}}

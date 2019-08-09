@@ -2,18 +2,18 @@
 #pragma once
 
 
-#include <{{api.identifer}}binding/no{{api.identifer}}.h>
+#include <{{api.identifier}}binding/no{{api.identifier}}.h>
 
-#include <{{api.identifer}}binding/{{api.identifer}}/enum.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/enum.h>
 
 
-namespace {{api.identifer}}{{memberSet}}
+namespace {{api.identifier}}{{memberSet}}
 {
 
 
 // import enums to namespace
 {%- for constant in constants %}
-using {{api.identifer}}::{{constant.identifier}};
+using {{api.identifier}}::{{constant.identifier}};
 {%- endfor %}
 
-} // namespace {{api.identifer}}{{memberSet}}
+} // namespace {{api.identifier}}{{memberSet}}

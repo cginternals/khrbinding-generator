@@ -84,13 +84,6 @@ template <>
 
 /**
 *  @brief
-*    A specialized ostream operator for the gl::GLuint_array_2 Value template
-*/
-template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::GLuint_array_2> & value);
-
-/**
-*  @brief
 *    The operator to allow Versions to be printed onto a std::ostream
 */
 {{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Version & version);

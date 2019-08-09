@@ -37,7 +37,7 @@ enum class {{binding.enumType}} : unsigned int
 {% else -%}
 // {{binding.constexpr}} static const {{binding.enumType}} {{value.identifier}} = {{binding.enumType}}::{{value.identifier}}; // reuse {{value.groups[0].identifier}}
 {% endif -%}
-{% endfor -%}
+{% endfor %}
 {% endfor %}
 
 } // namespace {{api.identifier}}

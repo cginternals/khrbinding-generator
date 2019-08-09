@@ -17,9 +17,16 @@ from khrapi.Import import Import
 class CPPGenerator:
 
     @classmethod
+    def ensure_dir(cls, file_path):
+        directory = os.path.dirname(file_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+    @classmethod
     def render(cls, engine, template, target, **kwargs):
         templateFilename = Template(template).render(**kwargs)
         targetFilename = Template(target).render(**kwargs)
+        cls.ensure_dir(targetFilename)
         print("Generate %s" % (targetFilename))
         t = engine.get_template(templateFilename)
         t.stream(**kwargs).dump(targetFilename)
@@ -36,7 +43,7 @@ class CPPGenerator:
         # target directory structure
 
         includedir = pjoin(targetdir, pjoin(binding.identifier, "include/" + binding.identifier + "/"))
-        includedir_api = pjoin(includedir, "{{binding.baseNamespace}}{{memberSet}}/")
+        includedir_api = pjoin(includedir, "{{apiString}}{{memberSet}}/")
         includedir_aux = pjoin(targetdir, pjoin(binding.bindingAuxIdentifier, "include", binding.bindingAuxIdentifier+"/"))
         sourcedir = pjoin(targetdir, pjoin(binding.identifier, "source/"))
         sourcedir_api = pjoin(sourcedir, "{{binding.baseNamespace}}/")
@@ -66,8 +73,8 @@ class CPPGenerator:
             max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ]))
         )
         cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 ],
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
+            groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 and type.identifier != profile.booleanType ],
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ],
             max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]))
         )
         cls.render(template_engine, "functions.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,
@@ -162,10 +169,10 @@ class CPPGenerator:
             booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
         )
         cls.render(template_engine, "Meta_StringsByEnum.cpp", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile, binding=binding,
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ]
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ]
         )
         cls.render(template_engine, "Meta_EnumsByString.cpp", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ], len(profile.uppercasePrefix))
+            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ], len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_StringsByExtension.cpp", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile, binding=binding,
             extensions=api.extensions
@@ -198,7 +205,7 @@ class CPPGenerator:
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
             cStringTypes=[ "GLubyte", "GLchar" ],
             cPointerTypes=[ "GLvoid" ],
-            types=[ type for type in api.types if not type.hideDeclaration ]
+            types=[ type for type in api.types if not type.hideDeclaration and not isinstance(type, Import) ]
         )
         
         cls.render(template_engine, "khrbinding-aux/ValidVersions.h", includedir_aux+"ValidVersions.h", api=api, profile=profile, binding=binding)
@@ -208,11 +215,11 @@ class CPPGenerator:
 
         groupedFunctions = cls.identifierPrefixGroups(api, api.functions, len(profile.lowercasePrefix))
         for prefix in cls.prefixes(api):
-            cls.render(template_engine, "functions.cpp", sourcedir_api+"functions_{{prefix}}.cpp", api=api, profile=profile, binding=binding,
+            cls.render(template_engine, "functions.cpp", sourcedir_api+"functions_{{prefix|lower}}.cpp", api=api, profile=profile, binding=binding,
                 prefix=prefix,
                 functions=groupedFunctions[prefix]
             )
-            cls.render(template_engine, "Binding_objects.cpp", sourcedir+"Binding_objects_{{prefix}}.cpp", api=api, profile=profile, binding=binding,
+            cls.render(template_engine, "Binding_objects.cpp", sourcedir+"Binding_objects_{{prefix|lower}}.cpp", api=api, profile=profile, binding=binding,
                 prefix=prefix,
                 functions=groupedFunctions[prefix]
             )
@@ -221,19 +228,19 @@ class CPPGenerator:
         for feature, core, ext in cls.apiMemberSets(api, profile, [ version for version in api.versions if isinstance(version, Version) ]):
             memberSet = "%i%i%s%s" % (feature.majorVersion, feature.minorVersion, "core" if core else "", "ext" if ext else "")
 
-            cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,
-                types=[ type for type in api.types if not type.hideDeclaration ]
+            cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
+                types=[ type for type in api.types if not type.hideDeclaration and not isinstance(type, Import) ]
             )
-            cls.render(template_engine, "bitfieldF.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,memberSet=memberSet,
+            cls.render(template_engine, "bitfieldF.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
             )
-            cls.render(template_engine, "enumF.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding,memberSet=memberSet,
+            cls.render(template_engine, "enumF.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ],
             )
-            cls.render(template_engine, "functionsF.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,memberSet=memberSet,
+            cls.render(template_engine, "functionsF.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 functions=[ function for function in api.functions ]
             )
-            cls.render(template_engine, "entrypointF.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding,memberSet=memberSet)
+            cls.render(template_engine, "entrypointF.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString)
 
     @classmethod
     def prefixes(cls, api):

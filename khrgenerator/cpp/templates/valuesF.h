@@ -2,17 +2,17 @@
 #pragma once
 
 
-#include <{{api.identifer}}binding/no{{api.identifer}}.h>
-#include <{{api.identifer}}binding/{{api.identifer}}/values.h>
+#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{api.identifier}}binding/{{api.identifier}}/values.h>
 
 
-namespace {{api.identifer}}{{memberSet}}
+namespace {{api.identifier}}{{memberSet}}
 {
 
 
 {{#valuesByType.groups}}
 {{#items}}
-using {{api.identifer}}::{{item.identifier}};
+using {{api.identifier}}::{{item.identifier}};
 {{/items}}
 
 {{/valuesByType.groups}}
@@ -21,4 +21,4 @@ using {{api.identifer}}::{{item.identifier}};
 
 {{/valuesByType.empty}}
 
-} // namespace {{api.identifer}}{{memberSet}}
+} // namespace {{api.identifier}}{{memberSet}}

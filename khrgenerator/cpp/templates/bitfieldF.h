@@ -2,19 +2,19 @@
 #pragma once
 
 
-#include <{{binding.identifer}}/no{{api.identifer}}.h>
+#include <{{binding.identifier}}/no{{api.identifier}}.h>
 
-#include <{{binding.identifer}}/{{api.identifer}}/bitfield.h>
+#include <{{binding.identifier}}/{{api.identifier}}/bitfield.h>
 
 
-namespace {{api.identifer}}{{memberSet}}
+namespace {{api.identifier}}{{memberSet}}
 {
 
 
 // import bitfields to namespace
 {%- for constant in constants %}
-using {{api.identifer}}::{{constant.identifier}};
+using {{api.identifier}}::{{constant.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifer}}{{memberSet}}
+} // namespace {{api.identifier}}{{memberSet}}

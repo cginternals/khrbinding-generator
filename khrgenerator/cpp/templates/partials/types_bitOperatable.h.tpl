@@ -1,5 +1,5 @@
 
-namespace {{api.identifer}}
+namespace {{api.identifier}}
 {
 
 
@@ -40,4 +40,4 @@ inline {{identifier}} & operator^=({{identifier}} & a, const {{identifier}} & b)
 }
 
 
-} // namespace {{api.identifer}}
+} // namespace {{api.identifier}}

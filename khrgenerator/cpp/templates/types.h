@@ -34,4 +34,4 @@ namespace {{api.identifier}}
 } // namespace {{api.identifier}}
 
 
-#include <{{binding.idenfitier}}/{{api.identifier}}/types.inl>
+#include <{{binding.identifier}}/{{api.identifier}}/types.inl>

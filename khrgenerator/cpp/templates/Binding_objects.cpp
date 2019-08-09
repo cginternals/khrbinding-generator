@@ -2,7 +2,7 @@
 #include "Binding_pch.h"
 
 
-using namespace {{api.identifer}};
+using namespace {{api.identifier}};
 
 
 namespace {{binding.namespace}}
@@ -10,6 +10,7 @@ namespace {{binding.namespace}}
 
 {% for function in functions %}
 Function<{{function.returnType.identifier}}{{ ", " if function.parameters|length > 0 }}{% for parameter in function.parameters %}{{parameter.type.identifier}}{{ ", " if not loop.last }}{% endfor %}> Binding::{{function.namespaceLessIdentifier}}("{{function.identifier}}");
-{% endfor %}
+{%- endfor %}
+
 
 } // namespace {{binding.namespace}}

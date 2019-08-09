@@ -1,4 +1,4 @@
-{{api.identifer}}{{api.identifer}}
+{{api.identifier}}{{api.identifier}}
 namespace {{api}}
 {
 

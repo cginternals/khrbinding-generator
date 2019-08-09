@@ -3,6 +3,7 @@ class Type(object):
     def __init__(self, api, identifier):
         self.api = api
         self.identifier = identifier
+        self.namespacedIdentifier = identifier
         self.namespace = None
         self.require = None
         self.declaration = self.identifier

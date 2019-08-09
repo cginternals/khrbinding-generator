@@ -52,14 +52,18 @@ class GLParser(XMLParser):
 
                 if nameTag is not None and nameTag.text.startswith("struct"):
                     name = re.search('%s(.*)%s' % ("struct ", ""), nameTag.text).group(1).strip()
-                    api.types.append(NativeType(api, name, nameTag.text + text))
+                    newType = NativeType(api, name, nameTag.text + text)
+                    newType.namespacedIdentifier = profile.baseNamespace+"::"+name
+                    api.types.append(newType)
 
                 elif text.startswith("#include"):
                     importName = re.search('%s(.*)%s' % ("<", ">"), text).group(1).strip()
                     api.types.append(Import(api, type.attrib["name"], importName))
 
                 elif text.startswith("#if"):
-                    api.types.append(NativeType(api, type.attrib["name"], text))
+                    newType = NativeType(api, type.attrib["name"], text)
+                    newType.namespacedIdentifier = profile.baseNamespace+"::"+type.attrib["name"]
+                    api.types.append(newType)
 
                 elif text.startswith("typedef"):
                     aliasName = re.search('%s(.*)%s' % ("typedef ", ";"), text).group(1).strip()
@@ -68,11 +72,16 @@ class GLParser(XMLParser):
                         alias = NativeType(api, aliasName, aliasName)
 
                     typename = nameTag.text
-                    api.types.append(TypeAlias(api, typename, alias))
+                    newType = TypeAlias(api, typename, alias)
+                    newType.namespacedIdentifier = profile.baseNamespace+"::"+typename
+                    api.types.append(newType)
 
         # Constants
         for E in registry.iter("enums"):
             for enum in E.findall("enum"):
+                if api.constantByIdentifier(enum.attrib["name"]) is not None:
+                    continue
+                
                 constant = Constant(api, enum.attrib["name"], enum.attrib["value"])
                 if "group" in E.attrib and E.attrib["group"] == "SpecialNumbers":
                     constant.type = cls.detectSpecialValueType(api, enum)
@@ -86,16 +95,19 @@ class GLParser(XMLParser):
 
                 if name.find("Mask") >= 0 or name == "PathFontStyle":
                     type = BitfieldGroup(api, name)
+                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
                 elif name.find("Boolean") >= 0:
                     type = ValueGroup(api, name)
                     type.hideDeclaration = True
+                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
                 else:
                     type = Enumerator(api, name)
                     type.hideDeclaration = True
+                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
                 
                 for enum in group.findall("enum"):
                     constant = api.constantByIdentifier(enum.attrib["name"])
-                    if constant is None:
+                    if constant is None or constant in type.values:
                         continue
                     type.values.append(constant)
                     constant.groups.append(type)
@@ -111,14 +123,17 @@ class GLParser(XMLParser):
 
                 if type is None and (name.find("Mask") >= 0 or name == "PathFontStyle"):
                     type = BitfieldGroup(api, name)
+                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
                     api.types.append(type)
                 elif type is None and name.find("Boolean") >= 0:
                     type = ValueGroup(api, name)
                     type.hideDeclaration = True
+                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
                     api.types.append(type)
                 elif type is None:
                     type = Enumerator(api, name)
                     type.hideDeclaration = True
+                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
                     api.types.append(type)
 
                 for enum in E.findall("enum"):
@@ -133,7 +148,7 @@ class GLParser(XMLParser):
             for command in C.iter("command"):
                 protoTag = command.find("proto")
                 returnTypeTag = protoTag.find("ptype")
-                returnTypeName = returnTypeTag.text.strip() if returnTypeTag is not None else protoTag.text.strip()
+                returnTypeName = " ".join([ text.strip() for text in [ protoTag.text if protoTag is not None else "", returnTypeTag.text if returnTypeTag is not None else "", returnTypeTag.tail if returnTypeTag is not None else "" ] if text is not None ]).strip()
                 name = protoTag.find("name").text.strip()
 
                 function = Function(api, name)
@@ -146,9 +161,10 @@ class GLParser(XMLParser):
                 function.returnType = returnType
 
                 for param in command.findall("param"):
-                    groupName = None # param.attrib.get("group", None) # Ignore group names for now
+                    groupName = param.attrib.get("group", None)
+                    groupType = api.typeByIdentifier(groupName)
                     typeTag = param.find("ptype")
-                    if groupName is not None:
+                    if groupType is not None and isinstance(groupType, BitfieldGroup):
                         typeName = groupName
                     else:
                         typeName = param.text if param.text else ""
@@ -161,8 +177,25 @@ class GLParser(XMLParser):
                     name = param.find("name").text
                     type = api.typeByIdentifier(typeName)
                     if type is None:
-                        type = NativeType(api, typeName, typeName)
+                        typeParts = typeName.split(" ")
+                        if "struct" in typeParts:
+                            typeParts.remove("struct")
+                        
+                        type = NativeType(api, " ".join(typeParts), " ".join(typeParts))
                         type.hideDeclaration = True
+
+                        if typeParts[0] == "const":
+                            if typeParts[1] == "void":
+                                pass
+                            else:
+                                typeParts[1] = profile.baseNamespace + "::" + typeParts[1]
+                        else:
+                            if typeParts[0] == "void":
+                                pass
+                            else:
+                                typeParts[0] = profile.baseNamespace + "::" + typeParts[0]
+
+                        type.namespacedIdentifier = " ".join(typeParts)
                         api.types.append(type)
 
                     function.parameters.append(Parameter(function, name, type))
@@ -245,11 +278,27 @@ class GLParser(XMLParser):
         api.types.remove(api.typeByIdentifier(profile.enumType))
         api.types.insert(1, Enumerator(api, profile.enumType))
 
-        # Remove boolean type
-        booleanType = next((t for t in api.types if isinstance(t, TypeAlias) and t.identifier == profile.booleanType), None)
-        api.types.remove(booleanType)
+        # Fix boolean type
         booleanType = Enumerator(api, profile.booleanType)
         booleanType.hideDeclaration = True
+
+        # Remove boolean values from GLenum
+        for constant in api.constants:
+            for group in [ group for group in constant.groups if group.identifier == profile.enumType ]:
+                group.values.remove(constant)
+                constant.groups.remove(group)
+            if constant.identifier in [ "GL_TRUE", "GL_FALSE" ]:
+                for group in constant.groups:
+                    group.values.remove(constant)
+                constant.groups = [ booleanType ]
+                booleanType.values.append(constant)
+
+        # Remove boolean type
+        oldBooleanType = next((t for t in api.types if isinstance(t, TypeAlias) and t.identifier == profile.booleanType), None)
+        api.types.remove(oldBooleanType)
+        
+        # Finally add boolean type
+
         api.types.insert(2, booleanType)
 
         # Generic None Bit
@@ -300,6 +349,14 @@ class GLParser(XMLParser):
         unusedBitConstant.groups.append(unusedMaskType)
         api.types.append(unusedMaskType)
         api.constants.append(unusedBitConstant)
+
+        # Add static cast to negative Enum values
+        for constant in api.constants:
+            if constant.value.startswith("-") and len(constant.groups) > 0:
+                if isinstance(constant.groups[0], Enumerator):
+                    constant.value = "static_cast<std::underlying_type<%s>::type>(%s)" % (profile.enumType, constant.value)
+                else:
+                    constant.value = "static_cast<std::underlying_type<%s>::type>(%s)" % (constant.groups[0].identifier, constant.value)
         
         # Add generic Feature Sets
         allFeatureSet = FeatureSet(api, "gl")

@@ -2,16 +2,16 @@
 #pragma once
 
 
-#include <{{binding.identifer}}/no{{api.identifer}}.h>
-#include <{{binding.identifer}}/{{api.identifer}}/functions.h>
+#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/{{api.identifier}}/functions.h>
 
 
-namespace {{api.identifer}}{{memberSet}}
+namespace {{api.identifier}}{{memberSet}}
 {
 
 // import functions
 {%- for function in functions %}
-using {{api.identifer}}::{{function.identifier}};
+using {{api.identifier}}::{{function.identifier}};
 {%- endfor %}
 
-} // namespace {{api.identifer}}{{memberSet}}
+} // namespace {{api.identifier}}{{memberSet}}

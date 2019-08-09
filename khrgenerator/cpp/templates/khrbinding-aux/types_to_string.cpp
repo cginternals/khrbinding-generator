@@ -93,12 +93,14 @@ std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
     {
         return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{cPointerType}} *>*>(value);
     }
-{% endfor %}
+{% endfor -%}
 {% for type in types|sort(attribute='identifier') %}
+    {{ "/*" if type.identifier.endswith("void") or type.identifier.startswith("_") }}
     if (typeid(*value) == typeid(Value<{{api.identifier}}::{{type.identifier}}>))
     {
         return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{type.identifier}}>*>(value);
     }
+    {{ "*/" if type.identifier.endswith("void") or type.identifier.startswith("_") }}
     
     if (typeid(*value) == typeid(Value<{{api.identifier}}::{{type.identifier}} *>))
     {
