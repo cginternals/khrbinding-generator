@@ -212,11 +212,17 @@ class EGLParser(XMLParser):
             api.versions.append(version)
 
     @classmethod
-    def patch(cls, profile, api):
+    def patch(cls, api, profile):
+        return api
+
+    @classmethod
+    def filterAPI(cls, api, profile):
         return api
 
     @classmethod
     def deriveBinding(cls, api, profile):
+        api.printSummary()
+
         binding = super(cls, EGLParser).deriveBinding(api, profile)
 
         return binding

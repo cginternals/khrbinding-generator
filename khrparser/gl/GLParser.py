@@ -379,7 +379,8 @@ class GLParser(XMLParser):
 
         # Remove boolean type
         oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
-        api.types.remove(oldBooleanType)
+        if oldBooleanType is not None:
+            api.types.remove(oldBooleanType)
         
         # Finally add boolean type
 
