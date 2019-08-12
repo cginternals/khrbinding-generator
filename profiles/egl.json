@@ -5,7 +5,7 @@
 	"sourceFile": "egl.xml",
 
 	"": "Parser configuration",
-	"parser": "gl",
+	"parser": "egl",
 
 	"": "Identifier parsing",
 	"lowercasePrefix": "egl",
@@ -29,7 +29,7 @@
 
 	"": "Types",
 	"extensionType": "EGLextension",
-	"booleanType": "EGLboolean",
+	"booleanType": "EGLBoolean",
 	"booleanWidth": 8,
 	"enumType": "EGLenum",
 	"bitfieldType": "EGLbitfield",

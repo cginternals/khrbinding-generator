@@ -327,10 +327,7 @@ class GLParser(XMLParser):
 
         for constant in api.constants:
             constant.groups = [ group for group in constant.groups if group in api.types ]
-            # print(constant.identifier, [group.identifier for group in constant.groups ])
         
-        # api.printSummary()
-
         return api
 
     @classmethod
