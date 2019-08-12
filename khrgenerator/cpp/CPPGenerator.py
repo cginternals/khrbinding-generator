@@ -49,6 +49,9 @@ class CPPGenerator:
         sourcedir_aux = pjoin(targetdir, pjoin(binding.bindingAuxIdentifier, "source/"))
         testdir = pjoin(targetdir, "tests/" + binding.identifier + "-test/")
 
+        booleanValues = [ constant for constant in [ type for type in api.types if type.identifier == profile.booleanType ] ]
+        booleanValueNames = [ constant.identifier for constant in booleanValues ]
+
         # TEMPLATE APPLICATION
 
         # API binding
@@ -73,7 +76,7 @@ class CPPGenerator:
         )
         cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 and type.identifier != profile.booleanType ],
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ],
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in booleanValueNames ],
             max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ] + [ 0 ]))
         )
         cls.render(template_engine, "functions.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
@@ -162,16 +165,16 @@ class CPPGenerator:
             groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_StringsByBoolean.cpp", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile, binding=binding,
-            booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
+            booleans=[ booleanValues ]
         )
         cls.render(template_engine, "Meta_BooleansByString.cpp", sourcedir_aux+"Meta_BooleansByString.cpp", api=api, profile=profile, binding=binding,
-            booleans=[api.constantByIdentifier("GL_TRUE"), api.constantByIdentifier("GL_FALSE")]
+            booleans=[ booleanValues ]
         )
         cls.render(template_engine, "Meta_StringsByEnum.cpp", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile, binding=binding,
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ]
+            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in booleanValueNames ]
         )
         cls.render(template_engine, "Meta_EnumsByString.cpp", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in [ "GL_TRUE", "GL_FALSE" ] ], len(profile.uppercasePrefix))
+            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in booleanValueNames ], len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_StringsByExtension.cpp", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile, binding=binding,
             extensions=api.extensions

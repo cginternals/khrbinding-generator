@@ -292,6 +292,14 @@ class EGLParser(XMLParser):
     @classmethod
     def patch(cls, api, profile):
 
+        # Remove EGLsizeiANDROID-dependent types
+        for constants in [ constant for constant in api.constants if constant.identifier.find('ANDROID') >= 0 ]: # TODO: Handle ANDROID correctly
+            api.constants.remove(constants)
+        for type in [ type for type in api.types if type.identifier.find('ANDROID') >= 0 ]: # TODO: Handle ANDROID correctly
+            api.types.remove(type)
+        for function in [ function for function in api.functions if function.identifier.find('ANDROID') >= 0 ]: # TODO: Handle ANDROID correctly
+            api.functions.remove(function)
+
         # Fix Special Values
         specialNumbersType = None
         oldSpecialNumbersType = api.typeByIdentifier("SpecialNumbers")
@@ -299,20 +307,16 @@ class EGLParser(XMLParser):
             api.types.remove(oldSpecialNumbersType)
 
         for constant in api.constants:
-            if "SpecialNumbers" in [ group.identifier for group in constant.groups ] and len(constant.groups) == 1 and constant.type is not None:
-                if specialNumbersType is None:
-                    specialNumbersType = SpecialValues(api, "SpecialValues")
-                    specialNumbersType.hideDeclaration = True
-                    api.types.append(specialNumbersType)
-            
-                specialNumbersType.values.append(constant)
-                constant.groups = [specialNumbersType]
+            if "SpecialNumbers" in [ group.identifier for group in constant.groups ]:
+                if len(constant.groups) == 1 and constant.type is not None:
+                    if specialNumbersType is None:
+                        specialNumbersType = SpecialValues(api, "SpecialValues")
+                        specialNumbersType.hideDeclaration = True
+                        api.types.append(specialNumbersType)
+                
+                    specialNumbersType.values.append(constant)
+                    constant.groups = [specialNumbersType]
         
-        # Remove EGLsizeiANDROID-dependent types
-        for type in [ type for type in api.types if type.identifier.endswith('ANDROID') ]: # TODO: Handle ANDROID correctly
-            api.types.remove(type)
-        for function in [ function for function in api.functions if function.identifier.find('ANDROID') >= 0 ]:
-            api.functions.remove(function)
 
         return api
     
@@ -350,7 +354,7 @@ class EGLParser(XMLParser):
         for constant in api.constants:
             constant.groups = [ group for group in constant.groups if group in api.types ]
         
-        api.printSummary()
+        # api.printSummary()
 
         return api
 
@@ -476,13 +480,16 @@ class EGLParser(XMLParser):
 
     @classmethod
     def detectSpecialValueType(cls, api, enum):
-        if "comment" in enum.attrib:
-            if re.search('Not an API enum.*', enum.attrib["comment"]) is not None:
-                return None
-
-            result = re.search('%s([A-Za-z0-9_]+)' % ("Tagged as "), enum.attrib["comment"])
-            if result is not None:
-                typeName = result.group(1).strip()
-                return next((t for t in api.types if t.identifier.endswith(typeName)), api.typeByIdentifier("GLuint"))
+        if "type" in enum.attrib:
+            if enum.attrib["type"]=="ull":
+                return api.typeByIdentifier("EGLuint64KHR")
         
-        return api.typeByIdentifier("GLuint")
+        if "value" in enum.attrib:
+            castResult = re.search('%s([A-Za-z0-9_]+)' % ("EGL_CAST\("), enum.attrib["value"])
+            if castResult is not None:
+                typeName = castResult.group(1).strip()
+                return next((t for t in api.types if t.identifier.endswith(typeName)), api.typeByIdentifier("EGLint"))
+            if enum.attrib["value"].startswith("-"):
+                return api.typeByIdentifier("EGLint")
+
+        return api.typeByIdentifier("EGLint")
