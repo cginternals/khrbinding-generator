@@ -68,19 +68,15 @@ template <>
 template <>
 {{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.booleanType}}> & value);
 
-/**
-*  @brief
-*    A specialized ostream operator for the gl::GLubyte * Value template
-*/
-template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::GLubyte *> & value);
+{%- for cStringTypeName in cStringTypes %}
 
 /**
 *  @brief
-*    A specialized ostream operator for the gl::GLchar * Value template
+*    A specialized ostream operator for the {{cStringTypeName}} * Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::GLchar *> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{cStringTypeName}} *> & value);
+{%- endfor %}
 
 /**
 *  @brief

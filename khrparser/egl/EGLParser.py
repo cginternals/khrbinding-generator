@@ -90,8 +90,9 @@ class EGLParser(XMLParser):
 
 
         # Constants
-        for E in registry.iter("enums"):
-            for enum in E.findall("enum"):
+
+        for E in registry.iter("enums"): # Enum Groups
+            for enum in E.findall("enum"): # Enum Values / Constants
                 if api.constantByIdentifier(enum.attrib["name"]) is not None:
                     continue
                 
@@ -102,39 +103,16 @@ class EGLParser(XMLParser):
 
         # Groups
 
-        for G in registry.iter("groups"):
-            for group in G.findall("group"):
-                name = group.attrib["name"]
-
-                if name.find("Mask") >= 0 or name == "PathFontStyle":
-                    type = BitfieldGroup(api, name)
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                elif name.find("Boolean") >= 0:
-                    type = ValueGroup(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                else:
-                    type = Enumerator(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                
-                for enum in group.findall("enum"):
-                    constant = api.constantByIdentifier(enum.attrib["name"])
-                    if constant is None or constant in type.values:
-                        continue
-                    type.values.append(constant)
-                    constant.groups.append(type)
-                
-                if len(type.values) > 0:
-                    api.types.append(type)
-        
         for E in registry.iter("enums"):
-            if "group" in E.attrib:
-                name = E.attrib["group"]
+            if "namespace" in E.attrib:
+                name = E.attrib["namespace"]
 
+                if "group" in E.attrib:
+                    name = E.attrib["group"]
+                
                 type = api.typeByIdentifier(name)
 
-                if type is None and (name.find("Mask") >= 0 or name == "PathFontStyle"):
+                if type is None and "type" in E.attrib and E.attrib["type"] == "bitmask":
                     type = BitfieldGroup(api, name)
                     type.namespacedIdentifier = profile.baseNamespace+"::"+name
                     api.types.append(type)
@@ -145,7 +123,7 @@ class EGLParser(XMLParser):
                     api.types.append(type)
                 elif type is None:
                     type = Enumerator(api, name)
-                    type.hideDeclaration = True
+                    type.hideDeclaration = False # Required
                     type.namespacedIdentifier = profile.baseNamespace+"::"+name
                     api.types.append(type)
 
@@ -317,6 +295,19 @@ class EGLParser(XMLParser):
                     specialNumbersType.values.append(constant)
                     constant.groups = [specialNumbersType]
         
+        # Fix EGLenum type
+        api.types.remove(api.typeByIdentifier(profile.enumType))
+        # api.types.insert(1, Enumerator(api, profile.enumType))
+
+        # Rename EGL to EGLenum
+
+        EGLenumType = api.typeByIdentifier('EGL')
+        EGLenumType.identifier = profile.enumType
+        EGLenumType.namespacedIdentifier = profile.baseNamespace + "::" + EGLenumType.identifier
+
+        # Move to front
+        api.types.remove(EGLenumType)
+        api.types.insert(2, EGLenumType)
 
         return api
     
@@ -341,7 +332,7 @@ class EGLParser(XMLParser):
             any((featureSet for featureSet in featureSets if type in featureSet.requiredTypes)) or
             any((constant for constant in api.constants if type == constant.type or type in constant.groups)) or
             any((function for function in api.functions if type == function.returnType or type in ([ parameter.type for parameter in function.parameters ] + [ parameter.nativeType for parameter in function.parameters ]))) or
-            type.identifier in [ "GLuint64", "GLchar", "GLubyte", profile.bitfieldType, "SpecialValues" ]
+            type.identifier in [ profile.bitfieldType, "SpecialValues" ]
         ]
         for type in api.types:
             if isinstance(type, BitfieldGroup):
@@ -362,7 +353,7 @@ class EGLParser(XMLParser):
     def deriveBinding(cls, api, profile):
 
         # Remove shared enum and bitfield GL_NONE
-        noneBit = api.constantByIdentifier("GL_NONE")
+        noneBit = api.constantByIdentifier("EGL_NONE")
         if noneBit is not None:
             for group in noneBit.groups[:]:
                 if isinstance(group, BitfieldGroup):
@@ -380,15 +371,26 @@ class EGLParser(XMLParser):
         for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
             group.values.append(genericNoneBit)
             genericNoneBit.groups.append(group)
+        
+        # Add EGLuint type
+        uintType = api.typeByIdentifier('unsigned int')
+        if uintType is None:
+            uintType = NativeType(api, 'unsigned int', 'unsigned int')
+            uintType.hideDeclaration = True
+            api.types.append(uintType)
+        eglUintType = TypeAlias(api, "EGLuint", uintType)
+        eglUintType.namespacedIdentifier = profile.baseNamespace+"::"+eglUintType.identifier
+        api.types.append(eglUintType)
 
-        # Add GLextension type
+        # Add EGLbitfield type
+        bitfieldType = TypeAlias(api, "EGLbitfield", eglUintType)
+        bitfieldType.namespacedIdentifier = profile.baseNamespace+"::"+bitfieldType.identifier
+        api.types.append(bitfieldType)
+
+        # Add EGLextension type
         extensionType = Enumerator(api, profile.extensionType)
         extensionType.unsigned = False
         api.types.insert(0, extensionType)
-
-        # Fix GLenum type
-        api.types.remove(api.typeByIdentifier(profile.enumType))
-        api.types.insert(1, Enumerator(api, profile.enumType))
 
         # Fix boolean type
         booleanType = Enumerator(api, profile.booleanType)
@@ -396,7 +398,7 @@ class EGLParser(XMLParser):
 
         # Remove boolean values from GLenum
         for constant in api.constants:
-            if constant.identifier in [ "GL_TRUE", "GL_FALSE" ]:
+            if constant.identifier in [ "EGL_TRUE", "EGL_FALSE" ]:
                 for group in constant.groups:
                     group.values.remove(constant)
                 constant.groups = [ booleanType ]
@@ -461,10 +463,7 @@ class EGLParser(XMLParser):
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
         binding.apientry = api.identifier.upper()+"_APIENTRY"
 
-        if profile.apiIdentifier == "gles2":
-            binding.additionalTypes = "using EGLint = int;\nusing EGLchar = char;\nusing EGLNativeDisplayType = void*;\nusing EGLNativePixmapType = void*;\nusing EGLNativeWindowType = void*;"
-        else:
-            binding.additionalTypes = ""
+        binding.additionalTypes = ""
         
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement
@@ -475,6 +474,7 @@ class EGLParser(XMLParser):
         binding.enumType = profile.enumType
         binding.bitfieldType = profile.bitfieldType
         binding.noneBitfieldValue = profile.noneBitfieldValue
+        binding.cStringOutputTypes = profile.cStringOutputTypes
 
         return binding
 

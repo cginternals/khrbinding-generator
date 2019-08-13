@@ -1,6 +1,5 @@
 {
 	"": "API specification",
-	"apiIdentifier": "egl",
 	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/master/api/egl.xml",
 	"sourceFile": "egl.xml",
 
@@ -34,6 +33,7 @@
 	"enumType": "EGLenum",
 	"bitfieldType": "EGLbitfield",
 	"noneBitfieldValue": "EGL_NONE_BIT",
+	"cStringOutputTypes": [],
 
 	"": "API Feature management",
 	"apiIdentifier": "egl",

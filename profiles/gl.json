@@ -33,6 +33,7 @@
 	"enumType": "GLenum",
 	"bitfieldType": "GLbitfield",
 	"noneBitfieldValue": "GL_NONE_BIT",
+	"cStringOutputTypes": [ "GLubyte", "GLchar" ],
 
 	"": "API Feature management",
 	"apiIdentifier": "gl",

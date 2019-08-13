@@ -49,7 +49,8 @@ class CPPGenerator:
         sourcedir_aux = pjoin(targetdir, pjoin(binding.bindingAuxIdentifier, "source/"))
         testdir = pjoin(targetdir, "tests/" + binding.identifier + "-test/")
 
-        booleanValues = [ constant for constant in [ type for type in api.types if type.identifier == profile.booleanType ] ]
+        booleanTypes = [ type for type in api.types if type.identifier == profile.booleanType ]
+        booleanValues = [ constant for booleanType in booleanTypes for constant in booleanType.values ]
         booleanValueNames = [ constant.identifier for constant in booleanValues ]
 
         # TEMPLATE APPLICATION
@@ -165,10 +166,10 @@ class CPPGenerator:
             groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_StringsByBoolean.cpp", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile, binding=binding,
-            booleans=[ booleanValues ]
+            booleans=booleanValues
         )
         cls.render(template_engine, "Meta_BooleansByString.cpp", sourcedir_aux+"Meta_BooleansByString.cpp", api=api, profile=profile, binding=binding,
-            booleans=[ booleanValues ]
+            booleans=booleanValues
         )
         cls.render(template_engine, "Meta_StringsByEnum.cpp", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile, binding=binding,
             constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in booleanValueNames ]
@@ -199,15 +200,16 @@ class CPPGenerator:
         cls.render(template_engine, "khrbinding-aux/RingBuffer.inl", includedir_aux+"RingBuffer.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.h", includedir_aux+"types_to_string.h", api=api, profile=profile, binding=binding,
             enumerators=[ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ],
-            bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ]
+            bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
+            cStringTypes=binding.cStringOutputTypes,
         )
         cls.render(template_engine, "khrbinding-aux/types_to_string.inl", includedir_aux+"types_to_string.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.cpp", sourcedir_aux+"types_to_string.cpp", api=api, profile=profile, binding=binding,
             enumerators=[ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ],
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
-            cStringTypes=[ "GLubyte", "GLchar" ],
+            cStringTypes=binding.cStringOutputTypes,
             cPointerTypes=[ type.identifier for type in api.types if type.identifier == "GLvoid" ],
-            types=[ type for type in api.types if not type.hideDeclaration ]
+            types=[ type for type in api.types if not type.hideDeclaration and not type.declaration.startswith('struct') ]
         )
         
         cls.render(template_engine, "khrbinding-aux/ValidVersions.h", includedir_aux+"ValidVersions.h", api=api, profile=profile, binding=binding)

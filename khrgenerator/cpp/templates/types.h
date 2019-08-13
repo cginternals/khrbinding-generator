@@ -25,10 +25,10 @@
 namespace {{api.identifier}}
 {
 
-{{binding.additionalTypes}}
 {% for declaration in declarations %}
 {{declaration}}
 {%- endfor %}
+
 
 } // namespace {{api.identifier}}
 

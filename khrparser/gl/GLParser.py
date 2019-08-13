@@ -366,6 +366,46 @@ class GLParser(XMLParser):
         booleanType = Enumerator(api, profile.booleanType)
         booleanType.hideDeclaration = True
 
+        # Add missing types
+        if profile.apiIdentifier == "gles2":
+            intType = api.typeByIdentifier('int')
+            if intType is None:
+                intType = NativeType(api, "int", "int")
+                intType.hideDeclaration = True
+                api.types.append(intType)
+
+            charType = api.typeByIdentifier('char')
+            if charType is None:
+                charType = NativeType(api, "char", "char")
+                charType.hideDeclaration = True
+                api.types.append(charType)
+                
+            voidpType = api.typeByIdentifier('void *')
+            if voidpType is None:
+                voidpType = NativeType(api, "void *", "void *")
+                voidpType.hideDeclaration = True
+                api.types.append(voidpType)
+
+            eglIntType = TypeAlias(api, "EGLint", intType)
+            eglIntType.namespacedIdentifier = profile.baseNamespace+"::"+eglIntType.identifier
+            api.types.append(eglIntType)
+
+            eglCharType = TypeAlias(api, "EGLchar", charType)
+            eglCharType.namespacedIdentifier = profile.baseNamespace+"::"+eglCharType.identifier
+            api.types.append(eglCharType)
+
+            eglNativeDisplayType = TypeAlias(api, "EGLNativeDisplayType", voidpType)
+            eglNativeDisplayType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativeDisplayType.identifier
+            api.types.append(eglNativeDisplayType)
+
+            eglNativePixmapType = TypeAlias(api, "EGLNativePixmapType", voidpType)
+            eglNativePixmapType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativePixmapType.identifier
+            api.types.append(eglNativePixmapType)
+
+            eglNativeWindowType = TypeAlias(api, "EGLNativeWindowType", voidpType)
+            eglNativeWindowType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativeWindowType.identifier
+            api.types.append(eglNativeWindowType)
+
         # Remove boolean values from GLenum
         for constant in api.constants:
             if constant.identifier in [ "GL_TRUE", "GL_FALSE" ]:
@@ -433,11 +473,6 @@ class GLParser(XMLParser):
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
         binding.apientry = api.identifier.upper()+"_APIENTRY"
 
-        if profile.apiIdentifier == "gles2":
-            binding.additionalTypes = "using EGLint = int;\nusing EGLchar = char;\nusing EGLNativeDisplayType = void*;\nusing EGLNativePixmapType = void*;\nusing EGLNativeWindowType = void*;"
-        else:
-            binding.additionalTypes = ""
-        
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement
 
@@ -447,6 +482,7 @@ class GLParser(XMLParser):
         binding.enumType = profile.enumType
         binding.bitfieldType = profile.bitfieldType
         binding.noneBitfieldValue = profile.noneBitfieldValue
+        binding.cStringOutputTypes = profile.cStringOutputTypes
 
         return binding
 
