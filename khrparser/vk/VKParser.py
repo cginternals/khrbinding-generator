@@ -64,6 +64,10 @@ class VKParser(XMLParser):
     @classmethod
     def filterAPI(cls, api, profile):
 
+        # filter extensions
+        api.extensions = [ extension for extension in api.extensions if not extension.identifier.startswith('RESERVED_DO_NOT_USE') ]
+        api.extensions = [ extension for extension in api.extensions if not "_extension_" in extension.identifier ]
+
         return api
 
     @classmethod
