@@ -2,11 +2,10 @@
 from .FeatureSet import FeatureSet
 
 class Version(FeatureSet):
-    def __init__(self, api, identifier, versionString):
-        internalIdentifier = "".join([c for c in identifier if not c.isdigit() ] + [ c for c in versionString if c.isdigit() ])
+    def __init__(self, api, internalIdentifier, identifier, versionString, apiString):
         super(Version, self).__init__(api, internalIdentifier)
         self.nativeIdentifier = identifier
-        self.apiString = "".join([c for c in identifier if not c.isdigit() ])
+        self.apiString = apiString
         self.majorVersion, self.minorVersion = [ int(val) for val in versionString.split(".")[0:2] ]
         self.isCore = False
         self.isExt = False

@@ -222,47 +222,7 @@ class EGLParser(XMLParser):
 
         # Versions
         for feature in registry.iter("feature"):
-
-            version = Version(api, feature.attrib["api"], feature.attrib["number"])
-            version.supportedAPIs = feature.attrib["api"].split("|")
-
-            for require in feature.findall("require"):
-                comment = require.attrib.get("comment", "")
-                if comment.startswith("Reuse tokens from "):
-                    requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse tokens from "), comment).group(1).strip()
-                    version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
-                elif comment.startswith("Reuse commands from "):
-                    requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse commands from "), comment).group(1).strip()
-                    version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
-                elif comment.startswith("Reuse "):
-                    requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse "), comment).group(1).strip()
-                    version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
-                elif comment.startswith("Promoted from "):
-                    requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Promoted from "), comment).group(1).strip()
-                    version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
-
-                if comment.startswith("Not used by the API"):
-                    continue
-
-                for child in require:
-                    if child.tag == "enum":
-                        version.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
-                    elif child.tag == "command":
-                        function = api.functionByIdentifier(child.attrib["name"])
-                        version.requiredFunctions.append(function)
-                        function.requiringFeatureSets.append(version)
-                    elif child.tag == "type":
-                        version.requiredTypes.append(api.typeByIdentifier(child.attrib["name"]))
-
-            for remove in feature.findall("remove"):
-                for child in remove:
-                    if child.tag == "enum":
-                        version.removedConstants.append(api.constantByIdentifier(child.attrib["name"]))
-                    elif child.tag == "command":
-                        version.removedFunctions.append(api.functionByIdentifier(child.attrib["name"]))
-                    elif child.tag == "type":
-                        version.removedTypes.append(api.typeByIdentifier(child.attrib["name"]))
-
+            version = cls.createVersion(api, feature)
             api.versions.append(version)
 
         return api
@@ -493,3 +453,48 @@ class EGLParser(XMLParser):
                 return api.typeByIdentifier("EGLint")
 
         return api.typeByIdentifier("EGLint")
+
+    @classmethod
+    def createVersion(cls, api, feature_xml):
+        internalIdentifier = "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ] + [ c for c in feature_xml.attrib["number"] if c.isdigit() ])
+        version = Version(api, internalIdentifier, feature.attrib["api"], feature_xml.attrib["number"], "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ]))
+        version.supportedAPIs = feature_xml.attrib["api"].split("|")
+
+        for require in feature_xml.findall("require"):
+            comment = require.attrib.get("comment", "")
+            if comment.startswith("Reuse tokens from "):
+                requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse tokens from "), comment).group(1).strip()
+                version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+            elif comment.startswith("Reuse commands from "):
+                requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse commands from "), comment).group(1).strip()
+                version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+            elif comment.startswith("Reuse "):
+                requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse "), comment).group(1).strip()
+                version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+            elif comment.startswith("Promoted from "):
+                requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Promoted from "), comment).group(1).strip()
+                version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+
+            if comment.startswith("Not used by the API"):
+                continue
+
+            for child in require:
+                if child.tag == "enum":
+                    version.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
+                elif child.tag == "command":
+                    function = api.functionByIdentifier(child.attrib["name"])
+                    version.requiredFunctions.append(function)
+                    function.requiringFeatureSets.append(version)
+                elif child.tag == "type":
+                    version.requiredTypes.append(api.typeByIdentifier(child.attrib["name"]))
+
+        for remove in feature_xml.findall("remove"):
+            for child in remove:
+                if child.tag == "enum":
+                    version.removedConstants.append(api.constantByIdentifier(child.attrib["name"]))
+                elif child.tag == "command":
+                    version.removedFunctions.append(api.functionByIdentifier(child.attrib["name"]))
+                elif child.tag == "type":
+                    version.removedTypes.append(api.typeByIdentifier(child.attrib["name"]))
+
+        return version

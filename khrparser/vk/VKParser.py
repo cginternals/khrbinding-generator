@@ -44,7 +44,7 @@ class VKParser(XMLParser):
         # Functions
         for C in registry.iter("commands"):
             for command in C.findall("command"):
-                cls.handleFunction(api, command)
+                cls.handleFunction(api, profile, command)
 
         # Extensions
         for E in registry.iter("extensions"):
@@ -58,12 +58,121 @@ class VKParser(XMLParser):
         return api
 
     @classmethod
-    def patch(cls, profile, api):
+    def patch(cls, api, profile):
+        return api
+
+    @classmethod
+    def filterAPI(cls, api, profile):
+
         return api
 
     @classmethod
     def deriveBinding(cls, api, profile):
+
+        # Remove shared enum and bitfield VK_NONE
+        noneBit = api.constantByIdentifier("VK_NONE")
+        if noneBit is not None:
+            for group in noneBit.groups[:]:
+                if isinstance(group, BitfieldGroup):
+                    group.values.remove(noneBit)
+                    noneBit.groups.remove(group)
+            if len(group.values) == 0:
+                api.types.remove(group)
+            if len(noneBit.groups) == 0:
+                api.constants.remove(noneBit)
+
+        # Generic None Bit
+        genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+        genericNoneBit.generic = True
+        api.constants.append(genericNoneBit)
+        for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
+            group.values.append(genericNoneBit)
+            genericNoneBit.groups.append(group)
+
+        # Add GLextension type
+        extensionType = Enumerator(api, profile.extensionType)
+        extensionType.unsigned = False
+        api.types.insert(0, extensionType)
+
+        # Fix GLenum type
+        oldEnumType = api.typeByIdentifier(profile.enumType)
+        if oldEnumType in api.types:
+            api.types.remove(oldEnumType)
+        api.types.insert(1, Enumerator(api, profile.enumType))
+
+        # Fix boolean type
+        booleanType = Enumerator(api, profile.booleanType)
+        booleanType.hideDeclaration = True
+
+        # Remove boolean values from GLenum
+        for constant in api.constants:
+            if constant.identifier in [ "VK_TRUE", "VK_FALSE" ]:
+                for group in constant.groups:
+                    group.values.remove(constant)
+                constant.groups = [ booleanType ]
+                booleanType.values.append(constant)
+
+        # Remove boolean type
+        oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
+        if oldBooleanType is not None:
+            api.types.remove(oldBooleanType)
+        
+        # Finally add boolean type
+
+        api.types.insert(2, booleanType)
+
+        # Assign Ungrouped
+        ungroupedType = None
+        for constant in api.constants:
+            if len(constant.groups) == 0:
+                if ungroupedType is None:
+                    ungroupedType = Enumerator(api, "UNGROUPED")
+                    ungroupedType.hideDeclaration = True
+                    api.types.append(ungroupedType)
+            
+                ungroupedType.values.append(constant)
+                constant.groups.append(ungroupedType)
+        
+        # Add unused mask bitfield
+        unusedMaskType = BitfieldGroup(api, "UnusedMask")
+        unusedBitConstant = Constant(api, "GL_UNUSED_BIT", "0x00000000")
+        unusedMaskType.values.append(unusedBitConstant)
+        unusedBitConstant.groups.append(unusedMaskType)
+        api.types.append(unusedMaskType)
+        api.constants.append(unusedBitConstant)
+
         binding = super(cls, VKParser).deriveBinding(api, profile)
+
+        binding.baseNamespace = profile.baseNamespace
+        
+        binding.multiContextBinding = profile.multiContextBinding
+        binding.minCoreVersion = profile.minCoreVersion
+        
+        binding.identifier = profile.bindingNamespace
+        binding.namespace = profile.bindingNamespace
+        binding.auxIdentifier = "aux"
+        binding.auxNamespace = "aux"
+        binding.bindingAuxIdentifier = binding.identifier + "-" + binding.auxIdentifier
+        binding.bindingAuxNamespace = binding.namespace + "::" + binding.auxNamespace
+        binding.apiExport = binding.identifier.upper() + "_API"
+        binding.apiTemplateExport = binding.identifier.upper() + "_TEMPLATE_API"
+        binding.auxApiExport = binding.identifier.upper() + "_" + binding.auxIdentifier.upper() + "_API"
+        binding.auxApiTemplateExport = binding.identifier.upper() + "_" + binding.auxIdentifier.upper() + "_TEMPLATE_API"
+        binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
+        binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
+        binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
+        binding.apientry = api.identifier.upper()+"_APIENTRY"
+
+        binding.headerGuardMacro = profile.headerGuardMacro
+        binding.headerReplacement = profile.headerReplacement
+
+        binding.extensionType = profile.extensionType
+        binding.booleanType = profile.booleanType
+        binding.booleanWidth = profile.booleanWidth
+        binding.enumType = profile.enumType
+        binding.bitfieldType = profile.bitfieldType
+        binding.noneBitfieldValue = profile.noneBitfieldValue
+        binding.cStringOutputTypes = profile.cStringOutputTypes
 
         return binding
 
@@ -173,12 +282,13 @@ class VKParser(XMLParser):
             api.constants.append(c)
 
     @classmethod
-    def handleFunction(cls, api, command):
+    def handleFunction(cls, api, profile, command):
         if "name" in command.attrib and "alias" in command.attrib:
             aliasFunction = api.functionByIdentifier(command.attrib["alias"])
             function = Function(api, command.attrib["name"])
             function.returnType = aliasFunction.returnType
             function.parameters = aliasFunction.parameters
+            function.namespaceLessIdentifier = function.identifier[len(profile.lowercasePrefix):]
             api.functions.append(function)
             return
 
@@ -193,6 +303,7 @@ class VKParser(XMLParser):
             returnType = NativeType(api, returnTypeName, returnTypeName)
             api.types.append(returnType)
         function.returnType = returnType
+        function.namespaceLessIdentifier = function.identifier[len(profile.lowercasePrefix):]
 
         for param in command.findall("param"):
             groupName = None # param.attrib.get("group", None) # Ignore group names for now
@@ -271,7 +382,8 @@ class VKParser(XMLParser):
 
     @classmethod
     def handleVersion(cls, api, feature):
-        version = Version(api, feature.attrib["name"], feature.attrib["number"])
+        identifier = "vk"+"".join([ c for c in feature.attrib["number"] if c.isdigit() ])
+        version = Version(api, identifier, feature.attrib["name"], feature.attrib["number"], "vk")
 
         for require in feature.findall("require"):
             cls.handleVersionRequire(api, version, require)
