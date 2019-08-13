@@ -73,5 +73,5 @@ More options are subject to future development. Ideas and requirements are welco
 
 ## Dependencies
 
-* Python (either 2.7 or 3)
-  * pystache
+* Python 3
+  * jinja2
