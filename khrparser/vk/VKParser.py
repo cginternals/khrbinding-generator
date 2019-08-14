@@ -46,14 +46,14 @@ class VKParser(XMLParser):
             for command in C.findall("command"):
                 cls.handleFunction(api, profile, command)
 
+        # Versions
+        for feature in registry.iter("feature"):
+            cls.handleVersion(api, feature)
+
         # Extensions
         for E in registry.iter("extensions"):
             for xmlExtension in E.findall("extension"):
                 cls.handleExtension(api, xmlExtension)
-
-        # Versions
-        for feature in registry.iter("feature"):
-            cls.handleVersion(api, feature)
 
         return api
 
@@ -67,6 +67,12 @@ class VKParser(XMLParser):
         # filter extensions
         api.extensions = [ extension for extension in api.extensions if not extension.identifier.startswith('RESERVED_DO_NOT_USE') ]
         api.extensions = [ extension for extension in api.extensions if not "_extension_" in extension.identifier ]
+
+        for constant in [ constant for constant in api.constants if constant.value == "__TODO_INVALID_VALUE__" ]:
+            for group in constant.groups:
+                group.values.remove(constant)
+            constant.groups = []
+            api.constants.remove(constant)
 
         return api
 
@@ -219,7 +225,7 @@ class VKParser(XMLParser):
         elif category == "basetype":
             cls.handleBaseType(api, type, name, text)
 
-        elif category == "bitmask":
+        elif category == "enum" and "Bit" in type.attrib["name"]:
             cls.handleBitmaskType(api, type, name, text)
 
         elif category == "handle":
@@ -242,19 +248,21 @@ class VKParser(XMLParser):
         nameString = E.attrib.get("name", None)
         typeString = E.attrib.get("type", None)
 
+        type = api.typeByIdentifier(nameString)
+        if type is not None:
+            return type
+
         if nameString == "API Constants":
             type = Enumerator(api, "UNGROUPED")
             api.types.append(type)
         else:
-            type = api.typeByIdentifier(nameString)
-            if type is None:
-                if typeString == "enum":
-                    type = Enumerator(api, nameString)
-                elif typeString == "bitmask":
-                    type = BitfieldGroup(api, nameString)
-                else:
-                    type = Enumerator(api, nameString)
-                api.types.append(type)
+            if typeString == "enum":
+                type = Enumerator(api, nameString)
+            elif typeString == "bitmask":
+                type = BitfieldGroup(api, nameString)
+            else:
+                type = Enumerator(api, nameString)
+            api.types.append(type)
         
         return type
 
@@ -262,9 +270,9 @@ class VKParser(XMLParser):
     def handleConstantValue(cls, api, type, enum):
         name = enum.attrib["name"]
         if "extnumber" in enum.attrib and "offset" in enum.attrib:
-            value = str(1000000000 + 1000 * (int(enum.attrib["extnumber"])-1) + int(enum.attrib["offset"]))
+            value = hex(1000000000 + 1000 * (int(enum.attrib["extnumber"])-1) + int(enum.attrib["offset"]))
         elif "bitpos" in enum.attrib:
-            value = str(1 << int(enum.attrib["bitpos"]))
+            value = hex(1 << int(enum.attrib["bitpos"]))
         else:
             value = enum.attrib.get("value", None)
 
@@ -351,27 +359,25 @@ class VKParser(XMLParser):
                             type = Enumerator(api, "UNGROUPED")
                             api.types.append(type)
 
-                        if "extnumber" in child.attrib and "offset" in child.attrib:
-                            value = str(1000000000 + 1000 * (int(child.attrib["extnumber"])-1) + int(child.attrib["offset"]))
+                        if "number" in xmlExtension.attrib and "offset" in child.attrib:
+                            value = hex(1000000000 + 1000 * (int(xmlExtension.attrib["number"])-1) + int(child.attrib["offset"]))
                         elif "bitpos" in child.attrib:
-                            value = str(1 << int(child.attrib["bitpos"]))
+                            value = hex(1 << int(child.attrib["bitpos"]))
                         else:
                             value = child.attrib.get("value", None)
 
-                        constant = Constant(api, name, value if value else name)
-
                         if "alias" in child.attrib:
                             alias = child.attrib["alias"]
-                            aliasConstant = Constant(api, alias, value)
-                            constants = [constant, aliasConstant]
-                        else:
-                            constants = [constant]
+                            aliasConstant = api.constantByIdentifier(alias)
+                            if aliasConstant is not None:
+                                value = aliasConstant.value
 
-                        for c in constants:
-                            type.values.append(c)
-                            c.groups.append(type)
-                            api.constants.append(c)
-                            extension.requiredConstants.append(c)
+                        constant = Constant(api, name, value if value else name)
+
+                        type.values.append(constant)
+                        constant.groups.append(type)
+                        api.constants.append(constant)
+                        extension.requiredConstants.append(constant)
                     else:
                         extension.requiredConstants.append(constant)
                 elif child.tag == "command":
@@ -422,26 +428,24 @@ class VKParser(XMLParser):
                         api.types.append(type)
 
                     if "extnumber" in child.attrib and "offset" in child.attrib:
-                        value = str(1000000000 + 1000 * (int(child.attrib["extnumber"])-1) + int(child.attrib["offset"]))
+                        value = hex(1000000000 + 1000 * (int(child.attrib["extnumber"])-1) + int(child.attrib["offset"]))
                     elif "bitpos" in child.attrib:
-                        value = str(1 << int(child.attrib["bitpos"]))
+                        value = hex(1 << int(child.attrib["bitpos"]))
                     else:
                         value = child.attrib.get("value", None)
-                    
-                    constant = Constant(api, name, value if value else name)
 
                     if "alias" in child.attrib:
                         alias = child.attrib["alias"]
-                        aliasConstant = Constant(api, alias, value)
-                        constants = [constant, aliasConstant]
-                    else:
-                        constants = [constant]
+                        aliasConstant = api.constantByIdentifier(alias)
+                        if aliasConstant is not None:
+                            value = aliasConstant.value
+                    
+                    constant = Constant(api, name, value if value else name)
 
-                    for c in constants:
-                        type.values.append(c)
-                        c.groups.append(type)
-                        api.constants.append(c)
-                        version.requiredConstants.append(c)
+                    type.values.append(constant)
+                    constant.groups.append(type)
+                    api.constants.append(constant)
+                    version.requiredConstants.append(constant)
                 else:
                     version.requiredConstants.append(constant)
             elif child.tag == "command":
@@ -500,16 +504,7 @@ class VKParser(XMLParser):
 
     @classmethod
     def handleBitmaskType(cls, api, type, name, text):
-        typeTag = type.find('type')
-        if text.startswith("typedef") and typeTag is not None:
-            aliasName = typeTag.text
-            alias = api.typeByIdentifier(aliasName)
-            if alias is None:
-                alias = NativeType(api, aliasName, aliasName)
-
-            api.types.append(TypeAlias(api, name, alias))
-        else:
-            pass
+        api.types.append(BitfieldGroup(api, type.attrib["name"]))
 
     @classmethod
     def handleHandleType(cls, api, type, name, text):
