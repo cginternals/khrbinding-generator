@@ -5,6 +5,7 @@ class CompoundType(Type):
     def __init__(self, api, identifier, type):
         super(CompoundType, self).__init__(api, identifier)
         self.type = type
+        self.extends = []
         self.memberFunctions = []
         self.staticFunctions = []
         self.memberAttributes = []

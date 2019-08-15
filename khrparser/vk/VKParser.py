@@ -33,8 +33,15 @@ class VKParser(XMLParser):
         for T in registry.iter("types"):
             for type in T.findall("type"):
                 cls.handleType(api, type, deferredFunctionPointerTypes)
+        
+        # Create deferred types
         for type in deferredFunctionPointerTypes:
             cls.handleFunctionPointerType(api, type)
+        
+        # Parse type relations
+        for T in registry.iter("types"):
+            for type in T.findall("type"):
+                cls.handleTypeRelations(api, type)
 
         # Constants
         for E in registry.iter("enums"):
@@ -49,14 +56,14 @@ class VKParser(XMLParser):
             for command in C.findall("command"):
                 cls.handleFunction(api, profile, command)
 
-        # Versions
-        for feature in registry.iter("feature"):
-            cls.handleVersion(api, feature)
-
         # Extensions
         for E in registry.iter("extensions"):
             for xmlExtension in E.findall("extension"):
                 cls.handleExtension(api, xmlExtension)
+
+        # Versions
+        for feature in registry.iter("feature"):
+            cls.handleVersion(api, feature)
 
         return api
 
@@ -95,19 +102,22 @@ class VKParser(XMLParser):
 
         api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
 
-        print([ function.identifier for function in api.functions ])
+        # print([ function.identifier for function in api.functions ])
         
         availableTypes = api.types
         api.types = [ type for type in availableTypes if
             any((featureSet for featureSet in featureSets if type in featureSet.requiredTypes)) or
             any((constant for constant in api.constants if type == constant.type or type in constant.groups)) or
             any((function for function in api.functions if type == function.returnType or type in ([ parameter.type for parameter in function.parameters ] + [ parameter.nativeType for parameter in function.parameters ]))) or
-            type.identifier in [ profile.bitfieldType, "SpecialValues" ]
+            type.identifier in [ profile.bitfieldType, "SpecialValues" ] or
+            isinstance(type, NativeCode)
         ]
-        for i in range(1, 5):
+        for i in range(1, 3):
             api.types = [ type for type in availableTypes if
                 type in api.types or
-                isinstance(type, CompoundType) and any((attribute for attribute in type.memberAttributes if attribute.type in api.types))
+                any((otherType for otherType in api.types if
+                    (isinstance(otherType, CompoundType) and (type in [ attribute.type for attribute in otherType.memberAttributes ] or type in [ attribute.nativeType for attribute in otherType.memberAttributes ] or type in otherType.extends))
+                ))
             ]
         
         api.types = [ type for type in api.types if ((not isinstance(type, BitfieldGroup) and not isinstance(type, Enumerator)) or len(type.values) > 0) ]
@@ -120,6 +130,8 @@ class VKParser(XMLParser):
                 type.values = [ value for value in type.values if value in api.constants ]
             if isinstance(type, Enumerator):
                 type.values = [ value for value in type.values if value in api.constants ]
+        
+        # api.printSummary()
 
         return api
 
@@ -127,76 +139,76 @@ class VKParser(XMLParser):
     def deriveBinding(cls, api, profile):
 
         # Remove shared enum and bitfield VK_NONE
-        noneBit = api.constantByIdentifier("VK_NONE")
-        if noneBit is not None:
-            for group in noneBit.groups[:]:
-                if isinstance(group, BitfieldGroup):
-                    group.values.remove(noneBit)
-                    noneBit.groups.remove(group)
-            if len(group.values) == 0:
-                api.types.remove(group)
-            if len(noneBit.groups) == 0:
-                api.constants.remove(noneBit)
+        # noneBit = api.constantByIdentifier("VK_NONE")
+        # if noneBit is not None:
+        #     for group in noneBit.groups[:]:
+        #         if isinstance(group, BitfieldGroup):
+        #             group.values.remove(noneBit)
+        #             noneBit.groups.remove(group)
+        #     if len(group.values) == 0:
+        #         api.types.remove(group)
+        #     if len(noneBit.groups) == 0:
+        #         api.constants.remove(noneBit)
 
         # Generic None Bit
-        genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
-        genericNoneBit.generic = True
-        api.constants.append(genericNoneBit)
-        for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
-            group.values.append(genericNoneBit)
-            genericNoneBit.groups.append(group)
+        # genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+        # genericNoneBit.generic = True
+        # api.constants.append(genericNoneBit)
+        # for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
+        #     group.values.append(genericNoneBit)
+        #     genericNoneBit.groups.append(group)
 
         # Add GLextension type
-        extensionType = Enumerator(api, profile.extensionType)
-        extensionType.unsigned = False
-        api.types.insert(0, extensionType)
+        # extensionType = Enumerator(api, profile.extensionType)
+        # extensionType.unsigned = False
+        # api.types.insert(0, extensionType)
 
         # Fix GLenum type
-        oldEnumType = api.typeByIdentifier(profile.enumType)
-        if oldEnumType in api.types:
-            api.types.remove(oldEnumType)
-        api.types.insert(1, Enumerator(api, profile.enumType))
+        # oldEnumType = api.typeByIdentifier(profile.enumType)
+        # if oldEnumType in api.types:
+        #     api.types.remove(oldEnumType)
+        # api.types.insert(1, Enumerator(api, profile.enumType))
 
         # Fix boolean type
-        booleanType = Enumerator(api, profile.booleanType)
-        booleanType.hideDeclaration = True
+        # booleanType = Enumerator(api, profile.booleanType)
+        # booleanType.hideDeclaration = True
 
         # Remove boolean values from GLenum
-        for constant in api.constants:
-            if constant.identifier in [ "VK_TRUE", "VK_FALSE" ]:
-                for group in constant.groups:
-                    group.values.remove(constant)
-                constant.groups = [ booleanType ]
-                booleanType.values.append(constant)
+        # for constant in api.constants:
+        #     if constant.identifier in [ "VK_TRUE", "VK_FALSE" ]:
+        #         for group in constant.groups:
+        #             group.values.remove(constant)
+        #         constant.groups = [ booleanType ]
+        #         booleanType.values.append(constant)
 
         # Remove boolean type
-        oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
-        if oldBooleanType is not None:
-            api.types.remove(oldBooleanType)
+        # oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
+        # if oldBooleanType is not None:
+        #     api.types.remove(oldBooleanType)
         
         # Finally add boolean type
 
-        api.types.insert(2, booleanType)
+        # api.types.insert(2, booleanType)
 
         # Assign Ungrouped
-        ungroupedType = None
-        for constant in api.constants:
-            if len(constant.groups) == 0:
-                if ungroupedType is None:
-                    ungroupedType = Enumerator(api, "UNGROUPED")
-                    ungroupedType.hideDeclaration = True
-                    api.types.append(ungroupedType)
-            
-                ungroupedType.values.append(constant)
-                constant.groups.append(ungroupedType)
+        # ungroupedType = None
+        # for constant in api.constants:
+        #     if len(constant.groups) == 0:
+        #         if ungroupedType is None:
+        #             ungroupedType = Enumerator(api, "UNGROUPED")
+        #             ungroupedType.hideDeclaration = True
+        #             api.types.append(ungroupedType)
+        #     
+        #         ungroupedType.values.append(constant)
+        #         constant.groups.append(ungroupedType)
         
         # Add unused mask bitfield
-        unusedMaskType = BitfieldGroup(api, "UnusedMask")
-        unusedBitConstant = Constant(api, "VK_UNUSED_BIT", "0x00000000")
-        unusedMaskType.values.append(unusedBitConstant)
-        unusedBitConstant.groups.append(unusedMaskType)
-        api.types.append(unusedMaskType)
-        api.constants.append(unusedBitConstant)
+        # unusedMaskType = BitfieldGroup(api, "UnusedMask")
+        # unusedBitConstant = Constant(api, "VK_UNUSED_BIT", "0x00000000")
+        # unusedMaskType.values.append(unusedBitConstant)
+        # unusedBitConstant.groups.append(unusedMaskType)
+        # api.types.append(unusedMaskType)
+        # api.constants.append(unusedBitConstant)
 
         binding = super(cls, VKParser).deriveBinding(api, profile)
 
@@ -274,10 +286,37 @@ class VKParser(XMLParser):
             deferredFunctionPointerTypes.append(type)
 
         elif category == "struct":
-            cls.handleStructType(api, type)
+            cls.handleStructType(api, type, False)
 
         elif category == "union":
-            cls.handleUnionType(api, type)
+            cls.handleUnionType(api, type, False)
+    
+    @classmethod
+    def handleTypeRelations(cls, api, type):
+        category = type.attrib.get("category", None)
+
+        if "structextends" in type.attrib:
+            structType = api.typeByIdentifier(type.attrib["name"])
+            typesToMerge = [ api.typeByIdentifier(extension) for extension in type.attrib["structextends"].split(",") ]
+            structType.extends = typesToMerge
+            memberAttributes = []
+            for t in typesToMerge + [ structType ]:
+                for member in t.memberAttributes:
+                    newMember = next((newMember for newMember in memberAttributes if newMember.name == member.name), None)
+                    if newMember is None:
+                        parameter = Parameter(structType, member.name, member.type)
+                        parameter.nativeType = member.nativeType
+                        memberAttributes.append(parameter)
+                    else:
+                        newMember.type = member.type
+                        newMember.nativeType = member.nativeType
+            structType.memberAttributes = memberAttributes
+
+        elif category == "struct":
+            cls.handleStructType(api, type, True)
+
+        elif category == "union":
+            cls.handleUnionType(api, type, True)
 
     @classmethod
     def handleConstantType(cls, api, E):
@@ -471,7 +510,10 @@ class VKParser(XMLParser):
         comment = require.attrib.get("comment", "")
         if comment.startswith("Promoted from "):
             requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Promoted from "), comment).group(1).strip()
-            version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+            extension = api.extensionByIdentifier(requiredExtension)
+            if extension is None:
+                print("Extension", requiredExtension, "missing for", version.identifier)
+            version.requiredExtensions.append(extension)
 
         if comment.startswith("Not used by the API"):
             return
@@ -596,7 +638,7 @@ class VKParser(XMLParser):
         typedefPosition = text.find("typedef ")
         if definePosition >= 0 and nameTag is not None:
             api.types.append(NativeCode(nameTag.text, text))
-        if definePosition >= 0 and nameTag is None:
+        elif definePosition >= 0 and nameTag is None:
             api.types.append(NativeCode(type.attrib["name"], text))
         elif typedefPosition >= 0:
             api.types.append(NativeCode(nameTag.text, text))
@@ -744,41 +786,82 @@ class VKParser(XMLParser):
         api.types.append(TypeAlias(api, name, alias))
 
     @classmethod
-    def handleStructType(cls, api, type):
+    def handleStructType(cls, api, type, parseMembers = False):
         name = type.attrib["name"]
 
-        structType = CompoundType(api, name, "struct")
-        for member in type.findall("member"):
-            memberName = member.find("name").text
-            memberTypeTag = member.find("type")
-            memberTypeName = member.text if member.text is not None else ""
-            memberTypeName += memberTypeTag.text
-            memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
+        if parseMembers:
+            structType = api.typeByIdentifier(name)
 
-            memberType = api.typeByIdentifier(memberTypeName)
-            if memberType is None:
-                memberType = NativeType(api, memberTypeName, memberTypeName)
-                memberType.hideDeclaration = True
-                api.types.append(memberType)
-            structType.memberAttributes.append(Parameter(structType, memberName, memberType))
-        api.types.append(structType)
+            for member in type.findall("member"):
+                memberName = member.find("name").text
+                memberTypeTag = member.find("type")
+                memberTypeName = member.text if member.text is not None else ""
+                memberTypeName += memberTypeTag.text
+                memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
+                nativeTypeName = memberTypeName
+
+                if nativeTypeName.startswith("const "):
+                    nativeTypeName = nativeTypeName[len("const "):]
+                while nativeTypeName.endswith("*"):
+                    nativeTypeName = nativeTypeName[0:-len("*")]
+
+                memberType = api.typeByIdentifier(memberTypeName)
+                if memberType is None:
+                    memberType = NativeType(api, memberTypeName, memberTypeName)
+                    memberType.hideDeclaration = True
+                    api.types.append(memberType)
+
+                print("Member type", memberType.identifier, "native type", nativeTypeName)
+                parameter = Parameter(structType, memberName, memberType)
+                nativeType = api.typeByIdentifier(nativeTypeName)
+                if nativeType is None:
+                    nativeType = NativeType(api, nativeTypeName, nativeTypeName)
+                    nativeType.hideDeclaration = True
+                    api.types.append(nativeType)
+
+                parameter.nativeType = nativeType
+                structType.memberAttributes.append(parameter)
+        else:
+            structType = CompoundType(api, name, "struct")
+            api.types.append(structType)
+
 
     @classmethod
-    def handleUnionType(cls, api, type):
+    def handleUnionType(cls, api, type, parseMembers = False):
         name = type.attrib["name"]
 
-        structType = CompoundType(api, name, "union")
-        for member in type.findall("member"):
-            memberName = member.find("name").text
-            memberTypeTag = member.find("type")
-            memberTypeName = member.text if member.text is not None else ""
-            memberTypeName += memberTypeTag.text
-            memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
+        if parseMembers:
+            structType = api.typeByIdentifier(name)
 
-            memberType = api.typeByIdentifier(memberTypeName)
-            if memberType is None:
-                memberType = NativeType(api, memberTypeName, memberTypeName)
-                memberType.hideDeclaration = True
-                api.types.append(memberType)
-            structType.memberAttributes.append(Parameter(structType, memberName, memberType))
-        api.types.append(structType)
+            for member in type.findall("member"):
+                memberName = member.find("name").text
+                memberTypeTag = member.find("type")
+                memberTypeName = member.text if member.text is not None else ""
+                memberTypeName += memberTypeTag.text
+                memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
+                nativeTypeName = memberTypeName
+
+                if nativeTypeName.startswith("const "):
+                    nativeTypeName = nativeTypeName[len("const "):]
+                while nativeTypeName.endswith("*"):
+                    nativeTypeName = nativeTypeName[0:-len("*")]
+
+                memberType = api.typeByIdentifier(memberTypeName)
+                if memberType is None:
+                    memberType = NativeType(api, memberTypeName, memberTypeName)
+                    memberType.hideDeclaration = True
+                    api.types.append(memberType)
+
+                print("Member type", memberType.identifier, "native type", nativeTypeName)
+                parameter = Parameter(structType, memberName, memberType)
+                nativeType = api.typeByIdentifier(nativeTypeName)
+                if nativeType is None:
+                    nativeType = NativeType(api, nativeTypeName, nativeTypeName)
+                    nativeType.hideDeclaration = True
+                    api.types.append(nativeType)
+
+                parameter.nativeType = nativeType
+                structType.memberAttributes.append(parameter)
+        else:
+            structType = CompoundType(api, name, "union")
+            api.types.append(structType)

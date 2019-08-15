@@ -51,7 +51,7 @@ class CPPGenerator:
         sourcedir_aux = pjoin(targetdir, pjoin(binding.bindingAuxIdentifier, "source/"))
         testdir = pjoin(targetdir, "tests/" + binding.identifier + "-test/")
 
-        booleanTypes = [ type for type in api.types if type.identifier == profile.booleanType ]
+        booleanTypes = [ type for type in api.types if type.identifier == profile.booleanType and isinstance(type, Enumerator) ]
         booleanValues = [ constant for booleanType in booleanTypes for constant in booleanType.values ]
         booleanValueNames = [ constant.identifier for constant in booleanValues ]
 
@@ -201,13 +201,13 @@ class CPPGenerator:
         cls.render(template_engine, "khrbinding-aux/RingBuffer.h", includedir_aux+"RingBuffer.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/RingBuffer.inl", includedir_aux+"RingBuffer.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.h", includedir_aux+"types_to_string.h", api=api, profile=profile, binding=binding,
-            enumerators=[ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ],
+            enumerators=[ enumerator for enumerator in [ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ] if enumerator is not None ],
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
             cStringTypes=binding.cStringOutputTypes,
         )
         cls.render(template_engine, "khrbinding-aux/types_to_string.inl", includedir_aux+"types_to_string.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.cpp", sourcedir_aux+"types_to_string.cpp", api=api, profile=profile, binding=binding,
-            enumerators=[ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ],
+            enumerators=[ enumerator for enumerator in [ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ] if enumerator is not None ],
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
             cStringTypes=binding.cStringOutputTypes,
             cPointerTypes=[ type.identifier for type in api.types if type.identifier == "GLvoid" ],

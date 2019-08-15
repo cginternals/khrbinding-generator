@@ -28,8 +28,8 @@
 
 	"": "Types",
 	"extensionType": "VKextension",
-	"booleanType": "VKboolean",
-	"booleanWidth": 8,
+	"booleanType": "VkBool32",
+	"booleanWidth": 32,
 	"enumType": "VKenum",
 	"bitfieldType": "VKbitfield",
 	"noneBitfieldValue": "VK_NONE_BIT",
