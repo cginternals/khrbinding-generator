@@ -29,6 +29,14 @@ namespace {{api.identifier}}
 {{declaration}}
 {%- endfor %}
 
+{% for declaration in declarationsOne %}
+{{declaration}}
+{%- endfor %}
+
+{% for declaration in declarationsMany %}
+{{declaration}}
+{%- endfor %}
+
 
 } // namespace {{api.identifier}}
 

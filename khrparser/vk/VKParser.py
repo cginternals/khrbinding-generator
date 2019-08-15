@@ -102,8 +102,6 @@ class VKParser(XMLParser):
 
         api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
 
-        # print([ function.identifier for function in api.functions ])
-        
         availableTypes = api.types
         api.types = [ type for type in availableTypes if
             any((featureSet for featureSet in featureSets if type in featureSet.requiredTypes)) or
@@ -112,15 +110,21 @@ class VKParser(XMLParser):
             type.identifier in [ profile.bitfieldType, "SpecialValues" ] or
             isinstance(type, NativeCode)
         ]
+
         for i in range(1, 3):
             api.types = [ type for type in availableTypes if
                 type in api.types or
                 any((otherType for otherType in api.types if
-                    (isinstance(otherType, CompoundType) and (type in [ attribute.type for attribute in otherType.memberAttributes ] or type in [ attribute.nativeType for attribute in otherType.memberAttributes ] or type in otherType.extends))
+                    (isinstance(otherType, CompoundType) and type in [ attribute.type for attribute in otherType.memberAttributes ]) or
+                    (isinstance(otherType, CompoundType) and type in [ attribute.nativeType for attribute in otherType.memberAttributes ]) or
+                    (isinstance(otherType, CompoundType) and type in otherType.extends) or
+                    (isinstance(otherType, TypeAlias) and type == otherType.aliasedType) or
+                    (isinstance(type, TypeAlias) and type.aliasedType == otherType)
                 ))
             ]
         
-        api.types = [ type for type in api.types if ((not isinstance(type, BitfieldGroup) and not isinstance(type, Enumerator)) or len(type.values) > 0) ]
+        # api.types = [ type for type in api.types if ((not isinstance(type, BitfieldGroup) and not isinstance(type, Enumerator)) or len(type.values) > 0) ]
+        # api.types = [ type for type in api.types if ((not isinstance(type, TypeAlias) or type.aliasedType in api.types))]
 
         for constant in api.constants:
             constant.groups = [ group for group in constant.groups if group in api.types ]
@@ -151,12 +155,12 @@ class VKParser(XMLParser):
         #         api.constants.remove(noneBit)
 
         # Generic None Bit
-        # genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
-        # genericNoneBit.generic = True
-        # api.constants.append(genericNoneBit)
-        # for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
-        #     group.values.append(genericNoneBit)
-        #     genericNoneBit.groups.append(group)
+        genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+        genericNoneBit.generic = True
+        api.constants.append(genericNoneBit)
+        for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
+            group.values.append(genericNoneBit)
+            genericNoneBit.groups.append(group)
 
         # Add GLextension type
         # extensionType = Enumerator(api, profile.extensionType)
@@ -364,8 +368,13 @@ class VKParser(XMLParser):
         constants.append(constant)
 
         for c in constants:
-            type.values.append(c)
-            c.groups.append(type)
+            if isinstance(type, TypeAlias):
+                type.aliasedType.values.append(c)
+                c.groups.append(type)
+                c.groups.append(type.aliasedType)
+            else:
+                type.values.append(c)
+                c.groups.append(type)
             api.constants.append(c)
 
     @classmethod
@@ -474,8 +483,12 @@ class VKParser(XMLParser):
 
                         constant = Constant(api, name, value if value else name)
 
-                        type.values.append(constant)
-                        constant.groups.append(type)
+                        if isinstance(type, TypeAlias):
+                            type.aliasedType.values.append(constant)
+                            constant.groups.append(type.aliasedType)
+                        else:
+                            type.values.append(constant)
+                            constant.groups.append(type)
                         api.constants.append(constant)
                         extension.requiredConstants.append(constant)
                     else:
@@ -511,8 +524,6 @@ class VKParser(XMLParser):
         if comment.startswith("Promoted from "):
             requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Promoted from "), comment).group(1).strip()
             extension = api.extensionByIdentifier(requiredExtension)
-            if extension is None:
-                print("Extension", requiredExtension, "missing for", version.identifier)
             version.requiredExtensions.append(extension)
 
         if comment.startswith("Not used by the API"):
@@ -547,8 +558,12 @@ class VKParser(XMLParser):
                     
                     constant = Constant(api, name, value if value else name)
 
-                    type.values.append(constant)
-                    constant.groups.append(type)
+                    if isinstance(type, TypeAlias):
+                        type.aliasedType.values.append(constant)
+                        constant.groups.append(type.aliasedType)
+                    else:
+                        type.values.append(constant)
+                        constant.groups.append(type)
                     api.constants.append(constant)
                     version.requiredConstants.append(constant)
                 else:
@@ -695,20 +710,31 @@ class VKParser(XMLParser):
 
         name = type.attrib["name"] if "name" in type.attrib else nameTag.text
 
-        api.types.append(BitfieldGroup(api, type.attrib["name"]))
+        if api.typeByIdentifier(type.attrib["name"]) is None:
+            api.types.append(BitfieldGroup(api, type.attrib["name"]))
 
     @classmethod
     def handleBitmask2Type(cls, api, type):
         if "name" in type.attrib:
             alias = type.attrib["alias"]
             name = type.attrib["name"]
+            bitfieldType = BitfieldGroup(api, name)
+            api.types.append(bitfieldType)
             aliasType = api.typeByIdentifier(alias)
             if aliasType is None:
-                aliasType = BitfieldGroup(api, alias)
+                aliasType = TypeAlias(api, alias, bitfieldType)
                 api.types.append(aliasType)
         else:
             name = type.find("name").text
-        api.types.append(BitfieldGroup(api, name))
+            if "requires" in type.attrib:
+                bitfieldType = BitfieldGroup(api, name)
+                api.types.append(bitfieldType)
+                aliasType = api.typeByIdentifier(type.attrib["requires"])
+                if aliasType is None:
+                    aliasType = TypeAlias(api, type.attrib["requires"], bitfieldType)
+                    api.types.append(aliasType)
+            else:
+                api.types.append(BitfieldGroup(api, name))
 
     @classmethod
     def handleHandleType(cls, api, type):
@@ -798,6 +824,7 @@ class VKParser(XMLParser):
                 memberTypeName = member.text if member.text is not None else ""
                 memberTypeName += memberTypeTag.text
                 memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
+                memberTypeName = memberTypeName.strip()
                 nativeTypeName = memberTypeName
 
                 if nativeTypeName.startswith("const "):
@@ -811,7 +838,6 @@ class VKParser(XMLParser):
                     memberType.hideDeclaration = True
                     api.types.append(memberType)
 
-                print("Member type", memberType.identifier, "native type", nativeTypeName)
                 parameter = Parameter(structType, memberName, memberType)
                 nativeType = api.typeByIdentifier(nativeTypeName)
                 if nativeType is None:
@@ -839,6 +865,7 @@ class VKParser(XMLParser):
                 memberTypeName = member.text if member.text is not None else ""
                 memberTypeName += memberTypeTag.text
                 memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
+                memberTypeName = memberTypeName.strip()
                 nativeTypeName = memberTypeName
 
                 if nativeTypeName.startswith("const "):
@@ -852,7 +879,6 @@ class VKParser(XMLParser):
                     memberType.hideDeclaration = True
                     api.types.append(memberType)
 
-                print("Member type", memberType.identifier, "native type", nativeTypeName)
                 parameter = Parameter(structType, memberName, memberType)
                 nativeType = api.typeByIdentifier(nativeTypeName)
                 if nativeType is None:
