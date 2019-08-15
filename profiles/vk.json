@@ -23,8 +23,8 @@
 	"generateCallbacks": true,
 	"generateLogging": true,
 	"generateHeaderGuard": true,
-	"headerGuardMacro": [ "__gl_h_" ],
-	"headerReplacement": [ "gl.h" ],
+	"headerGuardMacro": [ "__vulkan_h_" ],
+	"headerReplacement": [ "vulkan.h" ],
 
 	"": "Types",
 	"extensionType": "VKextension",

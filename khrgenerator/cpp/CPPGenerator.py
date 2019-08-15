@@ -12,6 +12,8 @@ from khrapi.Enumerator import Enumerator
 from khrapi.Version import Version
 from khrapi.NativeType import NativeType
 from khrapi.TypeAlias import TypeAlias
+from khrapi.NativeCode import NativeCode
+from khrapi.CompoundType import CompoundType
 
 class CPPGenerator:
 
@@ -62,7 +64,7 @@ class CPPGenerator:
             values=api.typeByIdentifier("SpecialValues")
         )
         cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
-            platform_includes=[ type.moduleName for type in api.dependencies ],
+            platform_includes=[ type.moduleName for type in api.dependencies if not type.hideDeclaration ],
             declarations=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in api.types ] if len(declaration) > 0 ]
         )
         cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
@@ -315,6 +317,15 @@ class CPPGenerator:
             return "enum class %s : %s;" % (type.identifier, "unsigned int" if type.unsigned else "int")
         if isinstance(type, BitfieldGroup):
             return "enum class %s : unsigned int;" % (type.identifier)
+        if isinstance(type, NativeCode):
+            return type.declaration
+        if isinstance(type, CompoundType):
+            if type.type == "struct":
+                return "struct %s {\n\t%s\n};" % (type.identifier, "\n\t".join([attribute.type.identifier + " " + attribute.name + ";" for attribute in type.memberAttributes ]))
+            elif type.type == "union":
+                return "union %s {\n\t%s\n};" % (type.identifier, "\n\t".join([attribute.type.identifier + " " + attribute.name + ";" for attribute in type.memberAttributes ]))
+            else:
+                pass
         
         return ""
 

@@ -23,6 +23,7 @@ class VKParser(XMLParser):
 
     @classmethod
     def parseXML(cls, api, profile, registry):
+        deferredFunctionPointerTypes = []
         # Vendors
         for V in registry.iter("tags"):
             for vendor in V.findall("tag"):
@@ -31,7 +32,9 @@ class VKParser(XMLParser):
         # Types
         for T in registry.iter("types"):
             for type in T.findall("type"):
-                cls.handleType(api, type)
+                cls.handleType(api, type, deferredFunctionPointerTypes)
+        for type in deferredFunctionPointerTypes:
+            cls.handleFunctionPointerType(api, type)
 
         # Constants
         for E in registry.iter("enums"):
@@ -64,15 +67,59 @@ class VKParser(XMLParser):
     @classmethod
     def filterAPI(cls, api, profile):
 
-        # filter extensions
-        api.extensions = [ extension for extension in api.extensions if not extension.identifier.startswith('RESERVED_DO_NOT_USE') ]
-        api.extensions = [ extension for extension in api.extensions if not "_extension_" in extension.identifier ]
+        featureSets = []
 
+        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+        featureSets += api.versions
+
+        # filter extensions
+        api.extensions = [ extension for extension in api.extensions if
+            extension.platform == "" and
+            not extension.identifier.startswith('RESERVED_DO_NOT_USE') and
+            not "_extension_" in extension.identifier and
+            profile.apiIdentifier in extension.supportedAPIs
+        ]
+        featureSets += api.extensions
+
+        # print([ feature.identifier for feature in featureSets ])
+
+        api.constants = [ constant for constant in api.constants if
+            any((featureSet for featureSet in featureSets if constant in featureSet.requiredConstants))
+        ]
+        
         for constant in [ constant for constant in api.constants if constant.value == "__TODO_INVALID_VALUE__" ]:
             for group in constant.groups:
                 group.values.remove(constant)
             constant.groups = []
             api.constants.remove(constant)
+
+        api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
+
+        print([ function.identifier for function in api.functions ])
+        
+        availableTypes = api.types
+        api.types = [ type for type in availableTypes if
+            any((featureSet for featureSet in featureSets if type in featureSet.requiredTypes)) or
+            any((constant for constant in api.constants if type == constant.type or type in constant.groups)) or
+            any((function for function in api.functions if type == function.returnType or type in ([ parameter.type for parameter in function.parameters ] + [ parameter.nativeType for parameter in function.parameters ]))) or
+            type.identifier in [ profile.bitfieldType, "SpecialValues" ]
+        ]
+        for i in range(1, 5):
+            api.types = [ type for type in availableTypes if
+                type in api.types or
+                isinstance(type, CompoundType) and any((attribute for attribute in type.memberAttributes if attribute.type in api.types))
+            ]
+        
+        api.types = [ type for type in api.types if ((not isinstance(type, BitfieldGroup) and not isinstance(type, Enumerator)) or len(type.values) > 0) ]
+
+        for constant in api.constants:
+            constant.groups = [ group for group in constant.groups if group in api.types ]
+        
+        for type in api.types:
+            if isinstance(type, BitfieldGroup):
+                type.values = [ value for value in type.values if value in api.constants ]
+            if isinstance(type, Enumerator):
+                type.values = [ value for value in type.values if value in api.constants ]
 
         return api
 
@@ -145,7 +192,7 @@ class VKParser(XMLParser):
         
         # Add unused mask bitfield
         unusedMaskType = BitfieldGroup(api, "UnusedMask")
-        unusedBitConstant = Constant(api, "GL_UNUSED_BIT", "0x00000000")
+        unusedBitConstant = Constant(api, "VK_UNUSED_BIT", "0x00000000")
         unusedMaskType.values.append(unusedBitConstant)
         unusedBitConstant.groups.append(unusedMaskType)
         api.types.append(unusedMaskType)
@@ -196,52 +243,41 @@ class VKParser(XMLParser):
         )
 
     @classmethod
-    def handleType(cls, api, type):
-        nameTag = type.find("name")
-        typeTags = type.findall("type")
+    def handleType(cls, api, type, deferredFunctionPointerTypes):
         category = type.attrib.get("category", None)
 
-        text = ""
-        text += type.text if type.text else ""
-        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
-
-        for typeTag in typeTags:
-            text += typeTag.text if typeTag.text else ""
-            text += typeTag.tail if typeTag.tail else ""
-
-        text = re.sub(r'\s*\n\s*', '', text)
-
-        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
-
         if category is None:
-            cls.handleNoneType(api, type, name, text)
+            cls.handleNoneType(api, type)
 
         elif category == "include":
-            cls.handleIncludeType(api, type, name, text)
+            cls.handleIncludeType(api, type)
 
         elif category == "define":
-            cls.handleDefineType(api, type, name, text)
+            cls.handleDefineType(api, type)
 
         elif category == "basetype":
-            cls.handleBaseType(api, type, name, text)
+            cls.handleBaseType(api, type)
 
         elif category == "enum" and "Bit" in type.attrib["name"]:
-            cls.handleBitmaskType(api, type, name, text)
+            cls.handleBitmaskType(api, type)
+
+        elif category == "bitmask":
+            cls.handleBitmask2Type(api, type)
 
         elif category == "handle":
-            cls.handleHandleType(api, type, name, text)
+            cls.handleHandleType(api, type)
 
         elif category == "enum":
-            cls.handleEnumType(api, type, name, text)
+            cls.handleEnumType(api, type)
 
         elif category == "funcpointer":
-            cls.handleFunctionPointerType(api, type, name, text)
+            deferredFunctionPointerTypes.append(type)
 
         elif category == "struct":
-            cls.handleStructType(api, type, name, text)
+            cls.handleStructType(api, type)
 
         elif category == "union":
-            cls.handleUnionType(api, type, name, text)
+            cls.handleUnionType(api, type)
 
     @classmethod
     def handleConstantType(cls, api, E):
@@ -313,6 +349,7 @@ class VKParser(XMLParser):
         returnType = api.typeByIdentifier(returnTypeName)
         if returnType is None:
             returnType = NativeType(api, returnTypeName, returnTypeName)
+            returnType.hideDeclaration = True
             api.types.append(returnType)
         function.returnType = returnType
         function.namespaceLessIdentifier = function.identifier[len(profile.lowercasePrefix):]
@@ -332,17 +369,41 @@ class VKParser(XMLParser):
                 typeName = typeName.strip()
             name = param.find("name").text
             type = api.typeByIdentifier(typeName)
+            nativeType = typeName
             if type is None:
-                type = NativeType(api, typeName, typeName)
+                typeParts = typeName.split(" ")
+                if "struct" in typeParts:
+                    typeParts.remove("struct")
+                
+                type = NativeType(api, " ".join(typeParts), " ".join(typeParts))
+                type.hideDeclaration = True
+
+                if typeParts[0] == "const":
+                    if typeParts[1] == "void" or typeParts[1] == "int":
+                        pass
+                    else:
+                        nativeType = typeParts[1]
+                        typeParts[1] = profile.baseNamespace + "::" + typeParts[1]
+                else:
+                    if typeParts[0] == "void" or typeParts[0] == "int":
+                        pass
+                    else:
+                        nativeType = typeParts[0]
+                        typeParts[0] = profile.baseNamespace + "::" + typeParts[0]
+
+                type.namespacedIdentifier = " ".join(typeParts)
                 api.types.append(type)
 
-            function.parameters.append(Parameter(function, name, type))
+            parameter = Parameter(function, name, type)
+            parameter.nativeType = api.typeByIdentifier(nativeType)
+            function.parameters.append(parameter)
 
         api.functions.append(function)
 
     @classmethod
     def handleExtension(cls, api, xmlExtension):
-        extension = Extension(api, xmlExtension.attrib["name"])
+        extension = Extension(api, xmlExtension.attrib["name"], xmlExtension.attrib["platform"] if "platform" in xmlExtension.attrib else "")
+        extension.supportedAPIs = xmlExtension.attrib["supported"].split("|")
 
         for require in xmlExtension.findall("require"):
             for child in require:
@@ -400,6 +461,8 @@ class VKParser(XMLParser):
 
         for remove in feature.findall("remove"):
             cls.handleVersionRemove(api, version, remove)
+        
+        version.supportedAPIs = feature.attrib["api"].split("|")
 
         api.versions.append(version)
 
@@ -467,30 +530,101 @@ class VKParser(XMLParser):
                 version.removedTypes.append(api.typeByIdentifier(child.attrib["name"]))
 
     @classmethod
-    def handleNoneType(cls, api, type, name, text):
-        api.types.append(NativeType(api, name, name))
+    def handleNoneType(cls, api, type):
+
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else ""
+            text += typeTag.tail if typeTag.tail else ""
+
+        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
+        nativeType = NativeType(api, name, name)
+        nativeType.hideDeclaration = True
+        api.types.append(nativeType)
 
     @classmethod
-    def handleIncludeType(cls, api, type, name, text):
+    def handleIncludeType(cls, api, type):
+
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else ""
+            text += typeTag.tail if typeTag.tail else ""
+
+        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
         if type.text is not None:
             importName = re.search('%s(.*)%s' % ('"', '"'), text).group(1).strip()
-            api.dependencies.append(Import(api, name, importName))
+            api.dependencies.append(Import(api, name, "vulkan/"+importName))
         else:
-            api.dependencies.append(Import(api, name, name))
+            importType = Import(api, name, name)
+            importType.hideDeclaration = True
+            api.dependencies.append(importType)
 
     @classmethod
-    def handleDefineType(cls, api, type, name, text):
-        if text.startswith("#define"):
-            api.types.append(NativeCode(name, text))
-        elif text.startswith("typedef"):
-            pass
-        elif text.startswith("struct"):
-            api.types.append(NativeType(api, name, text))
+    def handleDefineType(cls, api, type):
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        if nameTag is not None:
+            text += nameTag.text
+            text += nameTag.tail if nameTag.tail is not None else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text is not None else ""
+            text += typeTag.tail if typeTag.tail is not None else ""
+
+        definePosition = text.find("#define ")
+        structPosition = text.find("struct ")
+        typedefPosition = text.find("typedef ")
+        if definePosition >= 0 and nameTag is not None:
+            api.types.append(NativeCode(nameTag.text, text))
+        if definePosition >= 0 and nameTag is None:
+            api.types.append(NativeCode(type.attrib["name"], text))
+        elif typedefPosition >= 0:
+            api.types.append(NativeCode(nameTag.text, text))
+        elif structPosition >= 0:
+            api.types.append(NativeType(
+                api,
+                nameTag.text,
+                text))
         else:
-            api.types.append(NativeCode(name, text))
+            api.types.append(NativeCode(nameTag.text, text))
 
     @classmethod
-    def handleBaseType(cls, api, type, name, text):
+    def handleBaseType(cls, api, type):
+
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else ""
+            text += typeTag.tail if typeTag.tail else ""
+
+        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
         typeTag = type.find('type')
         if text.startswith("typedef") and typeTag is not None:
             aliasName = typeTag.text
@@ -503,63 +637,148 @@ class VKParser(XMLParser):
             pass
 
     @classmethod
-    def handleBitmaskType(cls, api, type, name, text):
+    def handleBitmaskType(cls, api, type):
+
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else ""
+            text += typeTag.tail if typeTag.tail else ""
+
+        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
         api.types.append(BitfieldGroup(api, type.attrib["name"]))
 
     @classmethod
-    def handleHandleType(cls, api, type, name, text):
-        api.types.append(NativeType(api, name, text))
+    def handleBitmask2Type(cls, api, type):
+        if "name" in type.attrib:
+            alias = type.attrib["alias"]
+            name = type.attrib["name"]
+            aliasType = api.typeByIdentifier(alias)
+            if aliasType is None:
+                aliasType = BitfieldGroup(api, alias)
+                api.types.append(aliasType)
+        else:
+            name = type.find("name").text
+        api.types.append(BitfieldGroup(api, name))
 
     @classmethod
-    def handleEnumType(cls, api, type, name, text):
+    def handleHandleType(cls, api, type):
+
+        if "alias" in type.attrib:
+            api.types.append(NativeCode(type.attrib["name"], "// Ignore %s for now" % (type.attrib["name"])))
+            return
+
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else ""
+            text += typeTag.tail if typeTag.tail else ""
+
+        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
+        api.types.append(NativeType(api, name, text[0:text.find("(")+1]+name+text[text.find("(")+1:]))
+
+    @classmethod
+    def handleEnumType(cls, api, type):
+
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else ""
+            text += typeTag.tail if typeTag.tail else ""
+
+        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
         enumType = Enumerator(api, name)
         api.types.append(enumType)
 
-        if "alias" in type.attrib:
-            aliasName = type.attrib["alias"]
-            api.types.append(TypeAlias(api, aliasName, enumType))
+        # if "alias" in type.attrib:
+        #     aliasName = type.attrib["alias"]
+        #     api.types.append(TypeAlias(api, aliasName, enumType))
 
     @classmethod
-    def handleFunctionPointerType(cls, api, type, name, text):
+    def handleFunctionPointerType(cls, api, type):
+
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        # text+= nameTag.text
+        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else ""
+            text += typeTag.tail if typeTag.tail else ""
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
+        text = re.sub(r'\s*\n\s*', '', text)
         aliasName = re.search('%s(.*)%s' % ("typedef ", ";"), text).group(1).strip()
         alias = api.typeByIdentifier(aliasName)
         if alias is None:
             alias = NativeType(api, aliasName, aliasName)
+            alias.hideDeclaration = True
+            api.types.append(alias)
 
         api.types.append(TypeAlias(api, name, alias))
 
     @classmethod
-    def handleStructType(cls, api, type, name, text):
+    def handleStructType(cls, api, type):
+        name = type.attrib["name"]
+
         structType = CompoundType(api, name, "struct")
         for member in type.findall("member"):
             memberName = member.find("name").text
             memberTypeTag = member.find("type")
-
-            memberTypeName = ""
-            memberTypeName += member.text if member.text else ""
-            memberTypeName += memberTypeTag.text if memberTypeTag.text else ""
-            memberTypeName += memberTypeTag.tail if memberTypeTag.tail else ""
+            memberTypeName = member.text if member.text is not None else ""
+            memberTypeName += memberTypeTag.text
+            memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
 
             memberType = api.typeByIdentifier(memberTypeName)
             if memberType is None:
                 memberType = NativeType(api, memberTypeName, memberTypeName)
+                memberType.hideDeclaration = True
                 api.types.append(memberType)
             structType.memberAttributes.append(Parameter(structType, memberName, memberType))
+        api.types.append(structType)
 
     @classmethod
-    def handleUnionType(cls, api, type, name, text):
+    def handleUnionType(cls, api, type):
+        name = type.attrib["name"]
+
         structType = CompoundType(api, name, "union")
         for member in type.findall("member"):
             memberName = member.find("name").text
             memberTypeTag = member.find("type")
-
-            memberTypeName = ""
-            memberTypeName += member.text if member.text else ""
-            memberTypeName += memberTypeTag.text if memberTypeTag.text else ""
-            memberTypeName += memberTypeTag.tail if memberTypeTag.tail else ""
+            memberTypeName = member.text if member.text is not None else ""
+            memberTypeName += memberTypeTag.text
+            memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
 
             memberType = api.typeByIdentifier(memberTypeName)
             if memberType is None:
                 memberType = NativeType(api, memberTypeName, memberTypeName)
+                memberType.hideDeclaration = True
                 api.types.append(memberType)
             structType.memberAttributes.append(Parameter(structType, memberName, memberType))
+        api.types.append(structType)
