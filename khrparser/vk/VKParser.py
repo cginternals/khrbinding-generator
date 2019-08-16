@@ -88,8 +88,6 @@ class VKParser(XMLParser):
         ]
         featureSets += api.extensions
 
-        # print([ feature.identifier for feature in featureSets ])
-
         api.constants = [ constant for constant in api.constants if
             any((featureSet for featureSet in featureSets if constant in featureSet.requiredConstants))
         ]
@@ -102,27 +100,27 @@ class VKParser(XMLParser):
 
         api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
 
-        availableTypes = api.types
-        api.types = [ type for type in availableTypes if
-            any((featureSet for featureSet in featureSets if type in featureSet.requiredTypes)) or
-            any((constant for constant in api.constants if type == constant.type or type in constant.groups)) or
-            any((function for function in api.functions if type == function.returnType or type in ([ parameter.type for parameter in function.parameters ] + [ parameter.nativeType for parameter in function.parameters ]))) or
-            type.identifier in [ profile.bitfieldType, "SpecialValues" ] or
-            isinstance(type, NativeCode)
-        ]
+        def combine(l1, l2):
+            for i in l2:
+                if i not in l1 and i is not None:
+                    l1.append(i)
 
-        for i in range(1, 3):
-            api.types = [ type for type in availableTypes if
-                type in api.types or
-                any((otherType for otherType in api.types if
-                    (isinstance(otherType, CompoundType) and type in [ attribute.type for attribute in otherType.memberAttributes ]) or
-                    (isinstance(otherType, CompoundType) and type in [ attribute.nativeType for attribute in otherType.memberAttributes ]) or
-                    (isinstance(otherType, CompoundType) and type in otherType.extends) or
-                    (isinstance(otherType, TypeAlias) and type == otherType.aliasedType) or
-                    (isinstance(type, TypeAlias) and type.aliasedType == otherType)
-                ))
-            ]
-        
+        requiredTypes = []
+        combine(requiredTypes, [ type for type in api.types if isinstance(type, NativeCode) or type.identifier in [ profile.bitfieldType, "SpecialValues" ] ])
+        combine(requiredTypes, [ type for featureSet in featureSets for type in featureSet.requiredTypes ])
+        combine(requiredTypes, [ constant.type for constant in api.constants ])
+        combine(requiredTypes, [ type for constant in api.constants for type in constant.groups ])
+        combine(requiredTypes, [ function.returnType for function in api.functions ])
+        combine(requiredTypes, [ parameter.type for function in api.functions for parameter in function.parameters ])
+        combine(requiredTypes, [ parameter.nativeType for function in api.functions for parameter in function.parameters ])
+        for i in range(1, 5):
+            combine(requiredTypes, [ member.type for compoundType in requiredTypes if isinstance(compoundType, CompoundType) for member in compoundType.memberAttributes ])
+            combine(requiredTypes, [ member.nativeType for compoundType in requiredTypes if isinstance(compoundType, CompoundType) for member in compoundType.memberAttributes ])
+            combine(requiredTypes, [ extensionType for compoundType in requiredTypes if isinstance(compoundType, CompoundType) for extensionType in compoundType.extends ])
+            combine(requiredTypes, [ type.aliasedType for type in requiredTypes if isinstance(type, TypeAlias) ])
+
+        api.types = cls.sortTypes(api, requiredTypes)
+
         # api.types = [ type for type in api.types if ((not isinstance(type, BitfieldGroup) and not isinstance(type, Enumerator)) or len(type.values) > 0) ]
         # api.types = [ type for type in api.types if ((not isinstance(type, TypeAlias) or type.aliasedType in api.types))]
 
@@ -390,7 +388,7 @@ class VKParser(XMLParser):
 
         protoTag = command.find("proto")
         returnTypeTag = protoTag.find("type")
-        returnTypeName = returnTypeTag.text.strip() if returnTypeTag is not None else protoTag.text.strip()
+        returnTypeName = (returnTypeTag.text if returnTypeTag is not None else protoTag.text).strip()
         name = protoTag.find("name").text.strip()
 
         function = Function(api, name)
@@ -415,7 +413,8 @@ class VKParser(XMLParser):
                     if typeTag.tail:
                         typeName += typeTag.tail
                 typeName = typeName.strip()
-            name = param.find("name").text
+            name = param.find("name").text.strip()
+            typeName = typeName.strip()
             type = api.typeByIdentifier(typeName)
             nativeType = typeName
             if type is None:
@@ -573,8 +572,11 @@ class VKParser(XMLParser):
             elif child.tag == "type":
                 requiredType = api.typeByIdentifier(child.attrib["name"])
                 if requiredType is None:
-                    requiredType = NativeType(api, child.attrib["name"], child.attrib["name"])
-                version.requiredTypes.append(requiredType)
+                    # requiredType = NativeType(api, child.attrib["name"], child.attrib["name"])
+                    # version.requiredTypes.append(requiredType)
+                    pass
+                else:
+                    version.requiredTypes.append(requiredType)
 
     @classmethod
     def handleVersionRemove(cls, api, version, remove):
@@ -589,19 +591,7 @@ class VKParser(XMLParser):
     @classmethod
     def handleNoneType(cls, api, type):
 
-        nameTag = type.find("name")
-        typeTags = type.findall("type")
-        
-        text = ""
-        text += type.text if type.text is not None else ""
-
-        for typeTag in typeTags:
-            text += typeTag.text if typeTag.text else ""
-            text += typeTag.tail if typeTag.tail else ""
-
-        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
-
-        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+        name = type.attrib["name"] if "name" in type.attrib else type.find("name").text
 
         nativeType = NativeType(api, name, name)
         nativeType.hideDeclaration = True
@@ -626,7 +616,9 @@ class VKParser(XMLParser):
 
         if type.text is not None:
             importName = re.search('%s(.*)%s' % ('"', '"'), text).group(1).strip()
-            api.dependencies.append(Import(api, name, "vulkan/"+importName))
+            importType = Import(api, name, "vulkan/"+importName)
+            importType.hideDeclaration = True
+            api.dependencies.append(importType)
         else:
             importType = Import(api, name, name)
             importType.hideDeclaration = True
@@ -667,29 +659,16 @@ class VKParser(XMLParser):
 
     @classmethod
     def handleBaseType(cls, api, type):
-
         nameTag = type.find("name")
-        typeTags = type.findall("type")
-        
-        text = ""
-        text += type.text if type.text is not None else ""
-
-        for typeTag in typeTags:
-            text += typeTag.text if typeTag.text else ""
-            text += typeTag.tail if typeTag.tail else ""
-
-        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
-
-        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
-
         typeTag = type.find('type')
-        if text.startswith("typedef") and typeTag is not None:
-            aliasName = typeTag.text
+        if type.text.startswith("typedef") and typeTag is not None and nameTag is not None:
+            aliasName = typeTag.text.strip()
             alias = api.typeByIdentifier(aliasName)
             if alias is None:
                 alias = NativeType(api, aliasName, aliasName)
+                alias.hideDeclaration = True
 
-            api.types.append(TypeAlias(api, name, alias))
+            api.types.append(TypeAlias(api, nameTag.text.strip(), alias))
         else:
             pass
 
@@ -803,6 +782,7 @@ class VKParser(XMLParser):
 
         text = re.sub(r'\s*\n\s*', '', text)
         aliasName = re.search('%s(.*)%s' % ("typedef ", ";"), text).group(1).strip()
+        aliasName = aliasName.replace("VKAPI_PTR", "VK_APIENTRY")
         alias = api.typeByIdentifier(aliasName)
         if alias is None:
             alias = NativeType(api, aliasName, aliasName)
@@ -816,40 +796,48 @@ class VKParser(XMLParser):
         name = type.attrib["name"]
 
         if parseMembers:
-            structType = api.typeByIdentifier(name)
+            if "alias" in type.attrib:
+                aliasedType = api.typeByIdentifier(type.attrib["alias"])
+                structType = TypeAlias(api, name, aliasedType)
+                api.types.append(structType)
+            else:
+                structType = api.typeByIdentifier(name)
 
-            for member in type.findall("member"):
-                memberName = member.find("name").text
-                memberTypeTag = member.find("type")
-                memberTypeName = member.text if member.text is not None else ""
-                memberTypeName += memberTypeTag.text
-                memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
-                memberTypeName = memberTypeName.strip()
-                nativeTypeName = memberTypeName
+                for member in type.findall("member"):
+                    memberName = member.find("name").text
+                    memberTypeTag = member.find("type")
+                    memberTypeName = member.text if member.text is not None else ""
+                    memberTypeName += memberTypeTag.text
+                    memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
+                    memberTypeName = memberTypeName.strip()
+                    nativeTypeName = memberTypeName
 
-                if nativeTypeName.startswith("const "):
-                    nativeTypeName = nativeTypeName[len("const "):]
-                while nativeTypeName.endswith("*"):
-                    nativeTypeName = nativeTypeName[0:-len("*")]
+                    if nativeTypeName.startswith("const "):
+                        nativeTypeName = nativeTypeName[len("const "):].strip()
+                    while nativeTypeName.endswith("*"):
+                        nativeTypeName = nativeTypeName[0:-len("*")].strip()
 
-                memberType = api.typeByIdentifier(memberTypeName)
-                if memberType is None:
-                    memberType = NativeType(api, memberTypeName, memberTypeName)
-                    memberType.hideDeclaration = True
-                    api.types.append(memberType)
+                    memberType = api.typeByIdentifier(memberTypeName)
+                    if memberType is None:
+                        memberType = NativeType(api, memberTypeName, memberTypeName)
+                        memberType.hideDeclaration = True
+                        api.types.append(memberType)
 
-                parameter = Parameter(structType, memberName, memberType)
-                nativeType = api.typeByIdentifier(nativeTypeName)
-                if nativeType is None:
-                    nativeType = NativeType(api, nativeTypeName, nativeTypeName)
-                    nativeType.hideDeclaration = True
-                    api.types.append(nativeType)
+                    parameter = Parameter(structType, memberName, memberType)
+                    nativeType = api.typeByIdentifier(nativeTypeName)
+                    if nativeType is None:
+                        nativeType = NativeType(api, nativeTypeName, nativeTypeName)
+                        nativeType.hideDeclaration = True
+                        api.types.append(nativeType)
 
-                parameter.nativeType = nativeType
-                structType.memberAttributes.append(parameter)
+                    parameter.nativeType = nativeType
+                    structType.memberAttributes.append(parameter)
         else:
-            structType = CompoundType(api, name, "struct")
-            api.types.append(structType)
+            if "alias" in type.attrib:
+                pass # do later
+            else:
+                structType = CompoundType(api, name, "struct")
+                api.types.append(structType)
 
 
     @classmethod
@@ -869,9 +857,9 @@ class VKParser(XMLParser):
                 nativeTypeName = memberTypeName
 
                 if nativeTypeName.startswith("const "):
-                    nativeTypeName = nativeTypeName[len("const "):]
+                    nativeTypeName = nativeTypeName[len("const "):].strip()
                 while nativeTypeName.endswith("*"):
-                    nativeTypeName = nativeTypeName[0:-len("*")]
+                    nativeTypeName = nativeTypeName[0:-len("*")].strip()
 
                 memberType = api.typeByIdentifier(memberTypeName)
                 if memberType is None:
@@ -891,3 +879,52 @@ class VKParser(XMLParser):
         else:
             structType = CompoundType(api, name, "union")
             api.types.append(structType)
+
+    @classmethod
+    def sortTypes(cls, api, types):
+        nativeCodes = []
+        nativeTypes = []
+        enumerators = []
+        bitfieldGroups = []
+        compoundTypes = []
+        aliases = []
+        for t in types:
+            typesToAdd = [ t ]
+            if isinstance(t, NativeCode):
+                nativeCodes.append(t)
+            elif isinstance(t, NativeType):
+                nativeTypes.append(t)
+            elif isinstance(t, Enumerator):
+                enumerators.append(t)
+            elif isinstance(t, BitfieldGroup):
+                bitfieldGroups.append(t)
+            elif isinstance(t, CompoundType):
+                compoundTypes.append(t)
+            elif isinstance(t, TypeAlias):
+                aliases.append(t)
+            else:
+                pass
+        
+        def collect(topologySortedCompoundTypes, compoundType):
+            print("Collect", compoundType.identifier)
+            for type in [ member.type for member in compoundType.memberAttributes ] + [ member.nativeType for member in compoundType.memberAttributes ]:
+                if isinstance(type, CompoundType) and not type == compoundType and not type in topologySortedCompoundTypes:
+                    collect(topologySortedCompoundTypes, type)
+    
+            if not compoundType in topologySortedCompoundTypes:
+                topologySortedCompoundTypes.append(compoundType)
+            else:
+                print("Cyclic dependency?")
+        
+        topologySortedCompoundTypes = []
+        for compoundType in compoundTypes:
+            collect(topologySortedCompoundTypes, compoundType)
+
+        types = []
+        for t in (nativeCodes + nativeTypes + enumerators + bitfieldGroups + topologySortedCompoundTypes):
+            alias = next((a for a in aliases if a.aliasedType == t), None)
+            types.append(t)
+            if alias is not None:
+                types.append(alias)
+
+        return types

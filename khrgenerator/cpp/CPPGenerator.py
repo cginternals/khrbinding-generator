@@ -55,9 +55,10 @@ class CPPGenerator:
         booleanValues = [ constant for booleanType in booleanTypes for constant in booleanType.values ]
         booleanValueNames = [ constant.identifier for constant in booleanValues ]
 
-        noneDependentTypes = [ type for type in api.types if not isinstance(type, CompoundType) or len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) ]) == 0 ]
-        oneDependentTypes = [ type for type in api.types if isinstance(type, CompoundType) and len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) ]) == 1 ]
-        moreDependentTypes = [ type for type in api.types if isinstance(type, CompoundType) and len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) ]) > 1 ]
+        nativeTypes = [ type for type in api.types if isinstance(type, NativeType) or isinstance(type, NativeCode) ]
+        noneDependentTypes = [ type for type in api.types if type not in nativeTypes and (not isinstance(type, CompoundType) or len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) or isinstance(otherType.nativeType, CompoundType) ]) == 0) ]
+        oneDependentTypes = [ type for type in api.types if isinstance(type, CompoundType) and len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) or isinstance(otherType.nativeType, CompoundType) ]) == 1 ]
+        moreDependentTypes = [ type for type in api.types if isinstance(type, CompoundType) and len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) or isinstance(otherType.nativeType, CompoundType) ]) > 1 ]
 
         # TEMPLATE APPLICATION
 
@@ -69,9 +70,7 @@ class CPPGenerator:
         )
         cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             platform_includes=[ type.moduleName for type in api.dependencies if not type.hideDeclaration ],
-            declarations=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in noneDependentTypes ] if len(declaration) > 0 ],
-            declarationsOne=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in oneDependentTypes ] if len(declaration) > 0 ],
-            declarationsMore=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in moreDependentTypes ] if len(declaration) > 0 ]
+            declarations=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in api.types ] if len(declaration) > 0 ]
         )
         cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             basic_enumerators=[ api.typeByIdentifier(binding.extensionType) ],
@@ -276,7 +275,7 @@ class CPPGenerator:
                 functions = currentFunctions | deprecatedFunctions
 
             cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                types=[ type for type in api.types if not type.hideDeclaration ]
+                types=[ type for type in api.types if not type.hideDeclaration and not isinstance(type, NativeCode) ]
             )
             cls.render(template_engine, "bitfieldF.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 constants=[ constant for constant in constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
