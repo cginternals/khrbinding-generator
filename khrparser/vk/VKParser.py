@@ -106,7 +106,7 @@ class VKParser(XMLParser):
                     l1.append(i)
 
         requiredTypes = []
-        combine(requiredTypes, [ type for type in api.types if isinstance(type, NativeCode) or type.identifier in [ profile.bitfieldType, "SpecialValues" ] ])
+        combine(requiredTypes, [ type for type in api.types if isinstance(type, NativeCode) or type.identifier in [ profile.bitfieldType, "SpecialValues", "VkInternalAllocationType", "VkSystemAllocationScope" ] ])
         combine(requiredTypes, [ type for featureSet in featureSets for type in featureSet.requiredTypes ])
         combine(requiredTypes, [ constant.type for constant in api.constants ])
         combine(requiredTypes, [ type for constant in api.constants for type in constant.groups ])
@@ -332,7 +332,6 @@ class VKParser(XMLParser):
         if nameString == "API Constants":
             type = Enumerator(api, "UNGROUPED")
             type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-            print("Introduce", type.namespacedIdentifier, "1")
             api.types.append(type)
         else:
             if typeString == "enum":
@@ -342,7 +341,6 @@ class VKParser(XMLParser):
             else:
                 type = Enumerator(api, nameString)
             type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-            print("Introduce", type.namespacedIdentifier, "2")
             api.types.append(type)
         
         return type
@@ -401,7 +399,6 @@ class VKParser(XMLParser):
             returnType = NativeType(api, returnTypeName, returnTypeName)
             returnType.hideDeclaration = True
             returnType.namespacedIdentifier = profile.baseNamespace + "::" + returnType.identifier
-            print("Introduce", returnType.namespacedIdentifier, "3")
             api.types.append(returnType)
         function.returnType = returnType
         function.namespaceLessIdentifier = function.identifier[len(profile.lowercasePrefix):]
@@ -445,7 +442,6 @@ class VKParser(XMLParser):
                         typeParts[0] = profile.baseNamespace + "::" + typeParts[0]
 
                 type.namespacedIdentifier = " ".join(typeParts)
-                print("Introduce", type.namespacedIdentifier, "4")
                 api.types.append(type)
 
             parameter = Parameter(function, name, type)
@@ -473,7 +469,6 @@ class VKParser(XMLParser):
                         if type is None:
                             type = Enumerator(api, "UNGROUPED")
                             type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-                            print("Introduce", type.namespacedIdentifier, "5")
                             api.types.append(type)
 
                         if "number" in xmlExtension.attrib and "offset" in child.attrib:
@@ -550,7 +545,6 @@ class VKParser(XMLParser):
                     if type is None:
                         type = Enumerator(api, "UNGROUPED")
                         type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-                        print("Introduce", type.namespacedIdentifier, "6")
                         api.types.append(type)
 
                     if "extnumber" in child.attrib and "offset" in child.attrib:
@@ -608,7 +602,6 @@ class VKParser(XMLParser):
         nativeType.hideDeclaration = True
         # None-categorized Types likely aren't declared by Vulkan
         # nativeType.namespacedIdentifier = profile.baseNamespace + "::" + nativeType.identifier
-        # print("Introduce", nativeType.namespacedIdentifier, "7")
         api.types.append(nativeType)
 
     @classmethod
@@ -666,7 +659,6 @@ class VKParser(XMLParser):
         elif structPosition >= 0:
             type = NativeType(api, nameTag.text, text)
             type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-            print("Introduce", type.namespacedIdentifier, "8")
             api.types.append(type)
         else:
             api.types.append(NativeCode(nameTag.text, text))
@@ -684,7 +676,6 @@ class VKParser(XMLParser):
 
             type = TypeAlias(api, nameTag.text.strip(), alias)
             type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-            print("Introduce", type.namespacedIdentifier, "9")
             api.types.append(type)
         else:
             pass
@@ -709,7 +700,6 @@ class VKParser(XMLParser):
         if api.typeByIdentifier(type.attrib["name"]) is None:
             type = BitfieldGroup(api, type.attrib["name"])
             type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-            print("Introduce", type.namespacedIdentifier, "10")
             api.types.append(type)
 
     @classmethod
@@ -719,7 +709,6 @@ class VKParser(XMLParser):
             name = type.attrib["name"]
             bitfieldType = BitfieldGroup(api, name)
             bitfieldType.namespacedIdentifier = profile.baseNamespace + "::" + bitfieldType.identifier
-            print("Introduce", bitfieldType.namespacedIdentifier, "11")
             api.types.append(bitfieldType)
             aliasType = api.typeByIdentifier(alias)
             if aliasType is None:
@@ -731,7 +720,6 @@ class VKParser(XMLParser):
             if "requires" in type.attrib:
                 bitfieldType = BitfieldGroup(api, name)
                 bitfieldType.namespacedIdentifier = profile.baseNamespace + "::" + bitfieldType.identifier
-                print("Introduce", bitfieldType.namespacedIdentifier, "12")
                 api.types.append(bitfieldType)
                 aliasType = api.typeByIdentifier(type.attrib["requires"])
                 if aliasType is None:
@@ -766,7 +754,6 @@ class VKParser(XMLParser):
 
         type = NativeType(api, name, text[0:text.find("(")+1]+name+text[text.find("(")+1:])
         type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-        print("Introduce", type.namespacedIdentifier, "13")
         api.types.append(type)
 
     @classmethod
@@ -788,7 +775,6 @@ class VKParser(XMLParser):
 
         enumType = Enumerator(api, name)
         enumType.namespacedIdentifier = profile.baseNamespace + "::" + enumType.identifier
-        print("Introduce", enumType.namespacedIdentifier, "14")
         api.types.append(enumType)
 
         # if "alias" in type.attrib:
@@ -815,6 +801,7 @@ class VKParser(XMLParser):
 
         text = re.sub(r'\s*\n\s*', '', text)
         aliasName = re.search('%s(.*)%s' % ("typedef ", ";"), text).group(1).strip()
+        aliasName = re.sub("\\s+", " ", aliasName)
         aliasName = aliasName.replace("VKAPI_PTR", "VK_APIENTRY")
         alias = api.typeByIdentifier(aliasName)
         if alias is None:
@@ -824,7 +811,6 @@ class VKParser(XMLParser):
 
         type = TypeAlias(api, name, alias)
         type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
-        print("Introduce", type.namespacedIdentifier, "15")
         api.types.append(type)
 
     @classmethod
@@ -836,7 +822,6 @@ class VKParser(XMLParser):
                 aliasedType = api.typeByIdentifier(type.attrib["alias"])
                 structType = TypeAlias(api, name, aliasedType)
                 structType.namespacedIdentifier = profile.baseNamespace + "::" + structType.identifier
-                print("Introduce", structType.namespacedIdentifier, "16")
                 api.types.append(structType)
             else:
                 structType = api.typeByIdentifier(name)
@@ -890,7 +875,6 @@ class VKParser(XMLParser):
             else:
                 structType = CompoundType(api, name, "struct")
                 structType.namespacedIdentifier = profile.baseNamespace + "::" + structType.identifier
-                print("Introduce", structType.namespacedIdentifier, "17")
                 api.types.append(structType)
 
 
@@ -933,7 +917,6 @@ class VKParser(XMLParser):
         else:
             structType = CompoundType(api, name, "union")
             structType.namespacedIdentifier = profile.baseNamespace + "::" + structType.identifier
-            print("Introduce", structType.namespacedIdentifier, "18")
             api.types.append(structType)
 
     @classmethod
@@ -941,6 +924,7 @@ class VKParser(XMLParser):
         nativeCodes = []
         nativeTypes = []
         enumerators = []
+        functionPointerTypes = []
         bitfieldGroups = []
         compoundTypes = []
         aliases = []
@@ -957,7 +941,10 @@ class VKParser(XMLParser):
             elif isinstance(t, CompoundType):
                 compoundTypes.append(t)
             elif isinstance(t, TypeAlias):
-                aliases.append(t)
+                if t.identifier.startswith('PFN'):
+                    functionPointerTypes.append(t)
+                else:
+                    aliases.append(t)
             else:
                 pass
         
@@ -984,6 +971,9 @@ class VKParser(XMLParser):
         # sort bitfieldGroups
         bitfieldGroups.sort(key=lambda t: t.identifier)
 
+        # sort functionPointerTypes
+        functionPointerTypes.sort(key=lambda t: t.identifier)
+
         # sort compoundTypes
         topologySortedCompoundTypes = []
         for compoundType in compoundTypes:
@@ -993,7 +983,7 @@ class VKParser(XMLParser):
         unaliasedTypes = [ alias for alias in aliases if alias.aliasedType.hideDeclaration or alias.aliasedType not in types ]
 
         types = []
-        for t in (nativeCodes + nativeTypes + enumerators + bitfieldGroups + unaliasedTypes + topologySortedCompoundTypes):
+        for t in (nativeCodes + nativeTypes + enumerators + bitfieldGroups + functionPointerTypes + unaliasedTypes + topologySortedCompoundTypes):
             alias = next((a for a in aliases if a.aliasedType == t), None)
             types.append(t)
             if alias is not None:
