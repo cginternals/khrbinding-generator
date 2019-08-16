@@ -73,8 +73,8 @@ class CPPGenerator:
             declarations=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in api.types ] if len(declaration) > 0 ]
         )
         cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
-            basic_enumerators=[ api.typeByIdentifier(binding.extensionType) ],
-            generic_enumerators=[ api.typeByIdentifier(binding.enumType) ],
+            basic_enumerators=[ type for type in [ api.typeByIdentifier(binding.extensionType) ] if type is not None ],
+            generic_enumerators=[ type for type in [ api.typeByIdentifier(binding.enumType) ] if type is not None ],
             bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ]
         )
         cls.render(template_engine, "bitfield.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
