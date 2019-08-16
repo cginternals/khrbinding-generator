@@ -724,6 +724,7 @@ class VKParser(XMLParser):
             aliasType = api.typeByIdentifier(alias)
             if aliasType is None:
                 aliasType = TypeAlias(api, alias, bitfieldType)
+                aliasType.namespacedIdentifier = profile.baseNamespace + "::" + aliasType.identifier
                 api.types.append(aliasType)
         else:
             name = type.find("name").text
@@ -735,9 +736,12 @@ class VKParser(XMLParser):
                 aliasType = api.typeByIdentifier(type.attrib["requires"])
                 if aliasType is None:
                     aliasType = TypeAlias(api, type.attrib["requires"], bitfieldType)
+                    aliasType.namespacedIdentifier = profile.baseNamespace + "::" + aliasType.identifier
                     api.types.append(aliasType)
             else:
-                api.types.append(BitfieldGroup(api, name))
+                type = BitfieldGroup(api, name)
+                type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
+                api.types.append(type)
 
     @classmethod
     def handleHandleType(cls, api, profile, type):
