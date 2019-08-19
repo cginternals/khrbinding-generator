@@ -82,7 +82,7 @@ public:
     *  @remark
     *    Beware, that some enums in the OpenGL API have different symbol names but identical enum values and that this function cannot differentiate between them
     */
-    static const std::string & getString({{api.identifier}}::{{binding.enumType}} {{api.identifier}}enum);
+    // static const std::string & getString({{api.identifier}}::{{binding.enumType}} {{api.identifier}}enum);
     
     /**
     *  @brief
@@ -251,18 +251,31 @@ public:
     *    The list of all Versions (Features) known by the {{profile.inputfile}}
     */
     static const std::set<Version> & versions();
-{% for group in groups|sort(attribute='identifier') %}
+{% for group in bitfieldGroups|sort(attribute='identifier') %}
     /**
     *  @brief
     *    Convert bitfield to symbol name string representation
     *
-    *  @param[in] glbitfield
+    *  @param[in] {{api.identifierl}}bitfield
     *    The bitfield value
     *
     *  @return
     *    The string representation of the value
     */
     static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}bitfield);
+{% endfor %}
+{% for group in enumGroups|sort(attribute='identifier') %}
+    /**
+    *  @brief
+    *    Convert enum to symbol name string representation
+    *
+    *  @param[in] {{api.identifierl}}enum
+    *    The enum value
+    *
+    *  @return
+    *    The string representation of the value
+    */
+    static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}enum);
 {% endfor %}
 
 private:

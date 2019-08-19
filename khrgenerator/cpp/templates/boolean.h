@@ -2,27 +2,24 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/{{nativeType}}.h>
 
-#include <{{api.identifier}}binding/{{api.identifier}}binding_features.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
+#include <{{binding.identifier}}/no{{api.identifier}}.h>
 
 
 namespace {{api.identifier}}
 {
 
 
-enum class GLboolean : unsigned char
-{
-{{#booleans.items}}
-    {{item.identifier}} = {{item.value}}{{^last}},{{/last}}
-{{/booleans.items}}
-};
+using {{binding.booleanType}} = {{binding.identifier}}::{{nativeType}};
+
 
 // import booleans to namespace
 
-{{#booleans.items}}
-{{ucapi}}BINDING_CONSTEXPR static const GLboolean {{item.identifier}} = GLboolean::{{item.identifier}};
-{{/booleans.items}}
-
+{% for constant in values|sort(attribute='identifier') -%}
+{{binding.constexpr}} static const {{binding.booleanType}} {{constant.identifier}} = {{binding.booleanType}}({{constant.value}});
+{% endfor %}
 
 } // namespace {{api.identifier}}

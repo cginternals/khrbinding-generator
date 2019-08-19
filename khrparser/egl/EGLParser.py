@@ -435,6 +435,7 @@ class EGLParser(XMLParser):
         binding.bitfieldType = profile.bitfieldType
         binding.noneBitfieldValue = profile.noneBitfieldValue
         binding.cStringOutputTypes = profile.cStringOutputTypes
+        binding.cPointerTypes = [ type.identifier for type in api.types if type.identifier == "GLvoid" ]
 
         return binding
 
