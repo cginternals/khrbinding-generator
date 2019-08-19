@@ -16,7 +16,7 @@ namespace {{api.identifier}}
 {% for group in groups|sort(attribute="identifier") -%}
 enum class {{group.identifier}} : unsigned int
 {
-{%- for value in group.values|sort(attribute="value") %}
+{%- for value in group.values|sort(attribute="decimalValue") %}
     {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}}{{ "," if not loop.last }}{% if value.generic %} // Generic {{ value.identifier }}{% else %}{% if group.identifier != value.groups[0].identifier %} // reuse from {{ value.groups[0].identifier }}{% endif %}{% endif %}
 {%- endfor %}
 };

@@ -106,7 +106,7 @@ class VKParser(XMLParser):
                     l1.append(i)
 
         requiredTypes = []
-        combine(requiredTypes, [ type for type in api.types if isinstance(type, NativeCode) or type.identifier in [ profile.bitfieldType, "SpecialValues", "VkInternalAllocationType", "VkSystemAllocationScope" ] ])
+        combine(requiredTypes, [ type for type in api.types if isinstance(type, NativeCode) or type.identifier in [ profile.bitfieldType, "SpecialNumbers", "VkInternalAllocationType", "VkSystemAllocationScope" ] ])
         combine(requiredTypes, [ type for featureSet in featureSets for type in featureSet.requiredTypes ])
         combine(requiredTypes, [ constant.type for constant in api.constants ])
         combine(requiredTypes, [ type for constant in api.constants for type in constant.groups ])
@@ -152,8 +152,38 @@ class VKParser(XMLParser):
         #     if len(noneBit.groups) == 0:
         #         api.constants.remove(noneBit)
 
+        # Fix Special Values
+        specialNumbersType = None
+        oldSpecialNumbersType = api.typeByIdentifier("SpecialNumbers")
+        if oldSpecialNumbersType is not None:
+            api.types.remove(oldSpecialNumbersType)
+
+        for constant in api.constants:
+            if "SpecialNumbers" in [ group.identifier for group in constant.groups ]:
+                if len(constant.groups) == 1 and constant.type is not None:
+                    if specialNumbersType is None:
+                        specialNumbersType = SpecialValues(api, "SpecialValues")
+                        specialNumbersType.hideDeclaration = True
+                        api.types.append(specialNumbersType)
+                
+                    specialNumbersType.values.append(constant)
+                    constant.groups = [specialNumbersType]
+        
+        # Add generic bitfield type
+        bitfieldType = api.typeByIdentifier(profile.bitfieldType)
+        if bitfieldType is None:
+            aliasedType = api.typeByIdentifier("unsigned int")
+            if aliasedType is None:
+                aliasedType = NativeType(api, "unsigned int", "unsigned int")
+                aliasedType.hideDeclaration = True
+                api.types.append(aliasedType)
+            bitfieldType = TypeAlias(api, profile.bitfieldType, aliasedType)
+            bitfieldType.namespacedIdentifier = profile.baseNamespace + "::" + bitfieldType.identifier
+            api.types.insert(0, bitfieldType)
+
         # Generic None Bit
         genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+        genericNoneBit.decimalValue = 0
         genericNoneBit.generic = True
         api.constants.append(genericNoneBit)
         for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
@@ -161,56 +191,57 @@ class VKParser(XMLParser):
             genericNoneBit.groups.append(group)
 
         # Add GLextension type
-        # extensionType = Enumerator(api, profile.extensionType)
-        # extensionType.unsigned = False
-        # api.types.insert(0, extensionType)
+        extensionType = Enumerator(api, profile.extensionType)
+        extensionType.unsigned = False
+        api.types.insert(1, extensionType)
 
         # Fix GLenum type
-        # oldEnumType = api.typeByIdentifier(profile.enumType)
-        # if oldEnumType in api.types:
-        #     api.types.remove(oldEnumType)
-        # api.types.insert(1, Enumerator(api, profile.enumType))
+        oldEnumType = api.typeByIdentifier(profile.enumType)
+        if oldEnumType in api.types:
+            api.types.remove(oldEnumType)
+        api.types.insert(2, Enumerator(api, profile.enumType))
 
         # Fix boolean type
-        # booleanType = Enumerator(api, profile.booleanType)
-        # booleanType.hideDeclaration = True
+        booleanType = Enumerator(api, profile.booleanType)
+        booleanType.hideDeclaration = True
 
         # Remove boolean values from GLenum
-        # for constant in api.constants:
-        #     if constant.identifier in [ "VK_TRUE", "VK_FALSE" ]:
-        #         for group in constant.groups:
-        #             group.values.remove(constant)
-        #         constant.groups = [ booleanType ]
-        #         booleanType.values.append(constant)
+        for constant in api.constants:
+            if constant.identifier in [ "VK_TRUE", "VK_FALSE" ]:
+                for group in constant.groups:
+                    group.values.remove(constant)
+                constant.groups = [ booleanType ]
+                booleanType.values.append(constant)
 
         # Remove boolean type
-        # oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
-        # if oldBooleanType is not None:
-        #     api.types.remove(oldBooleanType)
+        oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
+        if oldBooleanType is not None:
+            api.types.remove(oldBooleanType)
         
         # Finally add boolean type
 
-        # api.types.insert(2, booleanType)
+        api.types.insert(3, booleanType)
 
         # Assign Ungrouped
-        # ungroupedType = None
-        # for constant in api.constants:
-        #     if len(constant.groups) == 0:
-        #         if ungroupedType is None:
-        #             ungroupedType = Enumerator(api, "UNGROUPED")
-        #             ungroupedType.hideDeclaration = True
-        #             api.types.append(ungroupedType)
-        #     
-        #         ungroupedType.values.append(constant)
-        #         constant.groups.append(ungroupedType)
+        ungroupedType = None
+        for constant in api.constants:
+            if len(constant.groups) == 0:
+                if ungroupedType is None:
+                    ungroupedType = Enumerator(api, "UNGROUPED")
+                    ungroupedType.hideDeclaration = True
+                    api.types.append(ungroupedType)
+            
+                ungroupedType.values.append(constant)
+                constant.groups.append(ungroupedType)
         
         # Add unused mask bitfield
-        # unusedMaskType = BitfieldGroup(api, "UnusedMask")
-        # unusedBitConstant = Constant(api, "VK_UNUSED_BIT", "0x00000000")
-        # unusedMaskType.values.append(unusedBitConstant)
-        # unusedBitConstant.groups.append(unusedMaskType)
-        # api.types.append(unusedMaskType)
-        # api.constants.append(unusedBitConstant)
+        unusedMaskType = BitfieldGroup(api, "UnusedMask")
+        unusedBitConstant = Constant(api, "VK_UNUSED_BIT", "0x00000000")
+        unusedBitConstant.decimalValue = 0
+        unusedMaskType.values.append(unusedBitConstant)
+        unusedBitConstant.groups.append(unusedMaskType)
+        api.types.append(unusedMaskType)
+        api.constants.append(unusedBitConstant)
 
         binding = super(cls, VKParser).deriveBinding(api, profile)
 
@@ -330,7 +361,7 @@ class VKParser(XMLParser):
             return type
 
         if nameString == "API Constants":
-            type = Enumerator(api, "UNGROUPED")
+            type = Enumerator(api, "SpecialNumbers")
             type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
             api.types.append(type)
         else:
@@ -360,11 +391,17 @@ class VKParser(XMLParser):
             aliasConstant = api.constantByIdentifier(enum.attrib["alias"])
             if aliasConstant is None:
                 aliasConstant = Constant(api, alias, value)
+                aliasConstant.decimalValue = int(value, 0)
                 constants.append(aliasConstant)
             if aliasConstant.value is not None and value is None:
                 value = aliasConstant.value
+            constant = Constant(api, name, value if value is not None else name)
+            constant.type = aliasConstant.type
+        else:
+            constant = Constant(api, name, value if value is not None else name)
+            constant.type = cls.detectSpecialValueType(api, enum)
         
-        constant = Constant(api, name, value if value is not None else name)
+        constant.decimalValue = 0
         constants.append(constant)
 
         for c in constants:
@@ -459,6 +496,9 @@ class VKParser(XMLParser):
             for child in require:
                 if child.tag == "enum":
                     name = child.attrib["name"]
+                    if name.endswith("_NAME"):
+                        continue
+                    
                     constant = api.constantByIdentifier(name)
                     if constant is None:
                         if "extends" in child.attrib:
@@ -484,7 +524,9 @@ class VKParser(XMLParser):
                             if aliasConstant is not None:
                                 value = aliasConstant.value
 
+                        print("Handle constant",name,value)
                         constant = Constant(api, name, value if value else name)
+                        constant.decimalValue = int(value, 0)
 
                         if isinstance(type, TypeAlias):
                             type.aliasedType.values.append(constant)
@@ -561,6 +603,7 @@ class VKParser(XMLParser):
                             value = aliasConstant.value
                     
                     constant = Constant(api, name, value if value else name)
+                    constant.decimalValue = int(value, 0)
 
                     if isinstance(type, TypeAlias):
                         type.aliasedType.values.append(constant)
@@ -990,3 +1033,18 @@ class VKParser(XMLParser):
                 types.append(alias)
 
         return types
+
+    @classmethod
+    def detectSpecialValueType(cls, api, enum):
+        if not "value" in enum.attrib:
+            return None
+        
+        print("Detect type of", enum.attrib["name"])
+        if "." in enum.attrib["value"] and enum.attrib["value"].endswith("f"):
+            return api.typeByIdentifier("float")
+        elif "ULL" in enum.attrib["value"]:
+            return api.typeByIdentifier("unsigned long long")
+        elif "U" in enum.attrib["value"]:
+            return api.typeByIdentifier("unsigned int")
+
+        return api.typeByIdentifier("unsigned int")
