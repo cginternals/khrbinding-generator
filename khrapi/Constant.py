@@ -4,6 +4,7 @@ class Constant(object):
         self.api = api
         self.identifier = identifier # self.name?
         self.value = value if value is not None else "__TODO_INVALID_VALUE__"
+        self.decimalValue = 0
         self.groups = []
         self.type = None
         self.generic = False

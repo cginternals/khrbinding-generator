@@ -83,6 +83,7 @@ class GLParser(XMLParser):
                     continue
                 
                 constant = Constant(api, enum.attrib["name"], enum.attrib["value"])
+                constant.decimalValue = int(enum.attrib["value"], 0)
                 if "group" in E.attrib and E.attrib["group"] == "SpecialNumbers":
                     constant.type = cls.detectSpecialValueType(api, enum)
                 api.constants.append(constant)
@@ -308,6 +309,7 @@ class GLParser(XMLParser):
 
         # Generic None Bit
         genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+        genericNoneBit.decimalValue = 0
         genericNoneBit.generic = True
         api.constants.append(genericNoneBit)
         for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
@@ -399,6 +401,7 @@ class GLParser(XMLParser):
         # Add unused mask bitfield
         unusedMaskType = BitfieldGroup(api, "UnusedMask")
         unusedBitConstant = Constant(api, "GL_UNUSED_BIT", "0x00000000")
+        unusedBitConstant.decimalValue = 0
         unusedMaskType.values.append(unusedBitConstant)
         unusedBitConstant.groups.append(unusedMaskType)
         api.types.append(unusedMaskType)
