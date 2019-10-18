@@ -229,7 +229,7 @@ class GLParser(XMLParser):
         # Versions
         for feature in registry.iter("feature"):
 
-            version = cls.createVersion(feature)
+            version = cls.createVersion(api, feature)
             api.versions.append(version)
 
         return api
@@ -463,7 +463,7 @@ class GLParser(XMLParser):
     @classmethod
     def createVersion(cls, api, feature_xml):
         internalIdentifier = "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ] + [ c for c in feature_xml.attrib["number"] if c.isdigit() ])
-        version = Version(api, internalIdentifier, feature.attrib["api"], feature_xml.attrib["number"], "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ]))
+        version = Version(api, internalIdentifier, feature_xml.attrib["api"], feature_xml.attrib["number"], "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ]))
         version.supportedAPIs = feature_xml.attrib["api"].split("|")
 
         for require in feature_xml.findall("require"):
