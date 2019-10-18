@@ -18,6 +18,7 @@ from khrapi.Function import Function
 from khrapi.Parameter import Parameter
 from khrapi.NativeCode import NativeCode
 from khrapi.CompoundType import CompoundType
+from khrapi.SpecialValues import SpecialValues
 
 class VKParser(XMLParser):
 
@@ -56,14 +57,20 @@ class VKParser(XMLParser):
             for command in C.findall("command"):
                 cls.handleFunction(api, profile, command)
 
+        # Register Extensions
+        for E in registry.iter("extensions"):
+            for xmlExtension in E.findall("extension"):
+                cls.preHandleExtension(api, profile, xmlExtension)
+
+        # Versions
+        # Handle version before extension as some extension alias the values from the core features
+        for feature in registry.iter("feature"):
+            cls.handleVersion(api, profile, feature)
+
         # Extensions
         for E in registry.iter("extensions"):
             for xmlExtension in E.findall("extension"):
                 cls.handleExtension(api, profile, xmlExtension)
-
-        # Versions
-        for feature in registry.iter("feature"):
-            cls.handleVersion(api, profile, feature)
 
         return api
 
@@ -73,6 +80,8 @@ class VKParser(XMLParser):
 
     @classmethod
     def filterAPI(cls, api, profile):
+
+        # api.printSummary()
 
         featureSets = []
 
@@ -214,9 +223,13 @@ class VKParser(XMLParser):
                 booleanType.values.append(constant)
 
         # Remove boolean type
+        print("Search old boolean type", profile.booleanType)
+        print("Boolean types", [ type for type in api.types if type.identifier == profile.booleanType ])
         oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
-        if oldBooleanType is not None:
+        while oldBooleanType is not None: # TODO: check why VkBool32 was in api.types twice
+            print("Remove old boolean type", profile.booleanType, oldBooleanType)
             api.types.remove(oldBooleanType)
+            oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
         
         # Finally add boolean type
 
@@ -275,6 +288,7 @@ class VKParser(XMLParser):
         binding.bitfieldType = profile.bitfieldType
         binding.noneBitfieldValue = profile.noneBitfieldValue
         binding.cStringOutputTypes = profile.cStringOutputTypes
+        binding.cPointerTypes = [ type.identifier for type in api.types if type.identifier == "CAMetalLayer" ]
 
         return binding
 
@@ -488,15 +502,20 @@ class VKParser(XMLParser):
         api.functions.append(function)
 
     @classmethod
-    def handleExtension(cls, api, profile, xmlExtension):
+    def preHandleExtension(cls, api, profile, xmlExtension):
         extension = Extension(api, xmlExtension.attrib["name"], xmlExtension.attrib["platform"] if "platform" in xmlExtension.attrib else "")
         extension.supportedAPIs = xmlExtension.attrib["supported"].split("|")
+        api.extensions.append(extension)
+
+    @classmethod
+    def handleExtension(cls, api, profile, xmlExtension):
+        extension = api.extensionByIdentifier(xmlExtension.attrib["name"])
 
         for require in xmlExtension.findall("require"):
             for child in require:
                 if child.tag == "enum":
                     name = child.attrib["name"]
-                    if name.endswith("_NAME"):
+                    if name.endswith("_NAME"): # Ignore name constants for now
                         continue
                     
                     constant = api.constantByIdentifier(name)
@@ -515,18 +534,21 @@ class VKParser(XMLParser):
                             value = hex(1000000000 + 1000 * (int(xmlExtension.attrib["number"])-1) + int(child.attrib["offset"]))
                         elif "bitpos" in child.attrib:
                             value = hex(1 << int(child.attrib["bitpos"]))
+                        elif "alias" in child.attrib:
+                            aliasConstant = api.constantByIdentifier(child.attrib["alias"])
+                            if aliasConstant is not None:
+                                value = aliasConstant.value
+                            else:
+                                value = child.attrib.get("value", None)
                         else:
                             value = child.attrib.get("value", None)
 
-                        if "alias" in child.attrib:
-                            alias = child.attrib["alias"]
-                            aliasConstant = api.constantByIdentifier(alias)
-                            if aliasConstant is not None:
-                                value = aliasConstant.value
-
-                        print("Handle constant",name,value)
-                        constant = Constant(api, name, value if value else name)
-                        constant.decimalValue = int(value, 0)
+                        constant = Constant(api, name, value if value is not None else "__TODO_INVALID_VALUE__")
+                        try:
+                            constant.decimalValue = int(value if value is not None else "0", 0)
+                        except:
+                            constant.decimalValue = None
+                            # TODO: Handle string value
 
                         if isinstance(type, TypeAlias):
                             type.aliasedType.values.append(constant)
@@ -545,8 +567,6 @@ class VKParser(XMLParser):
                     if requiredType is None:
                         requiredType = NativeType(api, child.attrib["name"], child.attrib["name"])
                     extension.requiredTypes.append(requiredType)
-
-        api.extensions.append(extension)
 
     @classmethod
     def handleVersion(cls, api, profile, feature):
@@ -1039,12 +1059,20 @@ class VKParser(XMLParser):
         if not "value" in enum.attrib:
             return None
         
-        print("Detect type of", enum.attrib["name"])
         if "." in enum.attrib["value"] and enum.attrib["value"].endswith("f"):
-            return api.typeByIdentifier("float")
+            return cls.obtainNativeType(api, "float")
         elif "ULL" in enum.attrib["value"]:
-            return api.typeByIdentifier("unsigned long long")
+            return cls.obtainNativeType(api, "unsigned long long")
         elif "U" in enum.attrib["value"]:
-            return api.typeByIdentifier("unsigned int")
+            return cls.obtainNativeType(api, "unsigned int")
 
-        return api.typeByIdentifier("unsigned int")
+        return cls.obtainNativeType(api, "unsigned int")
+
+    @classmethod
+    def obtainNativeType(cls, api, name):
+        nativeType = api.typeByIdentifier(name)
+        if nativeType is None:
+            nativeType = NativeType(api, name, name)
+            nativeType.hideDeclaration = True
+            api.types.append(nativeType)
+        return nativeType

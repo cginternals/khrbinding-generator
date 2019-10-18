@@ -55,16 +55,21 @@ class CPPGenerator:
         booleanValues = [ constant for booleanType in booleanTypes for constant in booleanType.values ]
         booleanValueNames = [ constant.identifier for constant in booleanValues ]
 
-        nativeTypes = [ type for type in api.types if isinstance(type, NativeType) or isinstance(type, NativeCode) ]
-        noneDependentTypes = [ type for type in api.types if type not in nativeTypes and (not isinstance(type, CompoundType) or len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) or isinstance(otherType.nativeType, CompoundType) ]) == 0) ]
-        oneDependentTypes = [ type for type in api.types if isinstance(type, CompoundType) and len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) or isinstance(otherType.nativeType, CompoundType) ]) == 1 ]
-        moreDependentTypes = [ type for type in api.types if isinstance(type, CompoundType) and len([ otherType for otherType in type.memberAttributes if isinstance(otherType.type, CompoundType) or isinstance(otherType.nativeType, CompoundType) ]) > 1 ]
+        enumTypes = [ type for type in api.types if isinstance(type, Enumerator) and type.identifier != profile.booleanType and type.identifier != profile.extensionType ]
+        enumConstants = [ constant for constant in api.constants if len(constant.groups) > 0 and constant.groups[0] in enumTypes ]
+
+        bitfieldTypes = [ type for type in api.types if isinstance(type, BitfieldGroup) ]
+        bitfieldConstants = [ constant for constant in api.constants if len(constant.groups) > 0 and constant.groups[0] in bitfieldTypes ]
 
         # TEMPLATE APPLICATION
 
         # API binding
 
         cls.render(template_engine, "extension.h", includedir_api+"extension.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace)
+        cls.render(template_engine, "boolean.h", includedir_api+"boolean.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
+            values=booleanValues,
+            nativeType="Boolean8" if binding.booleanWidth == 8 else "Boolean32"
+        )
         cls.render(template_engine, "values.h", includedir_api+"values.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             values=api.typeByIdentifier("SpecialValues")
         )
@@ -75,17 +80,17 @@ class CPPGenerator:
         cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             basic_enumerators=[ type for type in [ api.typeByIdentifier(binding.extensionType) ] if type is not None ],
             generic_enumerators=[ type for type in [ api.typeByIdentifier(binding.enumType) ] if type is not None ],
-            bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ]
+            bitfields=bitfieldTypes
         )
         cls.render(template_engine, "bitfield.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ],
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],
-            max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ] + [ 0 ]))
+            groups=bitfieldTypes,
+            constants=bitfieldConstants,
+            max_constant_length=str(max([ len(constant.identifier) for constant in bitfieldConstants ] + [ 0 ]))
         )
         cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
-            groups=[ type for type in api.types if isinstance(type, Enumerator) and len(type.values) > 0 and type.identifier != profile.booleanType ],
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in booleanValueNames ],
-            max_constant_length=str(max([ len(constant.identifier) for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) ] + [ 0 ]))
+            groups=enumTypes,
+            constants=enumConstants,
+            max_constant_length=str(max([ len(constant.identifier) for constant in enumConstants ] + [ 0 ]))
         )
         cls.render(template_engine, "functions.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             functions=[ function for function in api.functions ]
@@ -158,19 +163,21 @@ class CPPGenerator:
         )
 
         cls.render(template_engine, "Meta.h", includedir_aux+"Meta.h", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+            bitfieldGroups=bitfieldTypes,
+            enumGroups=enumTypes
         )
         cls.render(template_engine, "Meta_Maps.h", sourcedir_aux+"Meta_Maps.h", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+            bitfieldGroups=bitfieldTypes,
+            enumGroups=enumTypes
         )
         cls.render(template_engine, "Meta_getStringByBitfield.cpp", sourcedir_aux+"Meta_getStringByBitfield.cpp", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+            groups=bitfieldTypes
         )
         cls.render(template_engine, "Meta_StringsByBitfield.cpp", sourcedir_aux+"Meta_StringsByBitfield.cpp", api=api, profile=profile, binding=binding,
-            groups=[ type for type in api.types if isinstance(type, BitfieldGroup) and len(type.values) > 0 ]
+            groups=bitfieldTypes
         )
         cls.render(template_engine, "Meta_BitfieldsByString.cpp", sourcedir_aux+"Meta_BitfieldsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ], len(profile.uppercasePrefix))
+            groups=cls.identifierPrefixGroups(api, bitfieldConstants, len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_StringsByBoolean.cpp", sourcedir_aux+"Meta_StringsByBoolean.cpp", api=api, profile=profile, binding=binding,
             booleans=booleanValues
@@ -179,10 +186,10 @@ class CPPGenerator:
             booleans=booleanValues
         )
         cls.render(template_engine, "Meta_StringsByEnum.cpp", sourcedir_aux+"Meta_StringsByEnum.cpp", api=api, profile=profile, binding=binding,
-            constants=[ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in booleanValueNames ]
+            constants=enumConstants
         )
         cls.render(template_engine, "Meta_EnumsByString.cpp", sourcedir_aux+"Meta_EnumsByString.cpp", api=api, profile=profile, binding=binding,
-            groups=cls.identifierPrefixGroups(api, [ constant for constant in api.constants if len(constant.groups) > 0 and isinstance(constant.groups[0], Enumerator) and constant.identifier not in booleanValueNames ], len(profile.uppercasePrefix))
+            groups=cls.identifierPrefixGroups(api, enumConstants, len(profile.uppercasePrefix))
         )
         cls.render(template_engine, "Meta_StringsByExtension.cpp", sourcedir_aux+"Meta_StringsByExtension.cpp", api=api, profile=profile, binding=binding,
             extensions=api.extensions
@@ -203,20 +210,24 @@ class CPPGenerator:
             extensionsByFunction=cls.identifierPrefixGroupsDict(api, api.extensionsByFunction(), len(profile.lowercasePrefix))
         )
 
+        for type in [ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ]:
+            if type not in enumTypes and type is not None:
+                enumTypes.append(type)
+    
         cls.render(template_engine, "khrbinding-aux/RingBuffer.h", includedir_aux+"RingBuffer.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/RingBuffer.inl", includedir_aux+"RingBuffer.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.h", includedir_aux+"types_to_string.h", api=api, profile=profile, binding=binding,
-            enumerators=[ enumerator for enumerator in [ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ] if enumerator is not None ],
-            bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
+            enumerators=enumTypes,
+            bitfields=bitfieldTypes,
             cStringTypes=binding.cStringOutputTypes,
         )
         cls.render(template_engine, "khrbinding-aux/types_to_string.inl", includedir_aux+"types_to_string.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.cpp", sourcedir_aux+"types_to_string.cpp", api=api, profile=profile, binding=binding,
-            enumerators=[ enumerator for enumerator in [ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ] if enumerator is not None ],
-            bitfields=[ type for type in api.types if isinstance(type, BitfieldGroup) ],
+            enumerators=enumTypes,
+            bitfields=bitfieldTypes,
             cStringTypes=binding.cStringOutputTypes,
-            cPointerTypes=[ type.identifier for type in api.types if type.identifier == "GLvoid" ],
-            types=[ type for type in api.types if not type.hideDeclaration and not type.declaration.startswith('struct') ]
+            cPointerTypes=binding.cPointerTypes,
+            types=[ type for type in api.types if not type.hideDeclaration and not type.declaration.startswith('struct') and not type.identifier in binding.cPointerTypes and not isinstance(type, NativeCode) and not isinstance(type, CompoundType) and not isinstance(type, TypeAlias) ]
         )
         
         cls.render(template_engine, "khrbinding-aux/ValidVersions.h", includedir_aux+"ValidVersions.h", api=api, profile=profile, binding=binding)
