@@ -11,11 +11,14 @@ namespace {{api.identifier}}{{memberSet}}
 {
 
 
-// import booleans to namespace
+// use boolean type
+using {{api.identifier}}::{{binding.booleanType}};
 
-{{#booleans.items}}
-using {{api.identifier}}::{{item.identifier}};
-{{/booleans.items}}
+
+// import booleans to namespace
+{%- for constant in constants|sort(attribute='identifier') %}
+using {{api.identifier}}::{{constant.identifier}};
+{%- endfor %}
 
 
 } // namespace {{api.identifier}}{{memberSet}}

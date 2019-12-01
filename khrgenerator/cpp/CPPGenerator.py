@@ -57,6 +57,8 @@ class CPPGenerator:
 
         enumTypes = [ type for type in api.types if isinstance(type, Enumerator) and type.identifier != profile.booleanType and type.identifier != profile.extensionType ]
         enumConstants = [ constant for constant in api.constants if len(constant.groups) > 0 and constant.groups[0] in enumTypes ]
+        originalEnumTypes = [ type for type in enumTypes if type.hideDeclaration ]
+        enumTypes = [ type for type in enumTypes if not type.hideDeclaration ]
 
         bitfieldTypes = [ type for type in api.types if isinstance(type, BitfieldGroup) ]
         bitfieldConstants = [ constant for constant in api.constants if len(constant.groups) > 0 and constant.groups[0] in bitfieldTypes ]
@@ -88,7 +90,7 @@ class CPPGenerator:
             max_constant_length=str(max([ len(constant.identifier) for constant in bitfieldConstants ] + [ 0 ]))
         )
         cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
-            groups=enumTypes,
+            groups=originalEnumTypes,
             constants=enumConstants,
             max_constant_length=str(max([ len(constant.identifier) for constant in enumConstants ] + [ 0 ]))
         )
@@ -168,7 +170,7 @@ class CPPGenerator:
         )
         cls.render(template_engine, "Meta_Maps.h", sourcedir_aux+"Meta_Maps.h", api=api, profile=profile, binding=binding,
             bitfieldGroups=bitfieldTypes,
-            enumGroups=enumTypes
+            enumGroups=originalEnumTypes if binding.useEnumGroups else []
         )
         cls.render(template_engine, "Meta_getStringByBitfield.cpp", sourcedir_aux+"Meta_getStringByBitfield.cpp", api=api, profile=profile, binding=binding,
             groups=bitfieldTypes
@@ -286,7 +288,10 @@ class CPPGenerator:
                 functions = currentFunctions | deprecatedFunctions
 
             cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                types=[ type for type in api.types if not type.hideDeclaration and not isinstance(type, NativeCode) ]
+                types=[ type for type in api.types if (not type.hideDeclaration or type in booleanTypes) and not isinstance(type, NativeCode) ]
+            )
+            cls.render(template_engine, "booleanF.h", includedir_api+"boolean.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
+                constants=booleanValues,
             )
             cls.render(template_engine, "bitfieldF.h", includedir_api+"bitfield.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 constants=[ constant for constant in constants if len(constant.groups) > 0 and isinstance(constant.groups[0], BitfieldGroup) ],

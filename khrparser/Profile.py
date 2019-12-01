@@ -23,9 +23,11 @@ class Profile:
         self.minCoreVersion = [ int(number) for number in jsonObject["coreProfileSince"].split(".") ] if jsonObject["coreProfileSince"] is not None else None
         self.extensionType = jsonObject["extensionType"]
         self.noneBitfieldValue = jsonObject["noneBitfieldValue"]
+        self.useEnumGroups = jsonObject["useEnumGroups"]
         self.enumType = jsonObject["enumType"]
         self.bitfieldType = jsonObject["bitfieldType"]
         self.booleanType = jsonObject["booleanType"]
         self.headerGuardMacro = jsonObject["headerGuardMacro"]
         self.headerReplacement = jsonObject["headerReplacement"]
         self.cStringOutputTypes = jsonObject["cStringOutputTypes"]
+        self.generateNoneBits = jsonObject["generateNoneBits"]

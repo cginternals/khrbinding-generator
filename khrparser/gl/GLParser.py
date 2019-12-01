@@ -295,79 +295,46 @@ class GLParser(XMLParser):
     @classmethod
     def deriveBinding(cls, api, profile):
 
-        # Remove shared enum and bitfield GL_NONE
-        noneBit = api.constantByIdentifier("GL_NONE")
-        if noneBit is not None:
-            for group in noneBit.groups[:]:
-                if isinstance(group, BitfieldGroup):
-                    group.values.remove(noneBit)
-                    noneBit.groups.remove(group)
-            if len(group.values) == 0:
-                api.types.remove(group)
-            if len(noneBit.groups) == 0:
-                api.constants.remove(noneBit)
+        if profile.generateNoneBits:
+            # Remove shared enum and bitfield GL_NONE
+            noneBit = api.constantByIdentifier("GL_NONE")
+            if noneBit is not None:
+                for group in noneBit.groups[:]:
+                    if isinstance(group, BitfieldGroup):
+                        group.values.remove(noneBit)
+                        noneBit.groups.remove(group)
+                if len(group.values) == 0:
+                    api.types.remove(group)
+                if len(noneBit.groups) == 0:
+                    api.constants.remove(noneBit)
 
-        # Generic None Bit
-        genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
-        genericNoneBit.decimalValue = 0
-        genericNoneBit.generic = True
-        api.constants.append(genericNoneBit)
-        for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
-            group.values.append(genericNoneBit)
-            genericNoneBit.groups.append(group)
-
-        # Add GLextension type
-        extensionType = Enumerator(api, profile.extensionType)
-        extensionType.unsigned = False
-        api.types.insert(0, extensionType)
+            # Generic None Bit
+            genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+            genericNoneBit.decimalValue = 0
+            genericNoneBit.generic = True
+            api.constants.append(genericNoneBit)
+            for group in [ group for group in api.types if isinstance(group, BitfieldGroup)]:
+                group.values.append(genericNoneBit)
+                genericNoneBit.groups.append(group)
 
         # Fix GLenum type
+        fixedEnumType = Enumerator(api, profile.enumType)
         api.types.remove(api.typeByIdentifier(profile.enumType))
-        api.types.insert(1, Enumerator(api, profile.enumType))
 
+        for type in [ type for type in api.types if isinstance(type, Enumerator) ]:
+            for value in type.values:
+                value.groups.append(fixedEnumType)
+                fixedEnumType.values.append(value)
+            if not profile.useEnumGroups:
+                type.hideDeclaration = True
+
+        api.types.insert(1, fixedEnumType)
+    
         # Fix boolean type
         booleanType = Enumerator(api, profile.booleanType)
         booleanType.hideDeclaration = True
 
-        # Add missing types
-        if profile.apiIdentifier == "gles2":
-            intType = api.typeByIdentifier('int')
-            if intType is None:
-                intType = NativeType(api, "int", "int")
-                intType.hideDeclaration = True
-                api.types.append(intType)
-
-            charType = api.typeByIdentifier('char')
-            if charType is None:
-                charType = NativeType(api, "char", "char")
-                charType.hideDeclaration = True
-                api.types.append(charType)
-                
-            voidpType = api.typeByIdentifier('void *')
-            if voidpType is None:
-                voidpType = NativeType(api, "void *", "void *")
-                voidpType.hideDeclaration = True
-                api.types.append(voidpType)
-
-            eglIntType = TypeAlias(api, "EGLint", intType)
-            eglIntType.namespacedIdentifier = profile.baseNamespace+"::"+eglIntType.identifier
-            api.types.append(eglIntType)
-
-            eglCharType = TypeAlias(api, "EGLchar", charType)
-            eglCharType.namespacedIdentifier = profile.baseNamespace+"::"+eglCharType.identifier
-            api.types.append(eglCharType)
-
-            eglNativeDisplayType = TypeAlias(api, "EGLNativeDisplayType", voidpType)
-            eglNativeDisplayType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativeDisplayType.identifier
-            api.types.append(eglNativeDisplayType)
-
-            eglNativePixmapType = TypeAlias(api, "EGLNativePixmapType", voidpType)
-            eglNativePixmapType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativePixmapType.identifier
-            api.types.append(eglNativePixmapType)
-
-            eglNativeWindowType = TypeAlias(api, "EGLNativeWindowType", voidpType)
-            eglNativeWindowType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativeWindowType.identifier
-            api.types.append(eglNativeWindowType)
+        cls.ensureGLES2Types(api, profile)
 
         # Remove boolean values from GLenum
         for constant in api.constants:
@@ -398,6 +365,11 @@ class GLParser(XMLParser):
                 ungroupedType.values.append(constant)
                 constant.groups.append(ungroupedType)
         
+        # Add GLextension type
+        extensionType = Enumerator(api, profile.extensionType)
+        extensionType.unsigned = False
+        api.types.insert(0, extensionType)
+
         # Add unused mask bitfield
         unusedMaskType = BitfieldGroup(api, "UnusedMask")
         unusedBitConstant = Constant(api, "GL_UNUSED_BIT", "0x00000000")
@@ -447,6 +419,7 @@ class GLParser(XMLParser):
         binding.bitfieldType = profile.bitfieldType
         binding.noneBitfieldValue = profile.noneBitfieldValue
         binding.cStringOutputTypes = profile.cStringOutputTypes
+        binding.useEnumGroups = profile.useEnumGroups
         binding.cPointerTypes = [ type.identifier for type in api.types if type.identifier == "GLvoid" ]
 
         return binding
@@ -508,3 +481,45 @@ class GLParser(XMLParser):
                     version.removedTypes.append(api.typeByIdentifier(child.attrib["name"]))
 
         return version
+
+    @classmethod
+    def ensureGLES2Types(cls, api, profile):
+        # Add missing types
+        if profile.apiIdentifier == "gles2":
+            intType = api.typeByIdentifier('int')
+            if intType is None:
+                intType = NativeType(api, "int", "int")
+                intType.hideDeclaration = True
+                api.types.append(intType)
+
+            charType = api.typeByIdentifier('char')
+            if charType is None:
+                charType = NativeType(api, "char", "char")
+                charType.hideDeclaration = True
+                api.types.append(charType)
+                
+            voidpType = api.typeByIdentifier('void *')
+            if voidpType is None:
+                voidpType = NativeType(api, "void *", "void *")
+                voidpType.hideDeclaration = True
+                api.types.append(voidpType)
+
+            eglIntType = TypeAlias(api, "EGLint", intType)
+            eglIntType.namespacedIdentifier = profile.baseNamespace+"::"+eglIntType.identifier
+            api.types.append(eglIntType)
+
+            eglCharType = TypeAlias(api, "EGLchar", charType)
+            eglCharType.namespacedIdentifier = profile.baseNamespace+"::"+eglCharType.identifier
+            api.types.append(eglCharType)
+
+            eglNativeDisplayType = TypeAlias(api, "EGLNativeDisplayType", voidpType)
+            eglNativeDisplayType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativeDisplayType.identifier
+            api.types.append(eglNativeDisplayType)
+
+            eglNativePixmapType = TypeAlias(api, "EGLNativePixmapType", voidpType)
+            eglNativePixmapType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativePixmapType.identifier
+            api.types.append(eglNativePixmapType)
+
+            eglNativeWindowType = TypeAlias(api, "EGLNativeWindowType", voidpType)
+            eglNativeWindowType.namespacedIdentifier = profile.baseNamespace+"::"+eglNativeWindowType.identifier
+            api.types.append(eglNativeWindowType)
