@@ -94,7 +94,19 @@ class GLParser(XMLParser):
             for group in G.findall("group"):
                 name = group.attrib["name"]
 
-                if name.find("Mask") >= 0 or name == "PathFontStyle":
+                if name=="VertexShaderWriteMaskEXT":
+                    # Fix VertexShaderWriteMaskEXT type (is actually a boolean)
+                    booleanType = api.typeByIdentifier(profile.booleanType)
+                    if booleanType is None:
+                        booleanType = ValueGroup(api, profile.booleanType)
+                        booleanType.hideDeclaration = True
+                        booleanType.namespacedIdentifier = profile.baseNamespace+"::"+profile.booleanType
+                        api.types.append(booleanType)
+                    type = TypeAlias(api, name, booleanType)
+                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
+                    api.types.append(type)
+                    continue
+                elif name.find("Mask") >= 0 or name == "PathFontStyle":
                     type = BitfieldGroup(api, name)
                     type.namespacedIdentifier = profile.baseNamespace+"::"+name
                 elif name.find("Boolean") >= 0:
@@ -122,7 +134,17 @@ class GLParser(XMLParser):
 
                 type = api.typeByIdentifier(name)
 
-                if type is None and (name.find("Mask") >= 0 or name == "PathFontStyle"):
+                if type is None and name=="VertexShaderWriteMaskEXT":
+                    booleanType = api.typeByIdentifier(profile.booleanType)
+                    if booleanType is None:
+                        booleanType = ValueGroup(api, profile.booleanType)
+                        booleanType.hideDeclaration = True
+                        booleanType.namespacedIdentifier = profile.baseNamespace+"::"+profile.booleanType
+                        api.types.append(booleanType)
+                    type = TypeAlias(api, name, booleanType)
+                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
+                    api.types.append(type)
+                elif type is None and (name.find("Mask") >= 0 or name == "PathFontStyle"):
                     type = BitfieldGroup(api, name)
                     type.namespacedIdentifier = profile.baseNamespace+"::"+name
                     api.types.append(type)
@@ -162,10 +184,13 @@ class GLParser(XMLParser):
                 function.returnType = returnType
 
                 for param in command.findall("param"):
+                    name = param.find("name").text
                     groupName = param.attrib.get("group", None)
                     groupType = api.typeByIdentifier(groupName)
                     typeTag = param.find("ptype")
                     if groupType is not None and isinstance(groupType, BitfieldGroup):
+                        typeName = groupName
+                    elif groupType is not None and isinstance(groupType, TypeAlias): # and isinstance(groupType.aliasedType, ValueGroup):
                         typeName = groupName
                     else:
                         typeName = param.text if param.text else ""
@@ -175,7 +200,6 @@ class GLParser(XMLParser):
                             if typeTag.tail:
                                 typeName += typeTag.tail
                         typeName = typeName.strip()
-                    name = param.find("name").text
                     type = api.typeByIdentifier(typeName)
                     nativeType = typeName
                     if type is None:
@@ -201,7 +225,7 @@ class GLParser(XMLParser):
 
                         type.namespacedIdentifier = " ".join(typeParts)
                         api.types.append(type)
-
+                    
                     parameter = Parameter(function, name, type)
                     parameter.nativeType = api.typeByIdentifier(nativeType)
                     function.parameters.append(parameter)
