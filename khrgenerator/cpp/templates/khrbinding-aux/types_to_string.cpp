@@ -64,6 +64,15 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}:
     return stream;
 }
 
+template <>
+std::ostream & operator<<(std::ostream & stream, const Value<const char *> & value)
+{
+    auto s = {{binding.auxNamespace}}::wrapString(value.value());
+    stream.write(s.c_str(), static_cast<std::streamsize>(s.size()));
+
+    return stream;
+}
+
 {% for cStringType in cStringTypes|sort %}
 template <>
 std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{cStringType}} *> & value)
@@ -88,10 +97,26 @@ std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
     {
         return stream << reinterpret_cast<const void*>(value);
     }
+{% for nativeType in nativeTypes|sort %}
+    if (typeid(*value) == typeid(Value<{{nativeType}}>))
+    {
+        return stream << *reinterpret_cast<const Value<{{nativeType}}>*>(value);
+    }
+{% endfor -%}
 {% for cPointerType in cPointerTypes|sort %}
     if (typeid(*value) == typeid(Value<{{api.identifier}}::{{cPointerType}} *>))
     {
         return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{cPointerType}} *>*>(value);
+    }
+{% endfor -%}
+    if (typeid(*value) == typeid(Value<const char *>))
+    {
+        return stream << *reinterpret_cast<const Value<const char *>*>(value);
+    }
+{% for cStringType in cStringTypes|sort %}
+    if (typeid(*value) == typeid(Value<{{api.identifier}}::{{cStringType}} *>))
+    {
+        return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{cStringType}} *>*>(value);
     }
 {% endfor -%}
 {% for type in types|sort(attribute='identifier') %}

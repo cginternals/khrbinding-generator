@@ -229,6 +229,7 @@ class CPPGenerator:
             bitfields=bitfieldTypes,
             cStringTypes=binding.cStringOutputTypes,
             cPointerTypes=binding.cPointerTypes,
+            nativeTypes=[ "int", "unsigned int", "float", "char", "unsigned char", "long", "unsigned long", "long long", "unsigned long long", "double"],
             types=[ type for type in api.types if not type.hideDeclaration and not type.declaration.startswith('struct') and not type.identifier in binding.cPointerTypes and not isinstance(type, NativeCode) and not isinstance(type, CompoundType) and not isinstance(type, TypeAlias) ]
         )
         

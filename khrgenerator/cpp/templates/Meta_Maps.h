@@ -28,7 +28,7 @@ extern const std::array<std::unordered_map<std::string, {{api.identifier}}::{{bi
 extern const std::unordered_map<{{api.identifier}}::{{binding.extensionType}}, Version> Meta_ReqVersionsByExtension;
 
 extern const std::unordered_map<{{api.identifier}}::{{binding.booleanType}}, std::string> Meta_StringsByBoolean;
-extern const std::unordered_map<{{api.identifier}}::{{binding.enumType}}, std::string> Meta_StringsByEnum;
+extern const std::multimap<{{api.identifier}}::{{binding.enumType}}, std::string> Meta_StringsByEnum;
 extern const std::unordered_map<{{api.identifier}}::{{binding.extensionType}}, std::string> Meta_StringsByExtension;
 extern const std::unordered_map<{{api.identifier}}::{{binding.extensionType}}, std::set<std::string>> Meta_FunctionStringsByExtension;
 extern const std::map<Version, std::set<std::string>> Meta_FunctionStringsByVersion;
