@@ -11,6 +11,11 @@ namespace {{binding.namespace}}
 {
 }
 
+{{binding.constexpr}} Boolean32::Boolean32(const Boolean32 & other)
+: m_value(other.m_value)
+{
+}
+
 {{binding.constexpr}} Boolean32::Boolean32(bool value)
 : m_value(static_cast<underlying_type>(value))
 {

@@ -35,6 +35,15 @@ public:
     *  @brief
     *    Constructor
     *
+    *  @param[in] other
+    *    Copy value
+    */
+    {{binding.constexpr}} inline Boolean8(const Boolean8 & other);
+
+    /**
+    *  @brief
+    *    Constructor
+    *
     *  @param[in] on
     *    Initial value
     */

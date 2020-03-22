@@ -19,6 +19,7 @@ public:
 
 public:
     {{binding.constexpr}} inline Boolean32();
+    {{binding.constexpr}} inline Boolean32(const Boolean32 & other);
     {{binding.constexpr}} inline Boolean32(bool on);
     {{binding.constexpr}} inline Boolean32(char on);
     {{binding.constexpr}} inline Boolean32(unsigned char on);
