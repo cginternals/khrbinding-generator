@@ -11,11 +11,6 @@ namespace {{binding.namespace}}
 {
 }
 
-{{binding.constexpr}} Boolean8::Boolean8(const Boolean8 & other)
-: m_value(other.m_value)
-{
-}
-
 {{binding.constexpr}} Boolean8::Boolean8(bool value)
 : m_value(static_cast<underlying_type>(value))
 {
@@ -64,13 +59,6 @@ namespace {{binding.namespace}}
 {{binding.constexpr}} Boolean8::operator unsigned int() const
 {
     return m_value;
-}
-
-Boolean8 & Boolean8::operator=(const Boolean8 & other)
-{
-    m_value = other.m_value;
-
-    return *this;
 }
 
 {{binding.constexpr}} bool Boolean8::operator<(const Boolean8 & other) const

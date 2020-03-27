@@ -19,7 +19,6 @@ public:
 
 public:
     {{binding.constexpr}} inline Boolean32();
-    {{binding.constexpr}} inline Boolean32(const Boolean32 & other);
     {{binding.constexpr}} inline Boolean32(bool on);
     {{binding.constexpr}} inline Boolean32(char on);
     {{binding.constexpr}} inline Boolean32(unsigned char on);
@@ -32,7 +31,6 @@ public:
     {{binding.constexpr}} inline explicit operator int() const;
     {{binding.constexpr}} inline explicit operator unsigned int() const;
 
-    inline Boolean32 & operator=(const Boolean32 & other);
     {{binding.constexpr}} inline bool operator<(const Boolean32 & other) const;
     {{binding.constexpr}} inline bool operator>(const Boolean32 & other) const;
     {{binding.constexpr}} inline bool operator<=(const Boolean32 & other) const;

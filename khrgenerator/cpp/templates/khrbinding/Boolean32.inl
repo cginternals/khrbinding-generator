@@ -11,11 +11,6 @@ namespace {{binding.namespace}}
 {
 }
 
-{{binding.constexpr}} Boolean32::Boolean32(const Boolean32 & other)
-: m_value(other.m_value)
-{
-}
-
 {{binding.constexpr}} Boolean32::Boolean32(bool value)
 : m_value(static_cast<underlying_type>(value))
 {
@@ -64,13 +59,6 @@ namespace {{binding.namespace}}
 {{binding.constexpr}} Boolean32::operator unsigned int() const
 {
     return m_value;
-}
-
-Boolean32 & Boolean32::operator=(const Boolean32 & other)
-{
-    m_value = other.m_value;
-
-    return *this;
 }
 
 {{binding.constexpr}} bool Boolean32::operator<(const Boolean32 & other) const
