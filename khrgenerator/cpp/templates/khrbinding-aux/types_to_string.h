@@ -68,6 +68,13 @@ template <>
 template <>
 {{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.booleanType}}> & value);
 
+/**
+*  @brief
+*    A specialized ostream operator for the const char * Value template
+*/
+template <>
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<const char *> & value);
+
 {%- for cStringTypeName in cStringTypes %}
 
 /**
