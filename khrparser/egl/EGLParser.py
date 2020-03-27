@@ -97,6 +97,7 @@ class EGLParser(XMLParser):
                     continue
                 
                 constant = Constant(api, enum.attrib["name"], enum.attrib["value"])
+                constant.decimalValue = int(enum.attrib["value"], 0)
                 if "group" in E.attrib and E.attrib["group"] == "SpecialNumbers":
                     constant.type = cls.detectSpecialValueType(api, enum)
                 api.constants.append(constant)
@@ -326,6 +327,7 @@ class EGLParser(XMLParser):
 
         # Generic None Bit
         genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
+        genericNoneBit.decimalValue = 0
         genericNoneBit.generic = True
         api.constants.append(genericNoneBit)
         for group in [ group for group in api.types if isinstance(group, BitfieldGroup) ]:
@@ -388,6 +390,7 @@ class EGLParser(XMLParser):
         # Add unused mask bitfield
         unusedMaskType = BitfieldGroup(api, "UnusedMask")
         unusedBitConstant = Constant(api, "GL_UNUSED_BIT", "0x00000000")
+        unusedBitConstant.decimalValue = 0
         unusedMaskType.values.append(unusedBitConstant)
         unusedBitConstant.groups.append(unusedMaskType)
         api.types.append(unusedMaskType)
@@ -428,6 +431,7 @@ class EGLParser(XMLParser):
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement
 
+        binding.useEnumGroups = False
         binding.extensionType = profile.extensionType
         binding.booleanType = profile.booleanType
         binding.booleanWidth = profile.booleanWidth
@@ -458,7 +462,7 @@ class EGLParser(XMLParser):
     @classmethod
     def createVersion(cls, api, feature_xml):
         internalIdentifier = "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ] + [ c for c in feature_xml.attrib["number"] if c.isdigit() ])
-        version = Version(api, internalIdentifier, feature.attrib["api"], feature_xml.attrib["number"], "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ]))
+        version = Version(api, internalIdentifier, feature_xml.attrib["api"], feature_xml.attrib["number"], "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ]))
         version.supportedAPIs = feature_xml.attrib["api"].split("|")
 
         for require in feature_xml.findall("require"):
