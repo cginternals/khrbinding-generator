@@ -97,7 +97,14 @@ class EGLParser(XMLParser):
                     continue
                 
                 constant = Constant(api, enum.attrib["name"], enum.attrib["value"])
-                constant.decimalValue = int(enum.attrib["value"], 0)
+                try:
+                    constant.decimalValue = int(enum.attrib["value"], 0)
+                except:
+                    castResult = re.search('EGL_CAST\(%s[A-Za-z0-9_]+\,([\-0-9]+)\)', enum.attrib["value"])
+                    if castResult is not None:
+                        constant.decimalValue = castResult.group(1).strip()
+                    else:
+                        constant.decimalValue = 0
                 if "group" in E.attrib and E.attrib["group"] == "SpecialNumbers":
                     constant.type = cls.detectSpecialValueType(api, enum)
                 api.constants.append(constant)
@@ -124,7 +131,7 @@ class EGLParser(XMLParser):
                     api.types.append(type)
                 elif type is None:
                     type = Enumerator(api, name)
-                    type.hideDeclaration = False # Required
+                    type.hideDeclaration = False # Required to have general EGLenum type
                     type.namespacedIdentifier = profile.baseNamespace+"::"+name
                     api.types.append(type)
 
@@ -143,14 +150,34 @@ class EGLParser(XMLParser):
                 returnTypeName = " ".join([ text.strip() for text in [ protoTag.text if protoTag is not None else "", returnTypeTag.text if returnTypeTag is not None else "", returnTypeTag.tail if returnTypeTag is not None else "" ] if text is not None ]).strip()
                 name = protoTag.find("name").text.strip()
 
+                if returnTypeName.startswith("struct "):
+                    returnTypeName = returnTypeName[7:]
+
                 function = Function(api, name)
                 function.namespaceLessIdentifier = function.identifier[len(profile.lowercasePrefix):]
                 returnType = api.typeByIdentifier(returnTypeName)
                 if returnType is None:
-                    returnType = NativeType(api, returnTypeName, returnTypeName)
-                    returnType.hideDeclaration = True
-                    returnType.namespacedIdentifier = returnTypeName
-                    api.types.append(returnType)
+                    if returnTypeName.endswith('*'):
+                        basicType = api.typeByIdentifier(returnTypeName[0:len(returnTypeName)-1].strip())
+
+                        returnType = NativeType(api, returnTypeName, returnTypeName)
+                        returnType.hideDeclaration = True
+                        if basicType is not None:
+                            returnType.nativeType = basicType
+                            if basicType.namespacedIdentifier.startswith(profile.baseNamespace):
+                                returnType.namespacedIdentifier = profile.baseNamespace + "::" + returnTypeName
+                            else:
+                                returnType.namespacedIdentifier = returnTypeName
+                            print("RETURN TYPE", returnType.namespacedIdentifier, "from", basicType.namespacedIdentifier)
+                        else:
+                            returnType.namespacedIdentifier = returnTypeName
+                        
+                        api.types.append(returnType)
+                    else:
+                        returnType = NativeType(api, returnTypeName, returnTypeName)
+                        returnType.hideDeclaration = True
+                        returnType.namespacedIdentifier = returnTypeName
+                        api.types.append(returnType)
                 function.returnType = returnType
 
                 for param in command.findall("param"):
@@ -257,19 +284,18 @@ class EGLParser(XMLParser):
                     constant.groups = [specialNumbersType]
         
         # Fix EGLenum type
+        fixedEnumType = Enumerator(api, profile.enumType)
         api.types.remove(api.typeByIdentifier(profile.enumType))
-        # api.types.insert(1, Enumerator(api, profile.enumType))
 
-        # Rename EGL to EGLenum
+        for type in [ type for type in api.types if isinstance(type, Enumerator) ]:
+            for value in type.values:
+                value.groups.append(fixedEnumType)
+                fixedEnumType.values.append(value)
+            if not profile.useEnumGroups:
+                type.hideDeclaration = True
 
-        EGLenumType = api.typeByIdentifier('EGL')
-        EGLenumType.identifier = profile.enumType
-        EGLenumType.namespacedIdentifier = profile.baseNamespace + "::" + EGLenumType.identifier
-
-        # Move to front
-        api.types.remove(EGLenumType)
-        api.types.insert(2, EGLenumType)
-
+        api.types.insert(1, fixedEnumType)
+        
         return api
     
     @classmethod
@@ -286,13 +312,13 @@ class EGLParser(XMLParser):
         api.constants = [ constant for constant in api.constants if
             any((featureSet for featureSet in featureSets if constant in featureSet.requiredConstants))
         ]
-        
+
         api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
         
         api.types = [ type for type in api.types if
             any((featureSet for featureSet in featureSets if type in featureSet.requiredTypes)) or
             any((constant for constant in api.constants if type == constant.type or type in constant.groups)) or
-            any((function for function in api.functions if type == function.returnType or type in ([ parameter.type for parameter in function.parameters ] + [ parameter.nativeType for parameter in function.parameters ]))) or
+            any((function for function in api.functions if type == function.returnType or (hasattr(function.returnType, "nativeType") and type == function.returnType.nativeType) or type in ([ parameter.type for parameter in function.parameters ] + [ parameter.nativeType for parameter in function.parameters ]))) or
             type.identifier in [ profile.bitfieldType, "SpecialValues" ]
         ]
         for type in api.types:
