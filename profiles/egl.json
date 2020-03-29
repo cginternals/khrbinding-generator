@@ -29,7 +29,7 @@
 	"": "Types",
 	"extensionType": "EGLextension",
 	"booleanType": "EGLBoolean",
-	"booleanWidth": 8,
+	"booleanWidth": 32,
 	"enumType": "EGLenum",
 	"bitfieldType": "EGLbitfield",
 	"noneBitfieldValue": "EGL_NONE_BIT",
