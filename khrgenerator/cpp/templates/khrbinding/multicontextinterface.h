@@ -58,7 +58,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *     * glfwGetProcAddress
 *     * QOpenGlContext::getProcAddress
 */
-{{binding.apiExport}} void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
+{{binding.apiExport}} void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions = true) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -77,7 +77,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *    A functionPointerResolver with value 'nullptr' will get initialized with the function
 *    pointer from the initial thread.
 */
-{{binding.apiExport}} void initialize(ContextHandle context, {{binding.identifier}}::GetProcAddress functionPointerResolver, bool useContext = true, bool resolveFunctions = true);
+{{binding.apiExport}} void initialize(ContextHandle context, {{binding.identifier}}::GetProcAddress functionPointerResolver, bool useContext = true, bool resolveFunctions = true) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -86,7 +86,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    This function queries the driver for the current OpenGL context
 */
-{{binding.apiExport}} void useCurrentContext();
+{{binding.apiExport}} void useCurrentContext() {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -95,7 +95,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] context
 *    The context handle of the context to set current
 */
-{{binding.apiExport}} void useContext(ContextHandle context);
+{{binding.apiExport}} void useContext(ContextHandle context) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -104,7 +104,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    This function queries the driver for the current OpenGL context
 */
-{{binding.apiExport}} void releaseCurrentContext();
+{{binding.apiExport}} void releaseCurrentContext() {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -113,7 +113,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] context
 *    The context handle of the context to remove
 */
-{{binding.apiExport}} void releaseContext(ContextHandle context);
+{{binding.apiExport}} void releaseContext(ContextHandle context) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -125,7 +125,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    The additional features are callbacks, and used in multi-context environments
 */
-{{binding.apiExport}} void registerAdditionalFunction(AbstractFunction * function);
+{{binding.apiExport}} void registerAdditionalFunction(AbstractFunction * function) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -134,13 +134,13 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] name
 *    The name of the function
 */
-{{binding.apiExport}} ProcAddress resolveFunction(const char * name);
+{{binding.apiExport}} ProcAddress resolveFunction(const char * name) {{profile.noexceptMacro}};
 
 /**
 *  @brief
 *    Resolves the funtion pointers of all registered OpenGL functions immediately for the current context
 */
-{{binding.apiExport}} void resolveFunctions();
+{{binding.apiExport}} void resolveFunctions() {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -149,7 +149,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] mask
 *    The new CallbackMask
 */
-{{binding.apiExport}} void setCallbackMask(CallbackMask mask);
+{{binding.apiExport}} void setCallbackMask(CallbackMask mask) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -160,7 +160,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] blackList
 *    The blacklist of functions to exclude in this update
 */
-{{binding.apiExport}} void setCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
+{{binding.apiExport}} void setCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -169,7 +169,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] mask
 *    The CallbackMask to include
 */
-{{binding.apiExport}} void addCallbackMask(CallbackMask mask);
+{{binding.apiExport}} void addCallbackMask(CallbackMask mask) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -180,7 +180,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] blackList
 *    The blacklist of functions to exclude in this update
 */
-{{binding.apiExport}} void addCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
+{{binding.apiExport}} void addCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -189,7 +189,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] mask
 *    The CallbackMask to exclude
 */
-{{binding.apiExport}} void removeCallbackMask(CallbackMask mask);
+{{binding.apiExport}} void removeCallbackMask(CallbackMask mask) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -200,7 +200,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @param[in] blackList
 *    The blacklist of functions to exclude in this update
 */
-{{binding.apiExport}} void removeCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList);
+{{binding.apiExport}} void removeCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -212,7 +212,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the After flag to enable the callback
 */
-{{binding.apiExport}} SimpleFunctionCallback unresolvedCallback();
+{{binding.apiExport}} SimpleFunctionCallback unresolvedCallback() {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -227,7 +227,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the Unresolved flag to enable the callback
 */
-{{binding.apiExport}} void setUnresolvedCallback(SimpleFunctionCallback callback);
+{{binding.apiExport}} void setUnresolvedCallback(SimpleFunctionCallback callback) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -239,7 +239,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the After flag to enable the callback
 */
-{{binding.apiExport}} FunctionCallback beforeCallback();
+{{binding.apiExport}} FunctionCallback beforeCallback() {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -254,7 +254,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the Before flag to enable the callback
 */
-{{binding.apiExport}} void setBeforeCallback(FunctionCallback callback);
+{{binding.apiExport}} void setBeforeCallback(FunctionCallback callback) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -266,7 +266,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the After flag to enable the callback
 */
-{{binding.apiExport}} FunctionCallback afterCallback();
+{{binding.apiExport}} FunctionCallback afterCallback() {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -281,7 +281,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the After flag to enable the callback
 */
-{{binding.apiExport}} void setAfterCallback(FunctionCallback callback);
+{{binding.apiExport}} void setAfterCallback(FunctionCallback callback) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -293,7 +293,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the Logging flag to enable the callback
 */
-{{binding.apiExport}} FunctionLogCallback logCallback();
+{{binding.apiExport}} FunctionLogCallback logCallback() {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -308,7 +308,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    Keep in mind that in addition to a registered callback, the callback mask of the current Function has to include the Logging flag to enable the callback
 */
-{{binding.apiExport}} void setLogCallback(FunctionLogCallback callback);
+{{binding.apiExport}} void setLogCallback(FunctionLogCallback callback) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -317,7 +317,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    There may be multiple context switch callbacks registered at once
 */
-{{binding.apiExport}} void addContextSwitchCallback(ContextSwitchCallback callback);
+{{binding.apiExport}} void addContextSwitchCallback(ContextSwitchCallback callback) {{profile.noexceptMacro}};
 
 
 } // namespace {{binding.namespace}}

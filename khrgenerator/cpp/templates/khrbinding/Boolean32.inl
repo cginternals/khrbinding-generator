@@ -6,87 +6,87 @@ namespace {{binding.namespace}}
 {
 
 
-{{binding.constexpr}} Boolean32::Boolean32()
+{{binding.constexpr}} Boolean32::Boolean32() {{profile.noexceptMacro}}
 : Boolean32(false)
 {
 }
 
-{{binding.constexpr}} Boolean32::Boolean32(bool value)
+{{binding.constexpr}} Boolean32::Boolean32(bool value) {{profile.noexceptMacro}}
 : m_value(static_cast<underlying_type>(value))
 {
 }
 
-{{binding.constexpr}} Boolean32::Boolean32(char value)
+{{binding.constexpr}} Boolean32::Boolean32(char value) {{profile.noexceptMacro}}
 : m_value(value)
 {
 }
 
-{{binding.constexpr}} Boolean32::Boolean32(unsigned char value)
+{{binding.constexpr}} Boolean32::Boolean32(unsigned char value) {{profile.noexceptMacro}}
 : m_value(static_cast<underlying_type>(value))
 {
 }
 
-{{binding.constexpr}} Boolean32::Boolean32(int value)
+{{binding.constexpr}} Boolean32::Boolean32(int value) {{profile.noexceptMacro}}
 : m_value(static_cast<underlying_type>(value))
 {
 }
 
-{{binding.constexpr}} Boolean32::Boolean32(unsigned int value)
+{{binding.constexpr}} Boolean32::Boolean32(unsigned int value) {{profile.noexceptMacro}}
 : m_value(static_cast<underlying_type>(value))
 {
 }
 
-{{binding.constexpr}} Boolean32::operator bool() const
+{{binding.constexpr}} Boolean32::operator bool() const {{profile.noexceptMacro}}
 {
     return m_value != 0;
 }
 
-{{binding.constexpr}} Boolean32::operator char() const
+{{binding.constexpr}} Boolean32::operator char() const {{profile.noexceptMacro}}
 {
     return m_value;
 }
 
-{{binding.constexpr}} Boolean32::operator unsigned char() const
+{{binding.constexpr}} Boolean32::operator unsigned char() const {{profile.noexceptMacro}}
 {
     return m_value;
 }
 
-{{binding.constexpr}} Boolean32::operator int() const
+{{binding.constexpr}} Boolean32::operator int() const {{profile.noexceptMacro}}
 {
     return m_value;
 }
 
-{{binding.constexpr}} Boolean32::operator unsigned int() const
+{{binding.constexpr}} Boolean32::operator unsigned int() const {{profile.noexceptMacro}}
 {
     return m_value;
 }
 
-{{binding.constexpr}} bool Boolean32::operator<(const Boolean32 & other) const
+{{binding.constexpr}} bool Boolean32::operator<(const Boolean32 & other) const {{profile.noexceptMacro}}
 {
     return m_value < other.m_value;
 }
 
-{{binding.constexpr}} bool Boolean32::operator>(const Boolean32 & other) const
+{{binding.constexpr}} bool Boolean32::operator>(const Boolean32 & other) const {{profile.noexceptMacro}}
 {
     return m_value > other.m_value;
 }
 
-{{binding.constexpr}} bool Boolean32::operator<=(const Boolean32 & other) const
+{{binding.constexpr}} bool Boolean32::operator<=(const Boolean32 & other) const {{profile.noexceptMacro}}
 {
     return m_value <= other.m_value;
 }
 
-{{binding.constexpr}} bool Boolean32::operator>=(const Boolean32 & other) const
+{{binding.constexpr}} bool Boolean32::operator>=(const Boolean32 & other) const {{profile.noexceptMacro}}
 {
     return m_value >= other.m_value;
 }
 
-{{binding.constexpr}} bool Boolean32::operator==(const Boolean32 & other) const
+{{binding.constexpr}} bool Boolean32::operator==(const Boolean32 & other) const {{profile.noexceptMacro}}
 {
     return m_value == other.m_value;
 }
 
-{{binding.constexpr}} bool Boolean32::operator!=(const Boolean32 & other) const
+{{binding.constexpr}} bool Boolean32::operator!=(const Boolean32 & other) const {{profile.noexceptMacro}}
 {
     return m_value != other.m_value;
 }
@@ -102,7 +102,7 @@ namespace std
 template<>
 struct hash<{{binding.identifier}}::Boolean32>
 {
-    std::size_t operator()(const {{binding.identifier}}::Boolean32 & boolean) const
+    std::size_t operator()(const {{binding.identifier}}::Boolean32 & boolean) const {{profile.noexceptMacro}}
     {
         return hash<{{binding.identifier}}::Boolean32::underlying_type>()(static_cast<{{binding.identifier}}::Boolean32::underlying_type>(boolean));
     }

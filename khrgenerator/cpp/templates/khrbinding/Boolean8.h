@@ -29,7 +29,7 @@ public:
     *  @remark
     *    The value is set to `false`
     */
-    {{binding.constexpr}} inline Boolean8();
+    {{binding.constexpr}} inline Boolean8() {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -38,7 +38,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{binding.constexpr}} inline Boolean8(bool on);
+    {{binding.constexpr}} inline Boolean8(bool on) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -47,7 +47,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{binding.constexpr}} inline Boolean8(char on);
+    {{binding.constexpr}} inline Boolean8(char on) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -56,7 +56,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{binding.constexpr}} inline Boolean8(unsigned char on);
+    {{binding.constexpr}} inline Boolean8(unsigned char on) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -65,7 +65,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{binding.constexpr}} inline Boolean8(int on);
+    {{binding.constexpr}} inline Boolean8(int on) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -74,7 +74,7 @@ public:
     *  @param[in] on
     *    Initial value
     */
-    {{binding.constexpr}} inline Boolean8(unsigned int on);
+    {{binding.constexpr}} inline Boolean8(unsigned int on) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -83,7 +83,7 @@ public:
     *  @return
     *    %Value as `bool`
     */
-    {{binding.constexpr}} inline explicit operator bool() const;
+    {{binding.constexpr}} inline explicit operator bool() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -92,7 +92,7 @@ public:
     *  @return
     *    %Value as `char`
     */
-    {{binding.constexpr}} inline explicit operator char() const;
+    {{binding.constexpr}} inline explicit operator char() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -101,7 +101,7 @@ public:
     *  @return
     *    %Value as `unsigned char`
     */
-    {{binding.constexpr}} inline explicit operator unsigned char() const;
+    {{binding.constexpr}} inline explicit operator unsigned char() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -110,7 +110,7 @@ public:
     *  @return
     *    %Value as `int`
     */
-    {{binding.constexpr}} inline explicit operator int() const;
+    {{binding.constexpr}} inline explicit operator int() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -119,7 +119,7 @@ public:
     *  @return
     *    %Value as `unsigned int`
     */
-    {{binding.constexpr}} inline explicit operator unsigned int() const;
+    {{binding.constexpr}} inline explicit operator unsigned int() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -134,7 +134,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{binding.constexpr}} inline bool operator<(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator<(const Boolean8 & other) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -149,7 +149,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{binding.constexpr}} inline bool operator>(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator>(const Boolean8 & other) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -164,7 +164,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{binding.constexpr}} inline bool operator<=(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator<=(const Boolean8 & other) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -179,7 +179,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{binding.constexpr}} inline bool operator>=(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator>=(const Boolean8 & other) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -194,7 +194,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{binding.constexpr}} inline bool operator==(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator==(const Boolean8 & other) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -209,7 +209,7 @@ public:
     *  @remark
     *    Comparison uses numeric comparison of #underlying_type
     */
-    {{binding.constexpr}} inline bool operator!=(const Boolean8 & other) const;
+    {{binding.constexpr}} inline bool operator!=(const Boolean8 & other) const {{profile.noexceptMacro}};
 
 public:
     underlying_type m_value; ///< %Value

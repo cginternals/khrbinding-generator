@@ -8,7 +8,7 @@ namespace {{binding.namespace}}
 {
 
 
-void State::resolve(const char * name)
+void State::resolve(const char * name) {{profile.noexceptMacro}}
 {
     if (m_initialized)
     {

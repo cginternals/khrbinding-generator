@@ -21,7 +21,7 @@ public:
     *  @brief
     *    Constructor
     */
-    State() = default;
+    State() {{profile.noexceptMacro}} = default;
 
     /**
     *  @brief
@@ -30,7 +30,7 @@ public:
     *  @param[in] name
     *    Name of the function to be resolved
     */
-    virtual void resolve(const char * name) override;
+    virtual void resolve(const char * name) {{profile.noexceptMacro}} override;
 };
 
 

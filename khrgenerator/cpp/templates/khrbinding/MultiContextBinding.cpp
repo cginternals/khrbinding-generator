@@ -13,7 +13,7 @@ namespace {{binding.namespace}}
 {
 
 
-void Binding::setCallbackMask(const CallbackMask mask)
+void Binding::setCallbackMask(const CallbackMask mask) {{profile.noexceptMacro}}
 {
     for (auto function : Binding::functions())
     {
@@ -21,7 +21,7 @@ void Binding::setCallbackMask(const CallbackMask mask)
     }
 }
 
-void Binding::setCallbackMaskExcept(const CallbackMask mask, const std::set<std::string> & blackList)
+void Binding::setCallbackMaskExcept(const CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}}
 {
     for (auto function : Binding::functions())
     {
@@ -32,7 +32,7 @@ void Binding::setCallbackMaskExcept(const CallbackMask mask, const std::set<std:
     }
 }
 
-void Binding::addCallbackMask(const CallbackMask mask)
+void Binding::addCallbackMask(const CallbackMask mask) {{profile.noexceptMacro}}
 {
     for (auto function : Binding::functions())
     {
@@ -40,7 +40,7 @@ void Binding::addCallbackMask(const CallbackMask mask)
     }
 }
 
-void Binding::addCallbackMaskExcept(const CallbackMask mask, const std::set<std::string> & blackList)
+void Binding::addCallbackMaskExcept(const CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}}
 {
     for (auto function : Binding::functions())
     {
@@ -51,7 +51,7 @@ void Binding::addCallbackMaskExcept(const CallbackMask mask, const std::set<std:
     }
 }
 
-void Binding::removeCallbackMask(const CallbackMask mask)
+void Binding::removeCallbackMask(const CallbackMask mask) {{profile.noexceptMacro}}
 {
     for (auto function : Binding::functions())
     {
@@ -59,7 +59,7 @@ void Binding::removeCallbackMask(const CallbackMask mask)
     }
 }
 
-void Binding::removeCallbackMaskExcept(const CallbackMask mask, const std::set<std::string> & blackList)
+void Binding::removeCallbackMaskExcept(const CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}}
 {
     for (auto function : Binding::functions())
     {
@@ -70,47 +70,47 @@ void Binding::removeCallbackMaskExcept(const CallbackMask mask, const std::set<s
     }
 }
 
-Binding::SimpleFunctionCallback Binding::unresolvedCallback()
+Binding::SimpleFunctionCallback Binding::unresolvedCallback() {{profile.noexceptMacro}}
 {
     return s_unresolvedCallback();
 }
 
-void Binding::setUnresolvedCallback(SimpleFunctionCallback callback)
+void Binding::setUnresolvedCallback(SimpleFunctionCallback callback) {{profile.noexceptMacro}}
 {
     s_unresolvedCallback() = std::move(callback);
 }
 
-Binding::FunctionCallback Binding::beforeCallback()
+Binding::FunctionCallback Binding::beforeCallback() {{profile.noexceptMacro}}
 {
     return s_beforeCallback();
 }
 
-void Binding::setBeforeCallback(FunctionCallback callback)
+void Binding::setBeforeCallback(FunctionCallback callback) {{profile.noexceptMacro}}
 {
     s_beforeCallback() = std::move(callback);
 }
 
-Binding::FunctionCallback Binding::afterCallback()
+Binding::FunctionCallback Binding::afterCallback() {{profile.noexceptMacro}}
 {
     return s_afterCallback();
 }
 
-void Binding::setAfterCallback(FunctionCallback callback)
+void Binding::setAfterCallback(FunctionCallback callback) {{profile.noexceptMacro}}
 {
     s_afterCallback() = std::move(callback);
 }
 
-Binding::FunctionLogCallback Binding::logCallback()
+Binding::FunctionLogCallback Binding::logCallback() {{profile.noexceptMacro}}
 {
     return s_logCallback();
 }
 
-void Binding::setLogCallback(Binding::FunctionLogCallback callback)
+void Binding::setLogCallback(Binding::FunctionLogCallback callback) {{profile.noexceptMacro}}
 {
     s_logCallback() = std::move(callback);
 }
 
-void Binding::unresolved(const AbstractFunction * function)
+void Binding::unresolved(const AbstractFunction * function) {{profile.noexceptMacro}}
 {
     if (s_unresolvedCallback())
     {
@@ -118,7 +118,7 @@ void Binding::unresolved(const AbstractFunction * function)
     }
 }
 
-void Binding::before(const FunctionCall & call)
+void Binding::before(const FunctionCall & call) {{profile.noexceptMacro}}
 {
     if (s_beforeCallback())
     {
@@ -126,7 +126,7 @@ void Binding::before(const FunctionCall & call)
     }
 }
 
-void Binding::after(const FunctionCall & call)
+void Binding::after(const FunctionCall & call) {{profile.noexceptMacro}}
 {
     if (s_afterCallback())
     {
@@ -134,7 +134,7 @@ void Binding::after(const FunctionCall & call)
     }
 }
 
-void Binding::log(FunctionCall && call)
+void Binding::log(FunctionCall && call) {{profile.noexceptMacro}}
 {
     if (s_logCallback())
     {
@@ -142,17 +142,17 @@ void Binding::log(FunctionCall && call)
     }
 }
 
-const std::vector<AbstractFunction *> & Binding::additionalFunctions()
+const std::vector<AbstractFunction *> & Binding::additionalFunctions() {{profile.noexceptMacro}}
 {
     return s_additionalFunctions();
 }
 
-size_t Binding::size()
+size_t Binding::size() {{profile.noexceptMacro}}
 {
     return Binding::functions().size() + s_additionalFunctions().size();
 }
 
-void Binding::initialize(const {{binding.identifier}}::GetProcAddress functionPointerResolver, const bool resolveFunctions)
+void Binding::initialize(const {{binding.identifier}}::GetProcAddress functionPointerResolver, const bool resolveFunctions) {{profile.noexceptMacro}}
 {
     initialize(0, functionPointerResolver, true, resolveFunctions);
 }
@@ -161,7 +161,7 @@ void Binding::initialize(
     const ContextHandle context
 ,   const {{binding.identifier}}::GetProcAddress functionPointerResolver
 ,   const bool _useContext
-,   const bool _resolveFunctions)
+,   const bool _resolveFunctions) {{profile.noexceptMacro}}
 {
     const auto resolveWOUse = !_useContext && _resolveFunctions;
     const auto currentContext = resolveWOUse ? s_context() : static_cast<ContextHandle>(0);
@@ -207,7 +207,7 @@ void Binding::initialize(
     }
 }
 
-ProcAddress Binding::resolveFunction(const char * name)
+ProcAddress Binding::resolveFunction(const char * name) {{profile.noexceptMacro}}
 {
     if (s_getProcAddress() != nullptr)
     {
@@ -222,12 +222,12 @@ ProcAddress Binding::resolveFunction(const char * name)
     return nullptr;
 }
 
-void Binding::registerAdditionalFunction(AbstractFunction * function)
+void Binding::registerAdditionalFunction(AbstractFunction * function) {{profile.noexceptMacro}}
 {
     s_additionalFunctions().push_back(function);
 }
 
-void Binding::resolveFunctions()
+void Binding::resolveFunctions() {{profile.noexceptMacro}}
 {
     for (auto function : Binding::functions())
     {
@@ -240,12 +240,12 @@ void Binding::resolveFunctions()
     }
 }
 
-void Binding::useCurrentContext()
+void Binding::useCurrentContext() {{profile.noexceptMacro}}
 {
     useContext(0);
 }
 
-void Binding::useContext(const ContextHandle context)
+void Binding::useContext(const ContextHandle context) {{profile.noexceptMacro}}
 {
     std_boost::lock_guard<std_boost::recursive_mutex> lock(s_mutex());
 
@@ -266,12 +266,12 @@ void Binding::useContext(const ContextHandle context)
     }
 }
 
-void Binding::releaseCurrentContext()
+void Binding::releaseCurrentContext() {{profile.noexceptMacro}}
 {
     releaseContext(0);
 }
 
-void Binding::releaseContext(const ContextHandle context)
+void Binding::releaseContext(const ContextHandle context) {{profile.noexceptMacro}}
 {
     std_boost::lock_guard<std_boost::recursive_mutex> lock(s_mutex());
 
@@ -280,24 +280,24 @@ void Binding::releaseContext(const ContextHandle context)
     s_bindings().erase(context);
 }
 
-void Binding::addContextSwitchCallback(const ContextSwitchCallback callback)
+void Binding::addContextSwitchCallback(const ContextSwitchCallback callback) {{profile.noexceptMacro}}
 {
     std_boost::lock_guard<std_boost::recursive_mutex> lock(s_mutex());
 
     s_contextSwitchCallbacks().push_back(std::move(callback));
 }
 
-int Binding::currentPos()
+int Binding::currentPos() {{profile.noexceptMacro}}
 {
     return s_pos();
 }
 
-int Binding::maxPos()
+int Binding::maxPos() {{profile.noexceptMacro}}
 {
     return s_maxPos();
 }
 
-void Binding::provideState(const int pos)
+void Binding::provideState(const int pos) {{profile.noexceptMacro}}
 {
     assert(pos > -1);
 
@@ -313,7 +313,7 @@ void Binding::provideState(const int pos)
     }
 }
 
-void Binding::neglectState(const int p)
+void Binding::neglectState(const int p) {{profile.noexceptMacro}}
 {
     assert(p <= s_maxPos());
     assert(p > -1);
@@ -341,66 +341,66 @@ void Binding::neglectState(const int p)
     }
 }
 
-void Binding::setStatePos(const int p)
+void Binding::setStatePos(const int p) {{profile.noexceptMacro}}
 {
     s_pos() = p;
 }
 
-int & Binding::s_maxPos()
+int & Binding::s_maxPos() {{profile.noexceptMacro}}
 {
     static int maxPos = -1;
 
     return maxPos;
 }
 
-const Binding::array_t & Binding::functions()
+const Binding::array_t & Binding::functions() {{profile.noexceptMacro}}
 {
     return s_functions;
 }
 
-std::vector<AbstractFunction *> & Binding::s_additionalFunctions()
+std::vector<AbstractFunction *> & Binding::s_additionalFunctions() {{profile.noexceptMacro}}
 {
     static std::vector<AbstractFunction *> additionalFunctions;
 
     return additionalFunctions;
 }
 
-std::vector<Binding::ContextSwitchCallback> & Binding::s_contextSwitchCallbacks()
+std::vector<Binding::ContextSwitchCallback> & Binding::s_contextSwitchCallbacks() {{profile.noexceptMacro}}
 {
     static std::vector<ContextSwitchCallback> callbacks;
 
     return callbacks;
 }
 
-Binding::SimpleFunctionCallback & Binding::s_unresolvedCallback()
+Binding::SimpleFunctionCallback & Binding::s_unresolvedCallback() {{profile.noexceptMacro}}
 {
     static SimpleFunctionCallback unresolvedCallback;
 
     return unresolvedCallback;
 }
 
-Binding::FunctionCallback & Binding::s_beforeCallback()
+Binding::FunctionCallback & Binding::s_beforeCallback() {{profile.noexceptMacro}}
 {
     static FunctionCallback beforeCallback;
 
     return beforeCallback;
 }
 
-Binding::FunctionCallback & Binding::s_afterCallback()
+Binding::FunctionCallback & Binding::s_afterCallback() {{profile.noexceptMacro}}
 {
     static FunctionCallback afterCallback;
 
     return afterCallback;
 }
 
-Binding::FunctionLogCallback & Binding::s_logCallback()
+Binding::FunctionLogCallback & Binding::s_logCallback() {{profile.noexceptMacro}}
 {
     static FunctionLogCallback logCallback;
 
     return logCallback;
 }
 
-int & Binding::s_pos()
+int & Binding::s_pos() {{profile.noexceptMacro}}
 {
     {{binding.threadlocal}} int pos = 0;
     //static int pos = 0;
@@ -408,7 +408,7 @@ int & Binding::s_pos()
     return pos;
 }
 
-ContextHandle & Binding::s_context()
+ContextHandle & Binding::s_context() {{profile.noexceptMacro}}
 {
     {{binding.threadlocal}} ContextHandle context = 0;
     //static ContextHandle context = 0;
@@ -416,7 +416,7 @@ ContextHandle & Binding::s_context()
     return context;
 }
 
-{{binding.identifier}}::GetProcAddress & Binding::s_getProcAddress()
+{{binding.identifier}}::GetProcAddress & Binding::s_getProcAddress() {{profile.noexceptMacro}}
 {
     {{binding.threadlocal}} {{binding.identifier}}::GetProcAddress getProcAddress = nullptr;
     //static {{binding.identifier}}::GetProcAddress getProcAddress = nullptr;
@@ -424,21 +424,21 @@ ContextHandle & Binding::s_context()
     return getProcAddress;
 }
 
-std_boost::recursive_mutex & Binding::s_mutex()
+std_boost::recursive_mutex & Binding::s_mutex() {{profile.noexceptMacro}}
 {
     static std_boost::recursive_mutex mutex;
 
     return mutex;
 }
 
-std::unordered_map<ContextHandle, int> & Binding::s_bindings()
+std::unordered_map<ContextHandle, int> & Binding::s_bindings() {{profile.noexceptMacro}}
 {
     static std::unordered_map<ContextHandle, int> bindings;
 
     return bindings;
 }
 
-{{binding.identifier}}::GetProcAddress & Binding::s_firstGetProcAddress()
+{{binding.identifier}}::GetProcAddress & Binding::s_firstGetProcAddress() {{profile.noexceptMacro}}
 {
     static {{binding.identifier}}::GetProcAddress getProcAddress = nullptr;
 

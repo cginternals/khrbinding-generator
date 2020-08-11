@@ -10,122 +10,122 @@ namespace {{binding.namespace}}
 {
 
 
-void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions)
+void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions) {{profile.noexceptMacro}}
 {
     Binding::initialize(functionPointerResolver, resolveFunctions);
 }
 
-void initialize(ContextHandle context, {{binding.identifier}}::GetProcAddress functionPointerResolver, bool useContext, bool resolveFunctions)
+void initialize(ContextHandle context, {{binding.identifier}}::GetProcAddress functionPointerResolver, bool useContext, bool resolveFunctions) {{profile.noexceptMacro}}
 {
     Binding::initialize(context, functionPointerResolver, useContext, resolveFunctions);
 }
 
-void useCurrentContext()
+void useCurrentContext() {{profile.noexceptMacro}}
 {
     Binding::useCurrentContext();
 }
 
-void useContext(ContextHandle context)
+void useContext(ContextHandle context) {{profile.noexceptMacro}}
 {
     Binding::useContext(context);
 }
 
-void releaseCurrentContext()
+void releaseCurrentContext() {{profile.noexceptMacro}}
 {
     Binding::releaseCurrentContext();
 }
 
-void releaseContext(ContextHandle context)
+void releaseContext(ContextHandle context) {{profile.noexceptMacro}}
 {
     Binding::releaseContext(context);
 }
 
-void registerAdditionalFunction(AbstractFunction * function)
+void registerAdditionalFunction(AbstractFunction * function) {{profile.noexceptMacro}}
 {
     Binding::registerAdditionalFunction(function);
 }
 
-ProcAddress resolveFunction(const char * name)
+ProcAddress resolveFunction(const char * name) {{profile.noexceptMacro}}
 {
     return Binding::resolveFunction(name);
 }
 
-void resolveFunctions()
+void resolveFunctions() {{profile.noexceptMacro}}
 {
     Binding::resolveFunctions();
 }
 
-void addContextSwitchCallback(ContextSwitchCallback callback)
+void addContextSwitchCallback(ContextSwitchCallback callback) {{profile.noexceptMacro}}
 {
     Binding::addContextSwitchCallback(callback);
 }
 
-void setCallbackMask(CallbackMask mask)
+void setCallbackMask(CallbackMask mask) {{profile.noexceptMacro}}
 {
     Binding::setCallbackMask(mask);
 }
 
-void setCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList)
+void setCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}}
 {
     Binding::setCallbackMaskExcept(mask, blackList);
 }
 
-void addCallbackMask(CallbackMask mask)
+void addCallbackMask(CallbackMask mask) {{profile.noexceptMacro}}
 {
     Binding::addCallbackMask(mask);
 }
 
-void addCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList)
+void addCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}}
 {
     Binding::addCallbackMaskExcept(mask, blackList);
 }
 
-void removeCallbackMask(CallbackMask mask)
+void removeCallbackMask(CallbackMask mask) {{profile.noexceptMacro}}
 {
     Binding::removeCallbackMask(mask);
 }
 
-void removeCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList)
+void removeCallbackMaskExcept(CallbackMask mask, const std::set<std::string> & blackList) {{profile.noexceptMacro}}
 {
     Binding::removeCallbackMaskExcept(mask, blackList);
 }
 
-SimpleFunctionCallback unresolvedCallback()
+SimpleFunctionCallback unresolvedCallback() {{profile.noexceptMacro}}
 {
     return Binding::unresolvedCallback();
 }
 
-void setUnresolvedCallback(SimpleFunctionCallback callback)
+void setUnresolvedCallback(SimpleFunctionCallback callback) {{profile.noexceptMacro}}
 {
     Binding::setUnresolvedCallback(callback);
 }
 
-FunctionCallback beforeCallback()
+FunctionCallback beforeCallback() {{profile.noexceptMacro}}
 {
     return Binding::beforeCallback();
 }
 
-void setBeforeCallback(FunctionCallback callback)
+void setBeforeCallback(FunctionCallback callback) {{profile.noexceptMacro}}
 {
     Binding::setBeforeCallback(callback);
 }
 
-FunctionCallback afterCallback()
+FunctionCallback afterCallback() {{profile.noexceptMacro}}
 {
     return Binding::afterCallback();
 }
 
-void setAfterCallback(FunctionCallback callback)
+void setAfterCallback(FunctionCallback callback) {{profile.noexceptMacro}}
 {
     Binding::setAfterCallback(callback);
 }
 
-FunctionLogCallback logCallback()
+FunctionLogCallback logCallback() {{profile.noexceptMacro}}
 {
     return Binding::logCallback();
 }
 
-void setLogCallback(FunctionLogCallback callback)
+void setLogCallback(FunctionLogCallback callback) {{profile.noexceptMacro}}
 {
     Binding::setLogCallback(callback);
 }

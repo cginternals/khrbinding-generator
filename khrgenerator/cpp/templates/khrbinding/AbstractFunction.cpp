@@ -17,16 +17,16 @@ namespace {{binding.namespace}}
 {
 
 
-AbstractFunction::AbstractFunction(const char * _name)
+AbstractFunction::AbstractFunction(const char * _name) {{profile.noexceptMacro}}
 : m_name(_name)
 {
 }
 
-AbstractFunction::~AbstractFunction()
+AbstractFunction::~AbstractFunction() {{profile.noexceptMacro}}
 {
 }
 
-void AbstractFunction::resolveAddress()
+void AbstractFunction::resolveAddress() {{profile.noexceptMacro}}
 {
     auto & currentState = state();
 
@@ -38,17 +38,17 @@ void AbstractFunction::resolveAddress()
     currentState.resolve(m_name);
 }
 
-const char * AbstractFunction::name() const
+const char * AbstractFunction::name() const {{profile.noexceptMacro}}
 {
     return m_name;
 }
 
-bool AbstractFunction::isResolved() const
+bool AbstractFunction::isResolved() const {{profile.noexceptMacro}}
 {
     return state().isResolved();
 }
 
-ProcAddress AbstractFunction::address() const
+ProcAddress AbstractFunction::address() const {{profile.noexceptMacro}}
 {
     if (!state().isInitialized())
     {
@@ -58,7 +58,7 @@ ProcAddress AbstractFunction::address() const
     return state().address();
 }
 
-bool AbstractFunction::isEnabled(const CallbackMask mask) const
+bool AbstractFunction::isEnabled(const CallbackMask mask) const {{profile.noexceptMacro}}
 {
     using callback_mask_t = std::underlying_type<CallbackMask>::type;
     
@@ -66,7 +66,7 @@ bool AbstractFunction::isEnabled(const CallbackMask mask) const
         & static_cast<callback_mask_t>(mask)) == static_cast<callback_mask_t>(mask);
 }
 
-bool AbstractFunction::isAnyEnabled(const CallbackMask mask) const
+bool AbstractFunction::isAnyEnabled(const CallbackMask mask) const {{profile.noexceptMacro}}
 {   
     using callback_mask_t = std::underlying_type<CallbackMask>::type;
     
@@ -74,52 +74,52 @@ bool AbstractFunction::isAnyEnabled(const CallbackMask mask) const
         & static_cast<callback_mask_t>(mask)) != 0;
 }
 
-CallbackMask AbstractFunction::callbackMask() const
+CallbackMask AbstractFunction::callbackMask() const {{profile.noexceptMacro}}
 {
     return state().callbackMask();
 }
 
-void AbstractFunction::setCallbackMask(const CallbackMask mask)
+void AbstractFunction::setCallbackMask(const CallbackMask mask) {{profile.noexceptMacro}}
 {
     state().setCallbackMask(mask);
 }
 
-void AbstractFunction::addCallbackMask(const CallbackMask mask)
+void AbstractFunction::addCallbackMask(const CallbackMask mask) {{profile.noexceptMacro}}
 {
     state().setCallbackMask(state().callbackMask() | mask);
 }
 
-void AbstractFunction::removeCallbackMask(const CallbackMask mask)
+void AbstractFunction::removeCallbackMask(const CallbackMask mask) {{profile.noexceptMacro}}
 {
     state().setCallbackMask(state().callbackMask() & ~mask);
 }
 
-void AbstractFunction::unresolved(const AbstractFunction * function)
+void AbstractFunction::unresolved(const AbstractFunction * function) {{profile.noexceptMacro}}
 {
     Binding::unresolved(function);
 }
 
-void AbstractFunction::before(const FunctionCall & call)
+void AbstractFunction::before(const FunctionCall & call) {{profile.noexceptMacro}}
 {
     Binding::before(call);
 }
 
-void AbstractFunction::after(const FunctionCall & call)
+void AbstractFunction::after(const FunctionCall & call) {{profile.noexceptMacro}}
 {
     Binding::after(call);
 }
 
-void AbstractFunction::log(FunctionCall && call)
+void AbstractFunction::log(FunctionCall && call) {{profile.noexceptMacro}}
 {
     Binding::log(std::move(call));
 }
 
-int AbstractFunction::currentPos()
+int AbstractFunction::currentPos() {{profile.noexceptMacro}}
 {
     return Binding::currentPos();
 }
 
-int AbstractFunction::maxPos()
+int AbstractFunction::maxPos() {{profile.noexceptMacro}}
 {
     return Binding::maxPos();
 }

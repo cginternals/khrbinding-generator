@@ -10,7 +10,7 @@ namespace {{binding.namespace}}
 {
 
 
-FunctionCall::FunctionCall(const AbstractFunction * _function)
+FunctionCall::FunctionCall(const AbstractFunction * _function) {{profile.noexceptMacro}}
 : function(_function)
 , returnValue(nullptr)
 {
@@ -20,7 +20,7 @@ FunctionCall::FunctionCall(const AbstractFunction * _function)
     }
 }
 
-FunctionCall::FunctionCall(FunctionCall && other)
+FunctionCall::FunctionCall(FunctionCall && other) {{profile.noexceptMacro}}
 : function(std::move(other.function))
 , timestamp(std::move(other.timestamp))
 , parameters(std::move(other.parameters))
@@ -28,11 +28,11 @@ FunctionCall::FunctionCall(FunctionCall && other)
 {
 }
 
-FunctionCall::~FunctionCall()
+FunctionCall::~FunctionCall() {{profile.noexceptMacro}}
 {
 }
 
-FunctionCall & FunctionCall::operator=(FunctionCall && other)
+FunctionCall & FunctionCall::operator=(FunctionCall && other) {{profile.noexceptMacro}}
 {
     function = std::move(other.function);
     timestamp = std::move(other.timestamp);

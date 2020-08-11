@@ -8,7 +8,7 @@ namespace {{api.identifier}}
 {
 
 {% for function in functions|sort(attribute='identifier') %}
-{{function.returnType.identifier}} {{function.identifier}}({% for parameter in function.parameters %}{{parameter.type.identifier}} {{parameter.name}}{{ ", " if not loop.last }}{% endfor %})
+{{function.returnType.identifier}} {{function.identifier}}({% for parameter in function.parameters %}{{parameter.type.identifier}} {{parameter.name}}{{ ", " if not loop.last }}{% endfor %}) {{profile.noexceptMacro}}
 {
     return {{binding.namespace}}::Binding::{{function.namespaceLessIdentifier}}({% for parameter in function.parameters %}{{parameter.name}}{{ ", " if not loop.last }}{% endfor %});
 }

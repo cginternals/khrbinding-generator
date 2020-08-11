@@ -46,7 +46,7 @@ public:
     *  @return
     *    The revision of the parsed {{profile.inputfile}} file
     */
-    static int {{api.identifier}}Revision();
+    static int {{api.identifier}}Revision() {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -58,7 +58,7 @@ public:
     *  @return
     *    The symbol identified through the bitfield string, 0 if failed
     */
-    static {{api.identifier}}::{{binding.bitfieldType}} getBitfield(const std::string & bitfield);
+    static {{api.identifier}}::{{binding.bitfieldType}} getBitfield(const std::string & bitfield) {{profile.noexceptMacro}};
     
     /**
     *  @brief
@@ -67,7 +67,7 @@ public:
     *  @return
     *    The list of all bitfields known by the {{profile.inputfile}}
     */
-    static std::vector<{{api.identifier}}::{{binding.bitfieldType}}> bitfields();
+    static std::vector<{{api.identifier}}::{{binding.bitfieldType}}> bitfields() {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -94,7 +94,7 @@ public:
     *  @return
     *    The symbol identified through the enum string, 0 if failed
     */
-    static {{api.identifier}}::{{binding.enumType}} getEnum(const std::string & {{api.identifier}}enum);
+    static {{api.identifier}}::{{binding.enumType}} getEnum(const std::string & {{api.identifier}}enum) {{profile.noexceptMacro}};
     
     /**
     *  @brief
@@ -103,7 +103,7 @@ public:
     *  @return
     *    The list of all enums known by the {{profile.inputfile}}
     */
-    static std::vector<{{api.identifier}}::{{binding.enumType}}> enums();
+    static std::vector<{{api.identifier}}::{{binding.enumType}}> enums() {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -118,7 +118,7 @@ public:
     *  @remark
     *    Can either be `{{api.identifier|upper}}_TRUE` or `{{api.identifier|upper}}_FALSE`
     */
-    static const std::string & getString(const {{api.identifier}}::{{binding.booleanType}} & {{api.identifier}}boolean);
+    static const std::string & getString(const {{api.identifier}}::{{binding.booleanType}} & {{api.identifier}}boolean) {{profile.noexceptMacro}};
     
     /**
     *  @brief
@@ -130,7 +130,7 @@ public:
     *  @return
     *    The symbol identified through the boolean string, `{{api.identifier|upper}}_FALSE` if failed
     */
-    static {{api.identifier}}::{{binding.booleanType}} getBoolean(const std::string & boolean);
+    static {{api.identifier}}::{{binding.booleanType}} getBoolean(const std::string & boolean) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -142,7 +142,7 @@ public:
     *  @return
     *    The string representation of the extension
     */
-    static const std::string & getString({{api.identifier}}::{{binding.extensionType}} {{api.identifier}}extension);
+    static const std::string & getString({{api.identifier}}::{{binding.extensionType}} {{api.identifier}}extension) {{profile.noexceptMacro}};
     
     /**
     *  @brief
@@ -154,7 +154,7 @@ public:
     *  @return
     *    The symbol identified through the extension string, 'UNKNOWN' if failed
     */
-    static {{api.identifier}}::{{binding.extensionType}} getExtension(const std::string & extension);
+    static {{api.identifier}}::{{binding.extensionType}} getExtension(const std::string & extension) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -163,7 +163,7 @@ public:
     *  @return
     *    The set of all extensions known by the {{profile.inputfile}}
     */
-    static std::set<{{api.identifier}}::{{binding.extensionType}}> extensions();
+    static std::set<{{api.identifier}}::{{binding.extensionType}}> extensions() {{profile.noexceptMacro}};
     
     /**
     *  @brief
@@ -178,7 +178,7 @@ public:
     *    The set of extensions that should be supported for the given version.
     *    All non-versioned extensions can be queried by providing the null version
     */
-    static const std::set<{{api.identifier}}::{{binding.extensionType}}> extensions(const Version & version);
+    static const std::set<{{api.identifier}}::{{binding.extensionType}}> extensions(const Version & version) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -190,7 +190,7 @@ public:
     *  @return
     *    The set of extensions that are requiring a function
     */
-    static const std::set<{{api.identifier}}::{{binding.extensionType}}> extensions(const std::string & {{api.identifier}}function);
+    static const std::set<{{api.identifier}}::{{binding.extensionType}}> extensions(const std::string & {{api.identifier}}function) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -202,7 +202,7 @@ public:
     *  @return
     *    The set of features that are requiring a function
     */
-    static const std::set<Version> versions(const std::string & {{api.identifier}}function);
+    static const std::set<Version> versions(const std::string & {{api.identifier}}function) {{profile.noexceptMacro}};
     
     /**
     *  @brief
@@ -217,7 +217,7 @@ public:
     *  @remark
     *    This is exclusive (preceeding versions are ignored)
     */
-    static const std::set<AbstractFunction *> functions(const Version & version);
+    static const std::set<AbstractFunction *> functions(const Version & version) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -229,7 +229,7 @@ public:
     *  @return
     *    The set of functions that are required for the extension
     */
-    static const std::set<AbstractFunction *> functions({{api.identifier}}::{{binding.extensionType}} extension);
+    static const std::set<AbstractFunction *> functions({{api.identifier}}::{{binding.extensionType}} extension) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -241,7 +241,7 @@ public:
     *  @return
     *    The first Version (Feature) that required the extension
     */
-    static const Version & version({{api.identifier}}::{{binding.extensionType}} {{api.identifier}}extension);
+    static const Version & version({{api.identifier}}::{{binding.extensionType}} {{api.identifier}}extension) {{profile.noexceptMacro}};
     
     /**
     *  @brief
@@ -250,7 +250,7 @@ public:
     *  @return
     *    The list of all Versions (Features) known by the {{profile.inputfile}}
     */
-    static const std::set<Version> & versions();
+    static const std::set<Version> & versions() {{profile.noexceptMacro}};
 {% for group in bitfieldGroups|sort(attribute='identifier') %}
     /**
     *  @brief
@@ -262,7 +262,7 @@ public:
     *  @return
     *    The string representation of the value
     */
-    static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}bitfield);
+    static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}bitfield) {{profile.noexceptMacro}};
 {% endfor %}
 {% for group in enumGroups|sort(attribute='identifier') %}
     /**
@@ -275,7 +275,7 @@ public:
     *  @return
     *    The string representation of the value
     */
-    static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}enum);
+    static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}enum) {{profile.noexceptMacro}};
 {% endfor %}
 
 private:
@@ -292,7 +292,7 @@ private:
     *  @return
     *    The bucket index of an identifier
     */
-    static size_t alphabeticalGroupIndex(const std::string & identifier, std::uint8_t prefixLength);
+    static size_t alphabeticalGroupIndex(const std::string & identifier, std::uint8_t prefixLength) {{profile.noexceptMacro}};
 };
 
 

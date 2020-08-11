@@ -10,7 +10,7 @@ namespace {{binding.namespace}}
 
 
 template <typename T>
-std::ostream & operator<<(std::ostream & stream, const Value<T> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<T> & value) {{profile.noexceptMacro}}
 {
     stream << value.value();
 
@@ -18,7 +18,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<T> & value)
 }
 
 template <typename T>
-std::ostream & operator<<(std::ostream & stream, const Value<T *> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<T *> & value) {{profile.noexceptMacro}}
 {
     stream << std::hex << value.value() << std::dec;
 

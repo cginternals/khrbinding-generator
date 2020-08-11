@@ -23,7 +23,7 @@ namespace {{binding.namespace}}
 template <typename ReturnType, typename... Arguments>
 struct BasicCallHelper
 {
-    inline static ReturnType call(const {{binding.identifier}}::Function<ReturnType, Arguments...> * function, Arguments&&... arguments)
+    inline static ReturnType call(const {{binding.identifier}}::Function<ReturnType, Arguments...> * function, Arguments&&... arguments) {{profile.noexceptMacro}}
     {
         return reinterpret_cast<typename {{binding.identifier}}::Function<ReturnType, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
     }
@@ -36,7 +36,7 @@ struct BasicCallHelper
 template <typename... Arguments>
 struct BasicCallHelper<{{binding.identifier}}::Boolean8, Arguments...>
 {
-    inline static {{binding.identifier}}::Boolean8 call(const {{binding.identifier}}::Function<{{binding.identifier}}::Boolean8, Arguments...> * function, Arguments&&... arguments)
+    inline static {{binding.identifier}}::Boolean8 call(const {{binding.identifier}}::Function<{{binding.identifier}}::Boolean8, Arguments...> * function, Arguments&&... arguments) {{profile.noexceptMacro}}
     {
         return reinterpret_cast<typename {{binding.identifier}}::Function<{{binding.identifier}}::Boolean8::underlying_type, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
     }
@@ -45,7 +45,7 @@ struct BasicCallHelper<{{binding.identifier}}::Boolean8, Arguments...>
 template <typename... Arguments>
 struct BasicCallHelper<{{binding.identifier}}::Boolean32, Arguments...>
 {
-    inline static {{binding.identifier}}::Boolean32 call(const {{binding.identifier}}::Function<{{binding.identifier}}::Boolean32, Arguments...> * function, Arguments&&... arguments)
+    inline static {{binding.identifier}}::Boolean32 call(const {{binding.identifier}}::Function<{{binding.identifier}}::Boolean32, Arguments...> * function, Arguments&&... arguments) {{profile.noexceptMacro}}
     {
         return reinterpret_cast<typename {{binding.identifier}}::Function<{{binding.identifier}}::Boolean32::underlying_type, Arguments...>::Signature>(function->address())(std::forward<Arguments>(arguments)...);
     }
@@ -56,7 +56,7 @@ struct BasicCallHelper<{{binding.identifier}}::Boolean32, Arguments...>
 template <typename ReturnType, typename... Arguments>
 struct FunctionHelper
 {
-    inline static ReturnType call(const {{binding.identifier}}::Function<ReturnType, Arguments...> * function, Arguments&&... arguments)
+    inline static ReturnType call(const {{binding.identifier}}::Function<ReturnType, Arguments...> * function, Arguments&&... arguments) {{profile.noexceptMacro}}
     {
         {{binding.identifier}}::FunctionCall functionCall(function);
 
@@ -105,7 +105,7 @@ struct FunctionHelper
 template <typename... Arguments>
 struct FunctionHelper<void, Arguments...>
 {
-    inline static void call(const {{binding.identifier}}::Function<void, Arguments...> * function, Arguments&&... arguments)
+    inline static void call(const {{binding.identifier}}::Function<void, Arguments...> * function, Arguments&&... arguments) {{profile.noexceptMacro}}
     {
         {{binding.identifier}}::FunctionCall functionCall(function);
 
@@ -145,7 +145,7 @@ struct FunctionHelper<void, Arguments...>
 
 
 template <typename ReturnType, typename... Arguments>
-Function<ReturnType, Arguments...>::Function(const char * _name)
+Function<ReturnType, Arguments...>::Function(const char * _name) {{profile.noexceptMacro}}
 : AbstractFunction{_name}
 , m_beforeCallback{nullptr}
 , m_afterCallback{nullptr}
@@ -153,13 +153,13 @@ Function<ReturnType, Arguments...>::Function(const char * _name)
 }
 
 template <typename ReturnType, typename... Arguments>
-ReturnType Function<ReturnType, Arguments...>::operator()(Arguments&... arguments) const
+ReturnType Function<ReturnType, Arguments...>::operator()(Arguments&... arguments) const {{profile.noexceptMacro}}
 {
     return call(arguments...);
 }
 
 template <typename ReturnType, typename... Arguments>
-ReturnType Function<ReturnType, Arguments...>::call(Arguments&... arguments) const
+ReturnType Function<ReturnType, Arguments...>::call(Arguments&... arguments) const {{profile.noexceptMacro}}
 {
     const auto myAddress = address();
 
@@ -191,7 +191,7 @@ ReturnType Function<ReturnType, Arguments...>::call(Arguments&... arguments) con
 }
 
 template <typename ReturnType, typename... Arguments>
-ReturnType Function<ReturnType, Arguments...>::directCall(Arguments... arguments) const
+ReturnType Function<ReturnType, Arguments...>::directCall(Arguments... arguments) const {{profile.noexceptMacro}}
 {
     if (address() == nullptr)
     {
@@ -202,61 +202,61 @@ ReturnType Function<ReturnType, Arguments...>::directCall(Arguments... arguments
 }
 
 template <typename ReturnType, typename... Arguments>
-void Function<ReturnType, Arguments...>::setBeforeCallback(BeforeCallback callback)
+void Function<ReturnType, Arguments...>::setBeforeCallback(BeforeCallback callback) {{profile.noexceptMacro}}
 {
     m_beforeCallback = std::move(callback);
 }
 
 template <typename ReturnType, typename... Arguments>
-void Function<ReturnType, Arguments...>::clearBeforeCallback()
+void Function<ReturnType, Arguments...>::clearBeforeCallback() {{profile.noexceptMacro}}
 {
     m_beforeCallback = nullptr;
 }
 
 template <typename ReturnType, typename... Arguments>
-void Function<ReturnType, Arguments...>::setAfterCallback(AfterCallback callback)
+void Function<ReturnType, Arguments...>::setAfterCallback(AfterCallback callback) {{profile.noexceptMacro}}
 {
     m_afterCallback = std::move(callback);
 }
 
 template <typename ReturnType, typename... Arguments>
-void Function<ReturnType, Arguments...>::clearAfterCallback()
+void Function<ReturnType, Arguments...>::clearAfterCallback() {{profile.noexceptMacro}}
 {
     m_afterCallback = nullptr;
 }
 
 template <typename ReturnType, typename... Arguments>
-typename Function<ReturnType, Arguments...>::BeforeCallback Function<ReturnType, Arguments...>::beforeCallback() const
+typename Function<ReturnType, Arguments...>::BeforeCallback Function<ReturnType, Arguments...>::beforeCallback() const {{profile.noexceptMacro}}
 {
     return m_beforeCallback;
 }
 
 template <typename ReturnType, typename... Arguments>
-typename Function<ReturnType, Arguments...>::AfterCallback Function<ReturnType, Arguments...>::afterCallback() const
+typename Function<ReturnType, Arguments...>::AfterCallback Function<ReturnType, Arguments...>::afterCallback() const {{profile.noexceptMacro}}
 {
     return m_afterCallback;
 }
 
 template <typename ReturnType, typename... Arguments>
-bool Function<ReturnType, Arguments...>::hasState() const
+bool Function<ReturnType, Arguments...>::hasState() const {{profile.noexceptMacro}}
 {
     return hasState(AbstractFunction::currentPos());
 }
 
 template <typename ReturnType, typename... Arguments>
-bool Function<ReturnType, Arguments...>::hasState(const int pos) const
+bool Function<ReturnType, Arguments...>::hasState(const int pos) const {{profile.noexceptMacro}}
 {
     return pos > -1 && AbstractFunction::maxPos() <= pos;
 }
 
 template <typename ReturnType, typename... Arguments>
-AbstractState & Function<ReturnType, Arguments...>::state() const
+AbstractState & Function<ReturnType, Arguments...>::state() const {{profile.noexceptMacro}}
 {
     return state(AbstractFunction::currentPos());
 }
 
 template <typename ReturnType, typename... Arguments>
-AbstractState & Function<ReturnType, Arguments...>::state(const int pos) const
+AbstractState & Function<ReturnType, Arguments...>::state(const int pos) const {{profile.noexceptMacro}}
 {
     assert(AbstractFunction::maxPos() >= pos);
     assert(pos > -1);
@@ -265,7 +265,7 @@ AbstractState & Function<ReturnType, Arguments...>::state(const int pos) const
 }
 
 template <typename ReturnType, typename... Arguments>
-void Function<ReturnType, Arguments...>::resizeStates(int count)
+void Function<ReturnType, Arguments...>::resizeStates(int count) {{profile.noexceptMacro}}
 {
     m_states.resize(static_cast<std::size_t>(count));
 }

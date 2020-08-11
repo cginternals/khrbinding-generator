@@ -13,7 +13,7 @@ namespace {{api.identifier}}
 
 
 {% for function in functions|sort(attribute='identifier') -%}
-{{binding.apiExport}} {{function.returnType.identifier}} {{function.identifier}}({% for param in function.parameters %}{{ param.type.identifier }} {{ param.name }}{% if not loop.last %}, {% endif %}{% endfor %});
+{{binding.apiExport}} {{function.returnType.identifier}} {{function.identifier}}({% for param in function.parameters %}{{ param.type.identifier }} {{ param.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {{profile.noexceptMacro}};
 {% endfor %}
 
 } // namespace {{api.identifier}}

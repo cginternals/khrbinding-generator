@@ -39,7 +39,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The inverted CallbackMask
 */
-{{binding.constexpr}} inline CallbackMask operator~(CallbackMask a);
+{{binding.constexpr}} inline CallbackMask operator~(CallbackMask a) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -53,7 +53,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The compound CallbackMask
 */
-{{binding.constexpr}} inline CallbackMask operator|(CallbackMask a, CallbackMask b);
+{{binding.constexpr}} inline CallbackMask operator|(CallbackMask a, CallbackMask b) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -67,7 +67,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The compound CallbackMask
 */
-{{binding.constexpr}} inline CallbackMask operator&(CallbackMask a, CallbackMask b);
+{{binding.constexpr}} inline CallbackMask operator&(CallbackMask a, CallbackMask b) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -81,7 +81,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The compound CallbackMask
 */
-{{binding.constexpr}} inline CallbackMask operator^(CallbackMask a, CallbackMask b);
+{{binding.constexpr}} inline CallbackMask operator^(CallbackMask a, CallbackMask b) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -95,7 +95,7 @@ enum class CallbackMask : unsigned char
 *  @return
 *    The first, now manipulated, CallbackMask
 */
-inline CallbackMask& operator|=(CallbackMask& a, CallbackMask b);
+inline CallbackMask& operator|=(CallbackMask& a, CallbackMask b) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -109,7 +109,7 @@ inline CallbackMask& operator|=(CallbackMask& a, CallbackMask b);
 *  @return
 *    The first, now manipulated, CallbackMask
 */
-inline CallbackMask& operator&=(CallbackMask& a, CallbackMask b);
+inline CallbackMask& operator&=(CallbackMask& a, CallbackMask b) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -123,7 +123,7 @@ inline CallbackMask& operator&=(CallbackMask& a, CallbackMask b);
 *  @return
 *    The first, now manipulated, CallbackMask
 */
-inline CallbackMask& operator^=(CallbackMask& a, CallbackMask b);
+inline CallbackMask& operator^=(CallbackMask& a, CallbackMask b) {{profile.noexceptMacro}};
 
 
 } // namespace {{binding.namespace}}

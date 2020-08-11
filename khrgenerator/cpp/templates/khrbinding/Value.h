@@ -36,7 +36,7 @@ public:
     *  @param[in] value
     *    The value that should be printed later
     */
-    {{binding.constexpr}} inline Value(const T & value);
+    {{binding.constexpr}} inline Value(const T & value) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -54,7 +54,7 @@ public:
     *  @return
     *    The value
     */
-    {{binding.constexpr}} inline T value() const;
+    {{binding.constexpr}} inline T value() const {{profile.noexceptMacro}};
 
 protected:
     const T m_value; ///< The value
@@ -71,7 +71,7 @@ protected:
 *    The argument to wrap into a Value of type Argument.
 */
 template <typename Argument>
-inline std::unique_ptr<AbstractValue> createValue(const Argument & argument);
+inline std::unique_ptr<AbstractValue> createValue(const Argument & argument) {{profile.noexceptMacro}};
 
 /**
 *  @brief
@@ -86,7 +86,7 @@ inline std::unique_ptr<AbstractValue> createValue(const Argument & argument);
 *    Internally uses the createValue() function
 */
 template <typename... Arguments>
-inline std::vector<std::unique_ptr<AbstractValue>> createValues(Arguments&&... arguments);
+inline std::vector<std::unique_ptr<AbstractValue>> createValues(Arguments&&... arguments) {{profile.noexceptMacro}};
 
 
 } // namespace {{binding.namespace}}

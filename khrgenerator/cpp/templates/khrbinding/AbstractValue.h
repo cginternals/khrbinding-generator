@@ -3,6 +3,7 @@
 
 
 #include <{{binding.identifier}}/{{binding.identifier}}_api.h>
+#include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 
 namespace {{binding.namespace}}
@@ -22,13 +23,13 @@ public:
     *  @brief
     *    Constructor
     */
-    AbstractValue();
+    AbstractValue() {{profile.noexceptMacro}};
 
     /**
     *  @brief
     *    Destructor for correct memory deallocation on subclasses
     */
-    virtual ~AbstractValue();
+    virtual ~AbstractValue() {{profile.noexceptMacro}};
 };
 
 

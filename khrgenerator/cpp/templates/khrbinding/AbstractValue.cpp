@@ -6,11 +6,11 @@ namespace {{binding.namespace}}
 {
 
 
-AbstractValue::AbstractValue()
+AbstractValue::AbstractValue() {{profile.noexceptMacro}}
 {
 }
 
-AbstractValue::~AbstractValue()
+AbstractValue::~AbstractValue() {{profile.noexceptMacro}}
 {
 }
 

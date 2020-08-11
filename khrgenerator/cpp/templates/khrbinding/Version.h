@@ -37,7 +37,7 @@ public:
     *  @brief
     *    Default constructor, resulting in an invalid Version object
     */
-    {{binding.constexpr}} inline Version();
+    {{binding.constexpr}} inline Version() {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -48,7 +48,7 @@ public:
     *  @param[in] minorVersion
     *    The minor version
     */
-    {{binding.constexpr}} inline Version(unsigned char majorVersion, unsigned char minorVersion);
+    {{binding.constexpr}} inline Version(unsigned char majorVersion, unsigned char minorVersion) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -57,7 +57,7 @@ public:
     *  @param[in] version
     *    The Version the data is used from
     */
-    {{binding.constexpr}} inline Version(const Version & version);
+    {{binding.constexpr}} inline Version(const Version & version) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -66,7 +66,7 @@ public:
     *  @param[in] version
     *    The Version the data is moved from
     */
-    inline Version(Version && version);
+    inline Version(Version && version) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -75,7 +75,7 @@ public:
     *  @return
     *    The major version
     */
-    {{binding.constexpr}} inline unsigned char majorVersion() const;
+    {{binding.constexpr}} inline unsigned char majorVersion() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -84,25 +84,25 @@ public:
     *  @return
     *    The minor version
     */
-    {{binding.constexpr}} inline unsigned char minorVersion() const;
+    {{binding.constexpr}} inline unsigned char minorVersion() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
     *    Cast operator for a std::pair cast of type unsigned char
     */
-    inline operator std::pair<unsigned char, unsigned char>() const;
+    inline operator std::pair<unsigned char, unsigned char>() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
     *    Cast operator for a std::pair cast of type unsigned short
     */
-    inline operator std::pair<unsigned short, unsigned short>() const;
+    inline operator std::pair<unsigned short, unsigned short>() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
     *    Cast operator for a std::pair cast of type unsigned int
     */
-    inline operator std::pair<unsigned int, unsigned int>() const;
+    inline operator std::pair<unsigned int, unsigned int>() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -111,7 +111,7 @@ public:
     *  @return
     *    The version as string, "-.-" iff the Version is invalid
     */
-    inline std::string toString() const;
+    inline std::string toString() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -123,7 +123,7 @@ public:
     *  @remark
     *    This method can be used to check if this Version was constructed using the default constructor or is otherwise malformed
     */
-    {{binding.constexpr}} inline bool isNull() const;
+    {{binding.constexpr}} inline bool isNull() const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -135,7 +135,7 @@ public:
     *  @return
     *    The reference to this Version
     */
-    inline Version & operator=(const Version & version);
+    inline Version & operator=(const Version & version) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -147,7 +147,7 @@ public:
     *  @return
     *    The reference to this Version
     */
-    inline Version & operator=(Version && version);
+    inline Version & operator=(Version && version) {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -159,7 +159,7 @@ public:
     *  @return
     *    `true` if this Version is lower than the other Version, else `false`
     */
-    {{binding.constexpr}} inline bool operator<(const Version & version) const;
+    {{binding.constexpr}} inline bool operator<(const Version & version) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -171,7 +171,7 @@ public:
     *  @return
     *    `true` if this Version is greater than the other Version, else `false`
     */
-    {{binding.constexpr}} inline bool operator>(const Version & version) const;
+    {{binding.constexpr}} inline bool operator>(const Version & version) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -183,7 +183,7 @@ public:
     *  @return
     *    `true` if this Version is equal to the other Version, else `false`
     */
-    {{binding.constexpr}} inline bool operator==(const Version & version) const;
+    {{binding.constexpr}} inline bool operator==(const Version & version) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -195,7 +195,7 @@ public:
     *  @return
     *    `true` if this Version is not equal to the other Version, else `false`
     */
-    {{binding.constexpr}} inline bool operator!=(const Version & version) const;
+    {{binding.constexpr}} inline bool operator!=(const Version & version) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -207,7 +207,7 @@ public:
     *  @return
     *    `true` if this Version is greater than or equal to the other Version, else `false`
     */
-    {{binding.constexpr}} inline bool operator>=(const Version & version) const;
+    {{binding.constexpr}} inline bool operator>=(const Version & version) const {{profile.noexceptMacro}};
 
     /**
     *  @brief
@@ -219,7 +219,7 @@ public:
     *  @return
     *    `true` if this Version is lower than or equal to the other Version, else `false`
     */
-    {{binding.constexpr}} inline bool operator<=(const Version & version) const;
+    {{binding.constexpr}} inline bool operator<=(const Version & version) const {{profile.noexceptMacro}};
 
 
 protected:

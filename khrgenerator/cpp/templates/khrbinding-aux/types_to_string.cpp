@@ -15,14 +15,14 @@ namespace {{api.identifier}}
 {
 
 {% for group in enumerators|sort(attribute='identifier') %}
-std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value)
+std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value) {{profile.noexceptMacro}}
 {
     stream << {{binding.bindingAuxNamespace}}::Meta::getString(value);
     return stream;
 }
 {% endfor -%}
 {% for group in bitfields|sort(attribute='identifier') %}
-std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value)
+std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value) {{profile.noexceptMacro}}
 {
     stream << {{binding.bindingAuxNamespace}}::bitfieldString<{{group.identifier}}>(value);
     return stream;
@@ -37,7 +37,7 @@ namespace {{binding.namespace}}
 
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.enumType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.enumType}}> & value) {{profile.noexceptMacro}}
 {
     const auto & name = {{binding.auxNamespace}}::Meta::getString(value.value());
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
@@ -46,7 +46,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}:
 }
 
 /*template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.bitfieldType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.bitfieldType}}> & value) {{profile.noexceptMacro}}
 {
     std::stringstream ss;
     ss << "0x" << std::hex << static_cast<unsigned>(value.value());
@@ -56,7 +56,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}:
 }*/
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.booleanType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.booleanType}}> & value) {{profile.noexceptMacro}}
 {
     const auto & name = {{binding.auxNamespace}}::Meta::getString(value.value());
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
@@ -65,7 +65,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}:
 }
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<const char *> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<const char *> & value) {{profile.noexceptMacro}}
 {
     auto s = {{binding.auxNamespace}}::wrapString(value.value());
     stream.write(s.c_str(), static_cast<std::streamsize>(s.size()));
@@ -75,7 +75,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<const char *> & val
 
 {% for cStringType in cStringTypes|sort %}
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{cStringType}} *> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{cStringType}} *> & value) {{profile.noexceptMacro}}
 {
     auto s = {{binding.auxNamespace}}::wrapString(reinterpret_cast<const char*>(value.value()));
     stream.write(s.c_str(), static_cast<std::streamsize>(s.size()));
@@ -84,14 +84,14 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}:
 }
 {% endfor %}
 
-std::ostream & operator<<(std::ostream & stream, const Version & version)
+std::ostream & operator<<(std::ostream & stream, const Version & version) {{profile.noexceptMacro}}
 {
     stream << version.toString();
 
     return stream;
 }
 
-std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
+std::ostream & operator<<(std::ostream & stream, const AbstractValue * value) {{profile.noexceptMacro}}
 {
     if (typeid(*value) == typeid(AbstractValue))
     {
