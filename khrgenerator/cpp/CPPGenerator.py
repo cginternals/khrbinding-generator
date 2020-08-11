@@ -212,20 +212,23 @@ class CPPGenerator:
             extensionsByFunction=cls.identifierPrefixGroupsDict(api, api.extensionsByFunction(), len(profile.lowercasePrefix))
         )
 
+        uniqueEnumTypes = []
         for type in [ api.typeByIdentifier(binding.extensionType), api.typeByIdentifier(binding.enumType), api.typeByIdentifier(binding.booleanType) ]:
-            if type not in enumTypes and type is not None:
-                enumTypes.append(type)
-    
+            if type not in enumTypes and type not in uniqueEnumTypes and type is not None:
+                uniqueEnumTypes.append(type)
+        
         cls.render(template_engine, "khrbinding-aux/RingBuffer.h", includedir_aux+"RingBuffer.h", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/RingBuffer.inl", includedir_aux+"RingBuffer.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.h", includedir_aux+"types_to_string.h", api=api, profile=profile, binding=binding,
             enumerators=enumTypes,
+            uniqueEnumerators=uniqueEnumTypes,
             bitfields=bitfieldTypes,
             cStringTypes=binding.cStringOutputTypes,
         )
         cls.render(template_engine, "khrbinding-aux/types_to_string.inl", includedir_aux+"types_to_string.inl", api=api, profile=profile, binding=binding)
         cls.render(template_engine, "khrbinding-aux/types_to_string.cpp", sourcedir_aux+"types_to_string.cpp", api=api, profile=profile, binding=binding,
             enumerators=enumTypes,
+            uniqueEnumerators=uniqueEnumTypes,
             bitfields=bitfieldTypes,
             cStringTypes=binding.cStringOutputTypes,
             cPointerTypes=binding.cPointerTypes,
