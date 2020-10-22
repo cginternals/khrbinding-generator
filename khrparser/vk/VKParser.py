@@ -285,6 +285,7 @@ class VKParser(XMLParser):
         binding.booleanType = profile.booleanType
         binding.booleanWidth = profile.booleanWidth
         binding.enumType = profile.enumType
+        binding.useEnumGroups = profile.useEnumGroups
         binding.bitfieldType = profile.bitfieldType
         binding.noneBitfieldValue = profile.noneBitfieldValue
         binding.cStringOutputTypes = profile.cStringOutputTypes
