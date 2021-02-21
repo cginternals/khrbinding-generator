@@ -17,7 +17,26 @@ namespace {{api.identifier}}
 {% for group in enumerators|sort(attribute='identifier') %}
 std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value)
 {
+    const auto strings = {{binding.bindingAuxNamespace}}::Meta::getStrings(value);
+
+    if (strings.size() == 0)
+    {
+        return stream;
+    }
+
+    stream << strings[0];
+
+    for (auto i = static_cast<std::size_t>(1); i < strings.size(); ++i)
+        stream << " | " << strings[i];
+
+    return stream;
+}
+{% endfor -%}
+{% for group in uniqueEnumerators|sort(attribute='identifier') %}
+std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value)
+{
     stream << {{binding.bindingAuxNamespace}}::Meta::getString(value);
+
     return stream;
 }
 {% endfor -%}
@@ -39,8 +58,7 @@ namespace {{binding.namespace}}
 template <>
 std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.enumType}}> & value)
 {
-    const auto & name = {{binding.auxNamespace}}::Meta::getString(value.value());
-    stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
+    stream << value.value();
 
     return stream;
 }

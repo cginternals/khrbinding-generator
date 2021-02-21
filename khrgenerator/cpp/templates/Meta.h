@@ -103,7 +103,7 @@ public:
     *  @return
     *    The list of all enums known by the {{profile.inputfile}}
     */
-    static std::vector<{{api.identifier}}::{{binding.enumType}}> enums();
+    static std::set<{{api.identifier}}::{{binding.enumType}}> enums();
 
     /**
     *  @brief
@@ -273,9 +273,24 @@ public:
     *    The enum value
     *
     *  @return
-    *    The string representation of the value
+    *    The shortest string representation of the value
+    *
+    *  @remark
+    *    Beware, that some enums in the API have different symbol names but identical enum values and that this function cannot differentiate between them
     */
     static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}enum);
+
+    /**
+    *  @brief
+    *    Convert enum to symbol name string representation
+    *
+    *  @param[in] {{api.identifierl}}enum
+    *    The enum value
+    *
+    *  @return
+    *    All string representations of the value
+    */
+    static std::vector<std::string> getStrings({{api.identifier}}::{{group.identifier}} {{api.identifier}}enum);
 {% endfor %}
 
 private:

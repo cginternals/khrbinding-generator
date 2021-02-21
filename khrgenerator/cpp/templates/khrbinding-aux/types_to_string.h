@@ -19,6 +19,9 @@ namespace {{api.identifier}}
 {% for group in enumerators|sort(attribute='identifier') -%}
 {{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value);
 {% endfor -%}
+{% for group in uniqueEnumerators|sort(attribute='identifier') -%}
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value);
+{% endfor -%}
 {% for group in bitfields|sort(attribute='identifier') -%}
 {{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value);
 {% endfor %}
