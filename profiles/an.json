@@ -1,0 +1,50 @@
+{
+	"": "API specification",
+	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/ANARI-Docs/main/xml/an.xml",
+	"sourceFile": "an.xml",
+
+    "": "Parser configuration",
+    "parser": "an",
+
+	"": "Identifier parsing",
+	"lowercasePrefix": "an",
+	"uppercasePrefix": "AN_",
+
+	"": "Meta Feature management",
+    "generator": "cpp",
+	"bindingNamespace": "anbinding",
+	"baseNamespace": "an",
+	"generateFeatures": true,
+	"generateProfiles": true,
+	"coreProfileSince": null,
+	"multiContext": false,
+	"generateStringLookup": true,
+	"generateStringConversion": true,
+	"generateCallbacks": true,
+	"generateLogging": true,
+	"generateHeaderGuard": true,
+	"headerGuardMacro": [ "__an_h_" ],
+	"headerReplacement": [ "an.h" ],
+
+	"": "Types",
+	"extensionType": "ANextension",
+	"booleanType": "AnBool32",
+	"booleanWidth": 32,
+	"enumType": "ANenum",
+	"bitfieldType": "ANbitfield",
+	"noneBitfieldValue": "AN_NONE_BIT",
+	"cStringOutputTypes": [],
+
+	"": "API Feature management",
+	"apiIdentifier": "anari",
+	"versions": [],
+	"featureBlacklist": [],
+	"extensionBlacklist": [],
+	"useBitfieldGroups": true,
+	"useEnumGroups": false,
+	"generateNoneBits": true,
+	"generateBitfieldTypeIntegrations": true,
+	"generateEnumTypeIntegrations": true,
+
+	"": "File patterns"
+}

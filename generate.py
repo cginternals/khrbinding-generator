@@ -7,6 +7,7 @@ from khrparser.Profile import Profile
 from khrparser.gl.GLParser import GLParser
 from khrparser.egl.EGLParser import EGLParser
 from khrparser.vk.VKParser import VKParser
+from khrparser.an.ANParser import ANParser
 
 from khrgenerator.cpp.CPPGenerator import CPPGenerator
 
@@ -38,6 +39,7 @@ def main(argv):
       "gl": GLParser,
       "egl": EGLParser,
       "vk": VKParser,
+      "an": ANParser,
       # "idl": IDLParser
     }
     
