@@ -27,11 +27,11 @@
 	"headerReplacement": [ "an.h" ],
 
 	"": "Types",
-	"extensionType": "ANextension",
+	"extensionType": "AnExtension",
 	"booleanType": "AnBool32",
 	"booleanWidth": 32,
-	"enumType": "ANenum",
-	"bitfieldType": "ANbitfield",
+	"enumType": "AnEnum",
+	"bitfieldType": "AnBitfield",
 	"noneBitfieldValue": "AN_NONE_BIT",
 	"cStringOutputTypes": [],
 

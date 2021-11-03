@@ -11,6 +11,7 @@ from khrapi.Import import Import
 from khrapi.TypeAlias import TypeAlias
 from khrapi.NativeType import NativeType
 
+from khrapi.Vendor import Vendor
 from khrapi.Enumerator import Enumerator
 from khrapi.BitfieldGroup import BitfieldGroup
 from khrapi.ValueGroup import ValueGroup
@@ -18,230 +19,87 @@ from khrapi.SpecialValues import SpecialValues
 from khrapi.Constant import Constant
 from khrapi.Function import Function
 from khrapi.Parameter import Parameter
+from khrapi.NativeCode import NativeCode
+from khrapi.CompoundType import CompoundType
 
 class ANParser(XMLParser):
 
     @classmethod
     def parseXML(cls, api, profile, registry):
+        deferredFunctionPointerTypes = []
+        # Vendors
+        for V in registry.iter("tags"):
+            for vendor in V.findall("tag"):
+                cls.handleVendor(api, profile, vendor)
+
         # Types
         for T in registry.iter("types"):
             for type in T.findall("type"):
-                isFunctionPointer = "category" in type.attrib and type.attrib["category"] == "funcpointer" in "funcpointer"
-                nameTag = type.find("name")
-                text = type.text
-                if isFunctionPointer:
-                    if text is None:
-                        text = "{{binding.apientry}} " + apiEntryTag.tail.strip()
-                    else:
-                        text = text + "{{binding.apientry}} " + apiEntryTag.tail.strip()
-
-                if nameTag is not None and nameTag.tail is not None:
-                    if text is None:
-                        text = nameTag.tail.strip()
-                    else:
-                        text = text + nameTag.tail.strip()
-
-                if type.tail is not None:
-                    if text is None:
-                        text = type.tail.strip()
-                    else:
-                        text = text + type.tail.strip()
-
-                if text is None:
-                    text = type.find("name").text
-
-                if nameTag is not None and nameTag.text.startswith("struct"):
-                    name = re.search('%s(.*)%s' % ("struct ", ""), nameTag.text).group(1).strip()
-                    newType = NativeType(api, name, nameTag.text + text)
-                    newType.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(newType)
-
-                elif text.startswith("#include"):
-                    importName = re.search('%s(.*)%s' % ('"', '"'), text).group(1).strip()
-                    api.dependencies.append(Import(api, type.attrib["name"], importName))
-
-                elif text.startswith("#if"):
-                    newType = NativeType(api, type.attrib["name"], text)
-                    newType.namespacedIdentifier = profile.baseNamespace+"::"+type.attrib["name"]
-                    api.types.append(newType)
-
-                elif text.startswith("typedef"):
-                    print(text)   
-                    aliasName = re.search('%s(.*)%s' % ("typedef ", ";"), text).group(1).strip()
-                    print(aliasName)
-                    alias = api.typeByIdentifier(aliasName)
-                    if alias is None:
-                        alias = NativeType(api, aliasName, aliasName)
-
-                    typename = nameTag.text
-                    print(typename)
-                    newType = TypeAlias(api, typename, alias)
-                    newType.namespacedIdentifier = profile.baseNamespace+"::"+typename
-                    api.types.append(newType)
+                cls.handleType(api, profile, type, deferredFunctionPointerTypes)
+        
+        # Create deferred types
+        for type in deferredFunctionPointerTypes:
+            cls.handleFunctionPointerType(api, profile, type)
+        
+        # Parse type relations
+        for T in registry.iter("types"):
+            for type in T.findall("type"):
+                cls.handleTypeRelations(api, profile, type)
 
         # Constants
         for E in registry.iter("enums"):
+
+            type = cls.handleConstantType(api, profile, E)
+
             for enum in E.findall("enum"):
-                if api.constantByIdentifier(enum.attrib["name"]) is not None:
-                    continue
-                
-                constant = Constant(api, enum.attrib["name"], enum.attrib["value"])
-                constant.decimalValue = int(enum.attrib["value"], 0)
-                if "group" in E.attrib and E.attrib["group"] == "SpecialNumbers":
-                    constant.type = cls.detectSpecialValueType(api, enum)
-                api.constants.append(constant)
-
-        # Groups
-
-        for G in registry.iter("groups"):
-            for group in G.findall("group"):
-                name = group.attrib["name"]
-
-                if name.find("Mask") >= 0:
-                    type = BitfieldGroup(api, name)
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                elif name.find("Boolean") >= 0:
-                    type = ValueGroup(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                else:
-                    type = Enumerator(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                
-                for enum in group.findall("enum"):
-                    constant = api.constantByIdentifier(enum.attrib["name"])
-                    if constant is None or constant in type.values:
-                        continue
-                    type.values.append(constant)
-                    constant.groups.append(type)
-                
-                if len(type.values) > 0:
-                    api.types.append(type)
-        
-        for E in registry.iter("enums"):
-            if "group" in E.attrib:
-                name = E.attrib["group"]
-
-                type = api.typeByIdentifier(name)
-
-                if type is None and name.find("Mask") >= 0:
-                    type = BitfieldGroup(api, name)
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(type)
-                elif type is None and name.find("Boolean") >= 0:
-                    type = ValueGroup(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(type)
-                elif type is None:
-                    type = Enumerator(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(type)
-
-                for enum in E.findall("enum"):
-                    constant = api.constantByIdentifier(enum.attrib["name"])
-                    if constant is None or constant in type.values:
-                        continue
-                    type.values.append(constant)
-                    constant.groups.append(type)
+                cls.handleConstantValue(api, profile, type, enum)
 
         # Functions
         for C in registry.iter("commands"):
-            for command in C.iter("command"):
-                protoTag = command.find("proto")
-                returnTypeTag = protoTag.find("ptype")
-                returnTypeName = " ".join([ text.strip() for text in [ protoTag.text if protoTag is not None else "", returnTypeTag.text if returnTypeTag is not None else "", returnTypeTag.tail if returnTypeTag is not None else "" ] if text is not None ]).strip()
-                name = protoTag.find("name").text.strip()
+            for command in C.findall("command"):
+                cls.handleFunction(api, profile, command)
 
-                function = Function(api, name)
-                function.namespaceLessIdentifier = function.identifier[len(profile.lowercasePrefix):]
-                returnType = api.typeByIdentifier(returnTypeName)
-                if returnType is None:
-                    returnType = NativeType(api, returnTypeName, returnTypeName)
-                    returnType.hideDeclaration = True
-                    api.types.append(returnType)
-                function.returnType = returnType
+        # Register Extensions
+        for E in registry.iter("extensions"):
+            for xmlExtension in E.findall("extension"):
+                cls.preHandleExtension(api, profile, xmlExtension)
 
-                for param in command.findall("param"):
-                    name = param.find("name").text
-                    groupName = param.attrib.get("group", None)
-                    groupType = api.typeByIdentifier(groupName)
-                    typeTag = param.find("ptype")
-                    if groupType is not None and isinstance(groupType, BitfieldGroup):
-                        typeName = groupName
-                    elif groupType is not None and isinstance(groupType, TypeAlias): # and isinstance(groupType.aliasedType, ValueGroup):
-                        typeName = groupName
-                    else:
-                        typeName = param.text if param.text else ""
-                        if typeTag is not None:
-                            if typeTag.text:
-                                typeName += typeTag.text
-                            if typeTag.tail:
-                                typeName += typeTag.tail
-                        typeName = typeName.strip()
-                    type = api.typeByIdentifier(typeName)
-                    nativeType = typeName
-                    if type is None:
-                        typeParts = typeName.split(" ")
-                        if "struct" in typeParts:
-                            typeParts.remove("struct")
-                        
-                        type = NativeType(api, " ".join(typeParts), " ".join(typeParts))
-                        type.hideDeclaration = True
-
-                        if typeParts[0] == "const":
-                            if typeParts[1] == "void":
-                                pass
-                            else:
-                                nativeType = typeParts[1]
-                                typeParts[1] = profile.baseNamespace + "::" + typeParts[1]
-                        else:
-                            if typeParts[0] == "void":
-                                pass
-                            else:
-                                nativeType = typeParts[0]
-                                typeParts[0] = profile.baseNamespace + "::" + typeParts[0]
-
-                        type.namespacedIdentifier = " ".join(typeParts)
-                        api.types.append(type)
-                    
-                    parameter = Parameter(function, name, type)
-                    parameter.nativeType = api.typeByIdentifier(nativeType)
-                    function.parameters.append(parameter)
-
-                api.functions.append(function)
+        # Versions
+        # Handle version before extension as some extension alias the values from the core features
+        for feature in registry.iter("feature"):
+            cls.handleVersion(api, profile, feature)
 
         # Extensions
         for E in registry.iter("extensions"):
             for xmlExtension in E.findall("extension"):
-                extension = Extension(api, xmlExtension.attrib["name"])
-                extension.supportedAPIs = xmlExtension.attrib["supported"].split("|")
-
-                for require in xmlExtension.findall("require"):
-                    for child in require:
-                        if child.tag == "enum":
-                            extension.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
-                        elif child.tag == "command":
-                            function = api.functionByIdentifier(child.attrib["name"])
-                            extension.requiredFunctions.append(function)
-                            function.requiringFeatureSets.append(extension)
-                        elif child.tag == "type":
-                            extension.requiredTypes.append(api.typeByIdentifier(child.attrib["name"]))
-
-                api.extensions.append(extension)
-
-        # Versions
-        for feature in registry.iter("feature"):
-
-            version = cls.createVersion(api, feature)
-            api.versions.append(version)
+                cls.handleExtension(api, profile, xmlExtension)
 
         return api
 
     @classmethod
     def patch(cls, api, profile):
+
+        firstVersion = api.versions[0] # hopefully 1.0
+        print(", ".join([ type.identifier for type in firstVersion.requiredTypes ]))
+        firstVersion.requiredTypes.append(api.typeByIdentifier("AnError"))
+        print(", ".join([ type.identifier for type in firstVersion.requiredTypes ]))
+
+        # Fix requires for constants that are defined through enumerators
+        for version in api.versions:
+            enumerators = [ type for type in version.requiredTypes if isinstance(type, Enumerator) ]
+            version.requiredConstants += [ constant for enumerator in enumerators for constant in enumerator.values ]
+
+        # api.printSummary()
+
+        return api
+    
+    @classmethod
+    def filterAPI(cls, api, profile):
+
+        return api
+
+    @classmethod
+    def deriveBinding(cls, api, profile):
 
         # Fix Special Values
         specialNumbersType = None
@@ -250,81 +108,26 @@ class ANParser(XMLParser):
             api.types.remove(oldSpecialNumbersType)
 
         for constant in api.constants:
-            if "SpecialNumbers" in [ group.identifier for group in constant.groups ] and len(constant.groups) == 1 and constant.type is not None:
-                if specialNumbersType is None:
-                    specialNumbersType = SpecialValues(api, "SpecialValues")
-                    specialNumbersType.hideDeclaration = True
-                    api.types.append(specialNumbersType)
-            
-                specialNumbersType.values.append(constant)
-                constant.groups = [specialNumbersType]
-
-        return api
-    
-    @classmethod
-    def filterAPI(cls, api, profile):
-
-        featureSets = []
-
-        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
-        featureSets += api.versions
-
-        api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
-        featureSets += api.extensions
-
-        api.constants = [ constant for constant in api.constants if
-            any((featureSet for featureSet in featureSets if constant in featureSet.requiredConstants))
-        ]
+            if "SpecialNumbers" in [ group.identifier for group in constant.groups ]:
+                if len(constant.groups) == 1 and constant.type is not None:
+                    if specialNumbersType is None:
+                        specialNumbersType = SpecialValues(api, "SpecialValues")
+                        specialNumbersType.hideDeclaration = True
+                        api.types.append(specialNumbersType)
+                
+                    specialNumbersType.values.append(constant)
+                    constant.groups = [specialNumbersType]
         
-        api.functions = [ function for function in api.functions if any((featureSet for featureSet in featureSets if function in featureSet.requiredFunctions)) ]
+        # Add extension type
+        extensionType = Enumerator(api, profile.extensionType)
+        extensionType.unsigned = False
+        api.types.insert(1, extensionType)
         
-        api.types = [ type for type in api.types if
-            any((featureSet for featureSet in featureSets if type in featureSet.requiredTypes)) or
-            any((constant for constant in api.constants if type == constant.type or type in constant.groups)) or
-            any((function for function in api.functions if type == function.returnType or type in ([ parameter.type for parameter in function.parameters ] + [ parameter.nativeType for parameter in function.parameters ]))) or
-            type.identifier in [ profile.bitfieldType, "SpecialValues" ]
-        ]
-        for type in api.types:
-            if isinstance(type, BitfieldGroup):
-                type.values = [ value for value in type.values if value in api.constants ]
-            if isinstance(type, Enumerator):
-                type.values = [ value for value in type.values if value in api.constants ]
-
-        api.types = [ type for type in api.types if ((not isinstance(type, BitfieldGroup) and not isinstance(type, Enumerator)) or len(type.values) > 0) ]
-
-        for constant in api.constants:
-            constant.groups = [ group for group in constant.groups if group in api.types ]
-        
-        return api
-
-    @classmethod
-    def deriveBinding(cls, api, profile):
-
-        if profile.generateNoneBits:
-            # Remove shared enum and bitfield AN_NONE
-            noneBit = api.constantByIdentifier("AN_NONE")
-            if noneBit is not None:
-                for group in noneBit.groups[:]:
-                    if isinstance(group, BitfieldGroup):
-                        group.values.remove(noneBit)
-                        noneBit.groups.remove(group)
-                if len(group.values) == 0:
-                    api.types.remove(group)
-                if len(noneBit.groups) == 0:
-                    api.constants.remove(noneBit)
-
-            # Generic None Bit
-            genericNoneBit = Constant(api, profile.noneBitfieldValue, "0x0")
-            genericNoneBit.decimalValue = 0
-            genericNoneBit.generic = True
-            api.constants.append(genericNoneBit)
-            for group in [ group for group in api.types if isinstance(group, BitfieldGroup)]:
-                group.values.append(genericNoneBit)
-                genericNoneBit.groups.append(group)
-
-        # Fix GLenum type
+        # Fix enum type
         fixedEnumType = Enumerator(api, profile.enumType)
-        api.types.remove(api.typeByIdentifier(profile.enumType))
+        oldEnumType = api.typeByIdentifier(profile.enumType)
+        if oldEnumType in api.types:
+            api.types.remove(oldEnumType)
 
         for type in [ type for type in api.types if isinstance(type, Enumerator) ]:
             for value in type.values:
@@ -334,12 +137,12 @@ class ANParser(XMLParser):
                 type.hideDeclaration = True
 
         api.types.insert(1, fixedEnumType)
-    
+
         # Fix boolean type
         booleanType = Enumerator(api, profile.booleanType)
         booleanType.hideDeclaration = True
 
-        # Remove boolean values from ANenum
+        # Remove boolean values from enum
         for constant in api.constants:
             if constant.identifier in [ "AN_TRUE", "AN_FALSE" ]:
                 for group in constant.groups:
@@ -349,48 +152,17 @@ class ANParser(XMLParser):
 
         # Remove boolean type
         oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
-        if oldBooleanType is not None:
+        while oldBooleanType is not None: # TODO: check why VkBool32 was in api.types twice
             api.types.remove(oldBooleanType)
+            oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
         
         # Finally add boolean type
 
-        api.types.insert(2, booleanType)
+        api.types.insert(3, booleanType)
 
-        # Assign Ungrouped
-        ungroupedType = None
-        for constant in api.constants:
-            if len(constant.groups) == 0:
-                if ungroupedType is None:
-                    ungroupedType = Enumerator(api, "UNGROUPED")
-                    ungroupedType.hideDeclaration = True
-                    api.types.append(ungroupedType)
-            
-                ungroupedType.values.append(constant)
-                constant.groups.append(ungroupedType)
-        
-        # Add GLextension type
-        extensionType = Enumerator(api, profile.extensionType)
-        extensionType.unsigned = False
-        api.types.insert(0, extensionType)
+        # General binding configuration
 
-        # Add unused mask bitfield
-        unusedMaskType = BitfieldGroup(api, "UnusedMask")
-        unusedBitConstant = Constant(api, "AN_UNUSED_BIT", "0x00000000")
-        unusedBitConstant.decimalValue = 0
-        unusedMaskType.values.append(unusedBitConstant)
-        unusedBitConstant.groups.append(unusedMaskType)
-        api.types.append(unusedMaskType)
-        api.constants.append(unusedBitConstant)
-
-        # Add static cast to negative Enum values
-        for constant in api.constants:
-            if constant.value.startswith("-") and len(constant.groups) > 0:
-                if isinstance(constant.groups[0], Enumerator):
-                    constant.value = "static_cast<std::underlying_type<%s>::type>(%s)" % (profile.enumType, constant.value)
-                else:
-                    constant.value = "static_cast<std::underlying_type<%s>::type>(%s)" % (constant.groups[0].identifier, constant.value)
-        
-        binding = super(cls, GLParser).deriveBinding(api, profile)
+        binding = super(cls, ANParser).deriveBinding(api, profile)
 
         binding.baseNamespace = profile.baseNamespace
         
@@ -423,64 +195,452 @@ class ANParser(XMLParser):
         binding.noneBitfieldValue = profile.noneBitfieldValue
         binding.cStringOutputTypes = profile.cStringOutputTypes
         binding.useEnumGroups = profile.useEnumGroups
-        binding.cPointerTypes = [ type.identifier for type in api.types if type.identifier == "GLvoid" ]
+        binding.cPointerTypes = [ type.identifier for type in api.types if False ]
 
         return binding
 
     @classmethod
-    def detectSpecialValueType(cls, api, enum):
-        if "comment" in enum.attrib:
-            if re.search('Not an API enum.*', enum.attrib["comment"]) is not None:
-                return None
-
-            result = re.search('%s([A-Za-z0-9_]+)' % ("Tagged as "), enum.attrib["comment"])
-            if result is not None:
-                typeName = result.group(1).strip()
-                return next((t for t in api.types if t.identifier.endswith(typeName)), api.typeByIdentifier("enum"))
-        
-        return api.typeByIdentifier("enum")
+    def handleVendor(cls, api, profile, vendor):
+        api.vendors.append(
+            Vendor(
+                vendor.attrib.get("name"),
+                vendor.attrib.get("author")
+            )
+        )
 
     @classmethod
-    def createVersion(cls, api, feature_xml):
-        internalIdentifier = "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ] + [ c for c in feature_xml.attrib["number"] if c.isdigit() ])
-        version = Version(api, internalIdentifier, feature_xml.attrib["api"], feature_xml.attrib["number"], "".join([c for c in feature_xml.attrib["api"] if not c.isdigit() ]))
-        version.supportedAPIs = feature_xml.attrib["api"].split("|")
+    def handleType(cls, api, profile, type, deferredFunctionPointerTypes):
+        category = type.attrib.get("category", None)
 
-        for require in feature_xml.findall("require"):
-            comment = require.attrib.get("comment", "")
-            if comment.startswith("Reuse tokens from "):
-                requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse tokens from "), comment).group(1).strip()
-                version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
-            elif comment.startswith("Reuse commands from "):
-                requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse commands from "), comment).group(1).strip()
-                version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
-            elif comment.startswith("Reuse "):
-                requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Reuse "), comment).group(1).strip()
-                version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
-            elif comment.startswith("Promoted from "):
-                requiredExtension = re.search('%s([A-Za-z0-9_]+)' % ("Promoted from "), comment).group(1).strip()
-                version.requiredExtensions.append(api.extensionByIdentifier(requiredExtension))
+        if category is None:
+            cls.handleNoneType(api, profile, type)
 
-            if comment.startswith("Not used by the API"):
-                continue
+        elif category == "include":
+            cls.handleIncludeType(api, profile, type)
 
-            for child in require:
-                if child.tag == "enum":
-                    version.requiredConstants.append(api.constantByIdentifier(child.attrib["name"]))
-                elif child.tag == "command":
-                    function = api.functionByIdentifier(child.attrib["name"])
-                    version.requiredFunctions.append(function)
-                    function.requiringFeatureSets.append(version)
-                elif child.tag == "type":
-                    version.requiredTypes.append(api.typeByIdentifier(child.attrib["name"]))
+        elif category == "define":
+            cls.handleDefineType(api, profile, type)
 
-        for remove in feature_xml.findall("remove"):
-            for child in remove:
-                if child.tag == "enum":
-                    version.removedConstants.append(api.constantByIdentifier(child.attrib["name"]))
-                elif child.tag == "command":
-                    version.removedFunctions.append(api.functionByIdentifier(child.attrib["name"]))
-                elif child.tag == "type":
-                    version.removedTypes.append(api.typeByIdentifier(child.attrib["name"]))
+        elif category == "basetype":
+            cls.handleBaseType(api, profile, type)
 
-        return version
+        elif category == "enum" and "Bit" in type.attrib["name"]:
+            cls.handleBitmaskType(api, profile, type)
+
+        elif category == "bitmask":
+            cls.handleBitmask2Type(api, profile, type)
+
+        elif category == "handle":
+            cls.handleHandleType(api, profile, type)
+
+        elif category == "enum":
+            cls.handleEnumType(api, profile, type)
+
+        elif category == "funcpointer":
+            deferredFunctionPointerTypes.append(type)
+
+        elif category == "struct":
+            cls.handleStructType(api, profile, type, False)
+
+        elif category == "union":
+            cls.handleUnionType(api, profile, type, False)
+    
+    @classmethod
+    def handleNoneType(cls, api, profile, type):
+
+        name = type.attrib["name"] if "name" in type.attrib else type.find("name").text
+
+        nativeType = NativeType(api, name, name)
+        nativeType.hideDeclaration = True
+
+        # None-categorized Types likely aren't declared by Anari
+        # nativeType.namespacedIdentifier = profile.baseNamespace + "::" + nativeType.identifier
+
+        api.types.append(nativeType)
+
+    @classmethod
+    def handleIncludeType(cls, api, profile, type):
+
+        """ Handled Cases:
+        * 1. <type name="an_platform" category="include">#include "an_platform.h"</type>
+        * 2. <type category="include" name="X11/Xlib.h"/>
+        """
+        
+        name = type.attrib["name"]
+
+        if type.text is not None: # case 1
+            importName = re.search('%s(.*)%s' % ('"', '"'), type.text).group(1).strip()
+            importType = Import(api, name, "anari/"+importName)
+            importType.hideDeclaration = True
+            api.dependencies.append(importType)
+        else: # case 2
+            importType = Import(api, name, name)
+            importType.hideDeclaration = True
+            api.dependencies.append(importType)
+
+    @classmethod
+    def handleDefineType(cls, api, profile, type):
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        if nameTag is not None:
+            text += nameTag.text
+            text += nameTag.tail if nameTag.tail is not None else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text is not None else ""
+            text += typeTag.tail if typeTag.tail is not None else ""
+
+        definePosition = text.find("#define ")
+        structPosition = text.find("struct ")
+        typedefPosition = text.find("typedef ")
+        if definePosition >= 0 and nameTag is not None:
+            api.types.append(NativeCode(nameTag.text, text))
+        elif definePosition >= 0 and nameTag is None:
+            api.types.append(NativeCode(type.attrib["name"], text))
+        elif typedefPosition >= 0:
+            api.types.append(NativeCode(nameTag.text, text))
+        elif structPosition >= 0:
+            type = NativeType(api, nameTag.text, text)
+            type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
+            api.types.append(type)
+        else:
+            api.types.append(NativeCode(nameTag.text, text))
+
+    @classmethod
+    def handleBaseType(cls, api, profile, type):
+        nameTag = type.find("name")
+        typeTag = type.find('type')
+        if type.text.startswith("typedef") and typeTag is not None and nameTag is not None:
+            aliasName = typeTag.text.strip()
+            alias = api.typeByIdentifier(aliasName)
+            if alias is None:
+                alias = NativeType(api, aliasName, aliasName)
+                alias.hideDeclaration = True
+
+            type = TypeAlias(api, nameTag.text.strip(), alias)
+            type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
+            api.types.append(type)
+        else:
+            pass
+
+    @classmethod
+    def handleHandleType(cls, api, profile, type):
+        """ Handled cases:
+        1. <type category="handle">typedef <type>_AnManagedObject</type>* <name>AnObject</name>;</type>
+        """
+
+        #if "alias" in type.attrib:
+        #    api.types.append(NativeCode(type.attrib["name"], "// Ignore %s for now" % (type.attrib["name"])))
+        #    return
+
+        nameTag = type.find("name") # Example: <name>AnObject</name>
+        typeTags = type.findall("type") # Example: <type>_AnManagedObject</type>
+        
+        text = ""
+        text += type.text if type.text is not None else "" # Example: typedef
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else "" # Example: _AnManagedObject
+            text += typeTag.tail if typeTag.tail else "" # Example: *
+        
+        text += nameTag.text if nameTag.text is not None else "" # Example: AnObject
+        text += nameTag.tail if nameTag is not None and nameTag.tail else "" # Example: ;
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
+        type = NativeType(api, name, text)
+        type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
+        api.types.append(type)
+
+
+    @classmethod
+    def handleEnumType(cls, api, profile, type):
+        
+        name = type.attrib["name"] if "name" in type.attrib else None
+
+        enumType = Enumerator(api, name)
+        enumType.namespacedIdentifier = profile.baseNamespace + "::" + enumType.identifier
+        api.types.append(enumType)
+
+
+    @classmethod
+    def handleFunctionPointerType(cls, api, profile, type):
+
+        nameTag = type.find("name")
+        typeTags = type.findall("type")
+        
+        text = ""
+        text += type.text if type.text is not None else ""
+
+        # text+= nameTag.text
+        text += nameTag.tail if nameTag is not None and nameTag.tail else ""
+
+        for typeTag in typeTags:
+            text += typeTag.text if typeTag.text else ""
+            text += typeTag.tail if typeTag.tail else ""
+
+        name = type.attrib["name"] if "name" in type.attrib else nameTag.text
+
+        text = re.sub(r'\s*\n\s*', '', text)
+        aliasName = re.search('%s(.*)%s' % ("typedef ", ";"), text).group(1).strip()
+        aliasName = re.sub("\\s+", " ", aliasName)
+        aliasName = aliasName.replace("ANAPI_PTR", "AN_APIENTRY")
+        alias = api.typeByIdentifier(aliasName)
+        if alias is None:
+            alias = NativeType(api, aliasName, aliasName)
+            alias.hideDeclaration = True
+            api.types.append(alias)
+
+        type = TypeAlias(api, name, alias)
+        type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
+        api.types.append(type)
+
+    
+    @classmethod
+    def handleStructType(cls, api, profile, type, parseMembers = False):
+        name = type.attrib["name"]
+
+        if parseMembers:
+            if "alias" in type.attrib:
+                aliasedType = api.typeByIdentifier(type.attrib["alias"])
+                structType = TypeAlias(api, name, aliasedType)
+                structType.namespacedIdentifier = profile.baseNamespace + "::" + structType.identifier
+                api.types.append(structType)
+            else:
+                structType = api.typeByIdentifier(name)
+
+                for member in type.findall("member"):
+                    nameTag = member.find("name")
+                    memberName = nameTag.text + nameTag.tail if nameTag is not None else ""
+                    memberTypeTag = member.find("type")
+                    memberTypeName = member.text if member.text is not None else ""
+                    memberTypeName += memberTypeTag.text
+                    memberTypeName += memberTypeTag.tail.strip() if memberTypeTag.tail is not None else ""
+                    memberTypeName = memberTypeName.strip()
+                    nativeTypeName = memberTypeName
+
+                    memberType = api.typeByIdentifier(memberTypeName)
+                    if memberType is None:
+                        typeParts = memberTypeName.split(" ")
+                        if "struct" in typeParts:
+                            typeParts.remove("struct")
+                        
+                        memberType = NativeType(api, " ".join(typeParts), " ".join(typeParts))
+                        memberType.hideDeclaration = True
+
+                        if typeParts[0] == "const":
+                            if typeParts[1] in [ "void", "void*", "void**", "int", "float", "int*", "uint32_t*", "size_t*", "uint64_t*", "char*" ]:
+                                pass
+                            else:
+                                nativeTypeName = typeParts[1].replace('*', '')
+                                typeParts[1] = profile.baseNamespace + "::" + typeParts[1]
+                        else:
+                            if typeParts[0] in [ "void", "void*", "void**", "int", "float", "int*", "uint32_t*", "size_t*", "uint64_t*", "char*" ]:
+                                pass
+                            else:
+                                nativeTypeName = typeParts[0].replace('*', '')
+                                typeParts[0] = profile.baseNamespace + "::" + typeParts[0]
+
+                        memberType.namespacedIdentifier = " ".join(typeParts)
+                        api.types.append(memberType)
+                    
+                    parameter = Parameter(structType, memberName, memberType)
+                    nativeType = api.typeByIdentifier(nativeTypeName)
+                    if nativeType is None:
+                        nativeType = NativeType(api, nativeTypeName, nativeTypeName)
+                        nativeType.hideDeclaration = True
+                        api.types.append(nativeType)
+
+                    parameter.nativeType = nativeType
+                    structType.memberAttributes.append(parameter)
+        else:
+            if "alias" in type.attrib:
+                pass # currently unused in ANARI
+            else:
+                structType = CompoundType(api, name, "struct")
+                structType.namespacedIdentifier = profile.baseNamespace + "::" + structType.identifier
+                api.types.append(structType)
+
+    @classmethod
+    def handleUnionType(cls, api, profile, type, parseMembers = False):
+        pass # currently unused in ANARI
+
+    @classmethod
+    def handleTypeRelations(cls, api, profile, type):
+        category = type.attrib.get("category", None)
+
+        if category == "struct":
+            cls.handleStructType(api, profile, type, True)
+
+        elif category == "union":
+            cls.handleUnionType(api, profile, type, True)
+
+    @classmethod
+    def handleConstantType(cls, api, profile, E):
+        nameString = E.attrib.get("name", None)
+        typeString = E.attrib.get("type", None)
+
+        type = api.typeByIdentifier(nameString)
+        if type is not None:
+            return type
+
+        if nameString == "API Constants":
+            type = Enumerator(api, "SpecialNumbers")
+            type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
+            api.types.append(type)
+        else:
+            if typeString == "enum":
+                type = Enumerator(api, nameString)
+            elif typeString == "bitmask":
+                type = BitfieldGroup(api, nameString)
+            else:
+                type = Enumerator(api, nameString)
+            type.namespacedIdentifier = profile.baseNamespace + "::" + type.identifier
+            api.types.append(type)
+        
+        return type
+
+    @classmethod
+    def handleConstantValue(cls, api, profile, type, enum):
+        name = enum.attrib["name"]
+        value = enum.attrib.get("value", None)
+
+        constants = []
+        
+        constant = Constant(api, name, value if value is not None else name)
+        constant.type = cls.detectSpecialValueType(api, enum)
+        
+        constant.decimalValue = 0
+        constants.append(constant)
+
+        for c in constants:
+            if isinstance(type, TypeAlias):
+                type.aliasedType.values.append(c)
+                c.groups.append(type)
+                c.groups.append(type.aliasedType)
+            else:
+                type.values.append(c)
+                c.groups.append(type)
+            api.constants.append(c)
+
+    @classmethod
+    def detectSpecialValueType(cls, api, enum):
+        if not "value" in enum.attrib:
+            return None
+        
+        return cls.obtainNativeType(api, "unsigned int")
+
+    @classmethod
+    def obtainNativeType(cls, api, name):
+        nativeType = api.typeByIdentifier(name)
+        if nativeType is None:
+            nativeType = NativeType(api, name, name)
+            nativeType.hideDeclaration = True
+            api.types.append(nativeType)
+        return nativeType
+
+    @classmethod
+    def handleFunction(cls, api, profile, command):
+        protoTag = command.find("proto")
+        returnTypeTag = protoTag.find("type")
+        returnTypeName = (returnTypeTag.text if returnTypeTag is not None else protoTag.text).strip()
+        name = protoTag.find("name").text.strip()
+
+        function = Function(api, name)
+        returnType = api.typeByIdentifier(returnTypeName)
+        if returnType is None:
+            returnType = NativeType(api, returnTypeName, returnTypeName)
+            returnType.hideDeclaration = True
+            returnType.namespacedIdentifier = profile.baseNamespace + "::" + returnType.identifier
+            api.types.append(returnType)
+        function.returnType = returnType
+        function.namespaceLessIdentifier = function.identifier[len(profile.lowercasePrefix):]
+
+        for param in command.findall("param"):
+            groupName = None # param.attrib.get("group", None) # Ignore group names for now
+            typeTag = param.find("type")
+            if groupName is not None:
+                typeName = groupName
+            else:
+                typeName = param.text if param.text else ""
+                if typeTag is not None:
+                    if typeTag.text:
+                        typeName += typeTag.text
+                    if typeTag.tail:
+                        typeName += typeTag.tail
+                typeName = typeName.strip()
+            name = param.find("name").text.strip()
+            typeName = typeName.strip()
+            type = api.typeByIdentifier(typeName)
+            nativeType = typeName
+            if type is None:
+                typeParts = typeName.split(" ")
+                if "struct" in typeParts:
+                    typeParts.remove("struct")
+                
+                type = NativeType(api, " ".join(typeParts), " ".join(typeParts))
+                type.hideDeclaration = True
+
+                if typeParts[0] == "const":
+                    if typeParts[1] in [ "void", "void*", "void**", "int", "float", "int*", "uint32_t*", "size_t*", "uint64_t*", "char*" ]:
+                        pass
+                    else:
+                        nativeType = typeParts[1].replace('*', '')
+                        typeParts[1] = profile.baseNamespace + "::" + typeParts[1]
+                else:
+                    if typeParts[0] in [ "void", "void*", "void**", "int", "float", "int*", "uint32_t*", "size_t*", "uint64_t*", "char*" ]:
+                        pass
+                    else:
+                        nativeType = typeParts[0].replace('*', '')
+                        typeParts[0] = profile.baseNamespace + "::" + typeParts[0]
+
+                type.namespacedIdentifier = " ".join(typeParts)
+                api.types.append(type)
+
+            parameter = Parameter(function, name, type)
+            parameter.nativeType = api.typeByIdentifier(nativeType)
+            function.parameters.append(parameter)
+
+        api.functions.append(function)
+
+    @classmethod
+    def handleVersion(cls, api, profile, feature):
+        """ Handled cases:
+        1. <feature api="anari" name="AN_VERSION_1_0" number="1.0" comment="ANARI core API interface definitions">
+        """
+
+        identifier = "an"+"".join([ c for c in feature.attrib["number"] if c.isdigit() ])
+        version = Version(api, identifier, feature.attrib["name"], feature.attrib["number"], "an")
+
+        for require in feature.findall("require"):
+            cls.handleVersionRequire(api, version, require)
+
+        # For now, ANARI has no deprecated features
+        #for remove in feature.findall("remove"):
+        #    cls.handleVersionRemove(api, version, remove)
+        
+        version.supportedAPIs = feature.attrib["api"] # .split("|") # why a split?
+
+        api.versions.append(version)
+
+    @classmethod
+    def handleVersionRequire(cls, api, version, require):
+        for child in require:
+            if child.tag == "enum":
+                name = child.attrib["name"]
+                constant = api.constantByIdentifier(name)
+                version.requiredConstants.append(constant)
+            elif child.tag == "command":
+                version.requiredFunctions.append(api.functionByIdentifier(child.attrib["name"]))
+            elif child.tag == "type":
+                requiredType = api.typeByIdentifier(child.attrib["name"])
+                if requiredType is None:
+                    # requiredType = NativeType(api, child.attrib["name"], child.attrib["name"])
+                    # version.requiredTypes.append(requiredType)
+                    pass
+                else:
+                    version.requiredTypes.append(requiredType)
