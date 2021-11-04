@@ -79,17 +79,25 @@ class ANParser(XMLParser):
     @classmethod
     def patch(cls, api, profile):
 
+        # Add Bitfield Type
+        bitfieldType = BitfieldGroup(api, profile.bitfieldType)
+        unusedBitConstant = Constant(api, "AN_UNUSED_BIT", "0x00000000")
+        unusedBitConstant.decimalValue = 0
+        bitfieldType.values.append(unusedBitConstant)
+        unusedBitConstant.groups.append(bitfieldType)
+        api.types.append(bitfieldType)
+        api.constants.append(unusedBitConstant)
+
+        # Add requires for basic types
         firstVersion = api.versions[0] # hopefully 1.0
-        print(", ".join([ type.identifier for type in firstVersion.requiredTypes ]))
+
+        firstVersion.requiredTypes.append(api.typeByIdentifier(profile.bitfieldType))
         firstVersion.requiredTypes.append(api.typeByIdentifier("AnError"))
-        print(", ".join([ type.identifier for type in firstVersion.requiredTypes ]))
 
         # Fix requires for constants that are defined through enumerators
         for version in api.versions:
             enumerators = [ type for type in version.requiredTypes if isinstance(type, Enumerator) ]
             version.requiredConstants += [ constant for enumerator in enumerators for constant in enumerator.values ]
-
-        # api.printSummary()
 
         return api
     
@@ -118,11 +126,6 @@ class ANParser(XMLParser):
                     specialNumbersType.values.append(constant)
                     constant.groups = [specialNumbersType]
         
-        # Add extension type
-        extensionType = Enumerator(api, profile.extensionType)
-        extensionType.unsigned = False
-        api.types.insert(1, extensionType)
-        
         # Fix enum type
         fixedEnumType = Enumerator(api, profile.enumType)
         oldEnumType = api.typeByIdentifier(profile.enumType)
@@ -138,6 +141,11 @@ class ANParser(XMLParser):
 
         api.types.insert(1, fixedEnumType)
 
+        # Add extension type
+        extensionType = Enumerator(api, profile.extensionType)
+        extensionType.unsigned = False
+        api.types.insert(1, extensionType)
+        
         # Fix boolean type
         booleanType = Enumerator(api, profile.booleanType)
         booleanType.hideDeclaration = True
@@ -586,13 +594,13 @@ class ANParser(XMLParser):
                 type.hideDeclaration = True
 
                 if typeParts[0] == "const":
-                    if typeParts[1] in [ "void", "void*", "void**", "int", "float", "int*", "uint32_t*", "size_t*", "uint64_t*", "char*" ]:
+                    if typeParts[1] in [ "void", "void*", "void**", "int", "float", "int*", "uint32_t*", "size_t*", "uint64_t*", "char*", "char**" ]:
                         pass
                     else:
                         nativeType = typeParts[1].replace('*', '')
                         typeParts[1] = profile.baseNamespace + "::" + typeParts[1]
                 else:
-                    if typeParts[0] in [ "void", "void*", "void**", "int", "float", "int*", "uint32_t*", "size_t*", "uint64_t*", "char*" ]:
+                    if typeParts[0] in [ "void", "void*", "void**", "int", "float", "int*", "uint32_t*", "size_t*", "uint64_t*", "char*", "char**" ]:
                         pass
                     else:
                         nativeType = typeParts[0].replace('*', '')

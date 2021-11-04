@@ -39,7 +39,6 @@ class CPPGenerator:
         # TEMPLATE SETUP
 
         template_engine = Environment(loader=PackageLoader('khrgenerator.cpp', 'templates'))
-        # print(template_engine.list_templates())
 
         # target directory structure
 
@@ -291,9 +290,6 @@ class CPPGenerator:
                 constants = currentConstants | deprecatedConstants
                 functions = currentFunctions | deprecatedFunctions
             
-            print("Generate Feature",memberSet)
-            print("Constants:", ", ".join([ constant.identifier for constant in constants ]))
-
             cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 types=[ type for type in api.types if (not type.hideDeclaration or type in booleanTypes) and not isinstance(type, NativeCode) ]
             )

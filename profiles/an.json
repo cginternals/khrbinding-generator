@@ -41,7 +41,7 @@
 	"featureBlacklist": [],
 	"extensionBlacklist": [],
 	"useBitfieldGroups": true,
-	"useEnumGroups": false,
+	"useEnumGroups": true,
 	"generateNoneBits": true,
 	"generateBitfieldTypeIntegrations": true,
 	"generateEnumTypeIntegrations": true,
