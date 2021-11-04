@@ -168,7 +168,6 @@ class EGLParser(XMLParser):
                                 returnType.namespacedIdentifier = profile.baseNamespace + "::" + returnTypeName
                             else:
                                 returnType.namespacedIdentifier = returnTypeName
-                            print("RETURN TYPE", returnType.namespacedIdentifier, "from", basicType.namespacedIdentifier)
                         else:
                             returnType.namespacedIdentifier = returnTypeName
                         

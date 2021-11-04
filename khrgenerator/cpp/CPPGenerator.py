@@ -39,7 +39,6 @@ class CPPGenerator:
         # TEMPLATE SETUP
 
         template_engine = Environment(loader=PackageLoader('khrgenerator.cpp', 'templates'))
-        # print(template_engine.list_templates())
 
         # target directory structure
 
@@ -90,7 +89,7 @@ class CPPGenerator:
             max_constant_length=str(max([ len(constant.identifier) for constant in bitfieldConstants ] + [ 0 ]))
         )
         cls.render(template_engine, "enum.h", includedir_api+"enum.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
-            groups=originalEnumTypes,
+            groups= enumTypes if binding.useEnumGroups else originalEnumTypes,
             constants=enumConstants,
             max_constant_length=str(max([ len(constant.identifier) for constant in enumConstants ] + [ 0 ]))
         )
@@ -290,7 +289,7 @@ class CPPGenerator:
             else: # normal
                 constants = currentConstants | deprecatedConstants
                 functions = currentFunctions | deprecatedFunctions
-
+            
             cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 types=[ type for type in api.types if (not type.hideDeclaration or type in booleanTypes) and not isinstance(type, NativeCode) ]
             )

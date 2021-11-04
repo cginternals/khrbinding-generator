@@ -223,11 +223,8 @@ class VKParser(XMLParser):
                 booleanType.values.append(constant)
 
         # Remove boolean type
-        print("Search old boolean type", profile.booleanType)
-        print("Boolean types", [ type for type in api.types if type.identifier == profile.booleanType ])
         oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
         while oldBooleanType is not None: # TODO: check why VkBool32 was in api.types twice
-            print("Remove old boolean type", profile.booleanType, oldBooleanType)
             api.types.remove(oldBooleanType)
             oldBooleanType = next((t for t in api.types if t.identifier == profile.booleanType), None)
         
