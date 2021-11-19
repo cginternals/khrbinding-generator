@@ -89,82 +89,70 @@ class GLParser(XMLParser):
                 api.constants.append(constant)
 
         # Groups
-
-        for G in registry.iter("groups"):
-            for group in G.findall("group"):
-                name = group.attrib["name"]
-
-                if name=="VertexShaderWriteMaskEXT":
-                    # Fix VertexShaderWriteMaskEXT type (is actually a boolean)
-                    booleanType = api.typeByIdentifier(profile.booleanType)
-                    if booleanType is None:
-                        booleanType = ValueGroup(api, profile.booleanType)
-                        booleanType.hideDeclaration = True
-                        booleanType.namespacedIdentifier = profile.baseNamespace+"::"+profile.booleanType
-                        api.types.append(booleanType)
-                    type = TypeAlias(api, name, booleanType)
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(type)
-                    continue
-                elif name.find("Mask") >= 0 or name == "PathFontStyle":
-                    type = BitfieldGroup(api, name)
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                elif name.find("Boolean") >= 0:
-                    type = ValueGroup(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                else:
-                    type = Enumerator(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                
-                for enum in group.findall("enum"):
-                    constant = api.constantByIdentifier(enum.attrib["name"])
-                    if constant is None or constant in type.values:
-                        continue
-                    type.values.append(constant)
-                    constant.groups.append(type)
-                
-                if len(type.values) > 0:
-                    api.types.append(type)
-        
+        groups = set([])
         for E in registry.iter("enums"):
             if "group" in E.attrib:
                 name = E.attrib["group"]
+                groups.update([ name ])
+            
+            for enum in E.findall("enum"):
+                # new feature: <enum> in <enums> may have additional groups, so we have to parse them
+                if "group" in enum.attrib:
+                    groups.update(enum.attrib["group"].split(","))
+            
+        for name in groups:
+            if name=="VertexShaderWriteMaskEXT":
+                # Fix VertexShaderWriteMaskEXT type (is actually a boolean)
+                booleanType = api.typeByIdentifier(profile.booleanType)
+                if booleanType is None:
+                    booleanType = ValueGroup(api, profile.booleanType)
+                    booleanType.hideDeclaration = True
+                    booleanType.namespacedIdentifier = profile.baseNamespace+"::"+profile.booleanType
+                    api.types.append(booleanType)
+                type = TypeAlias(api, name, booleanType)
+                type.namespacedIdentifier = profile.baseNamespace+"::"+name
+            elif name.find("Mask") >= 0 or name == "PathFontStyle":
+                type = BitfieldGroup(api, name)
+                type.namespacedIdentifier = profile.baseNamespace+"::"+name
+            elif name.find("Boolean") >= 0:
+                type = ValueGroup(api, name)
+                type.hideDeclaration = True
+                type.namespacedIdentifier = profile.baseNamespace+"::"+name
+            else:
+                type = Enumerator(api, name)
+                type.hideDeclaration = True
+                type.namespacedIdentifier = profile.baseNamespace+"::"+name
+            
+            api.types.append(type)
+        
+        # Register enum values at groups
+        for E in registry.iter("enums"):
+            name = E.attrib.get("group", None)
 
-                type = api.typeByIdentifier(name)
+            for enum in E.findall("enum"):
+                constant = api.constantByIdentifier(enum.attrib["name"])
 
-                if type is None and name=="VertexShaderWriteMaskEXT":
-                    booleanType = api.typeByIdentifier(profile.booleanType)
-                    if booleanType is None:
-                        booleanType = ValueGroup(api, profile.booleanType)
-                        booleanType.hideDeclaration = True
-                        booleanType.namespacedIdentifier = profile.baseNamespace+"::"+profile.booleanType
-                        api.types.append(booleanType)
-                    type = TypeAlias(api, name, booleanType)
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(type)
-                elif type is None and (name.find("Mask") >= 0 or name == "PathFontStyle"):
-                    type = BitfieldGroup(api, name)
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(type)
-                elif type is None and name.find("Boolean") >= 0:
-                    type = ValueGroup(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(type)
-                elif type is None:
-                    type = Enumerator(api, name)
-                    type.hideDeclaration = True
-                    type.namespacedIdentifier = profile.baseNamespace+"::"+name
-                    api.types.append(type)
+                if constant is None:
+                    continue
 
-                for enum in E.findall("enum"):
-                    constant = api.constantByIdentifier(enum.attrib["name"])
-                    if constant is None or constant in type.values:
+                # new feature: <enum> in <enums> may have additional groups, so we have to parse them
+                groups = set([ name ] if name is not None else [])
+                if "group" in enum.attrib:
+                    groups.update(enum.attrib["group"].split(","))
+                
+                for groupName in groups:
+                    group = api.typeByIdentifier(groupName)
+                    if group is None:
+                        print("Group",groupName,"not found")
                         continue
-                    type.values.append(constant)
-                    constant.groups.append(type)
+                    if isinstance(group, TypeAlias):
+                        continue
+                    
+                    print("Group name", group.identifier)
+                    if constant in group.values:
+                        continue
+                    group.values.append(constant)
+                    constant.groups.append(group)
 
         # Functions
         for C in registry.iter("commands"):
