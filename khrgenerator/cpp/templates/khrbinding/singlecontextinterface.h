@@ -24,7 +24,7 @@ class FunctionCall;
 
 using SimpleFunctionCallback = std::function<void(const AbstractFunction &)>;
 using FunctionCallback = std::function<void(const FunctionCall &)>;
-using FunctionLogCallback = std::function<void(FunctionCall *)>;
+using FunctionLogCallback = std::function<void(FunctionCall &&)>;
 
 {{binding.apiExport}} void initialize({{binding.identifier}}::GetProcAddress functionPointerResolver, bool resolveFunctions = true);
 {{binding.apiExport}} void registerAdditionalFunction(AbstractFunction * function);

@@ -60,7 +60,7 @@ public:
     *  @brief
     *    The callback type of a function log callback with parameters and return value
     */
-    using FunctionLogCallback = std::function<void(FunctionCall *)>;
+    using FunctionLogCallback = std::function<void(FunctionCall &&)>;
     
     using array_t = std::array<AbstractFunction *, {{functions|count}}>; ///< The type of the build-in functions collection
 
