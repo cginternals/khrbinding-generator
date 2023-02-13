@@ -16,10 +16,11 @@ enum class {{binding.enumType}} : unsigned int
 {%- for group in groups|sort(attribute='identifier') %}
     // {{ group.identifier }}
 {% for value in group.values|sort(attribute='value') -%}
-{%- if group.identifier == value.groups[0].identifier %}
+{%- set sorted_groups = value.groups|rejectattr("identifier", "equalto", binding.enumType)|sort(attribute='identifier') -%}
+{%- if group.identifier == sorted_groups[0].identifier %}
     {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}},
 {%- else %}
-//  {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}}, // reuse {{value.groups[0].identifier}}
+//  {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}}, // reuse {{sorted_groups[0].identifier}}
 {%- endif %}
 {%- endfor %}
 {% endfor %}
@@ -32,10 +33,11 @@ enum class {{binding.enumType}} : unsigned int
 // {{ group.identifier }}
 
 {% for value in group.values|sort(attribute='value') -%}
-{% if group.identifier == value.groups[0].identifier -%}
+{%- set sorted_groups = value.groups|rejectattr("identifier", "equalto", binding.enumType)|sort(attribute='identifier') -%}
+{% if group.identifier == sorted_groups[0].identifier -%}
 {{binding.constexpr}} static const {{binding.enumType}} {{value.identifier}} = {{binding.enumType}}::{{value.identifier}};
 {% else -%}
-// {{binding.constexpr}} static const {{binding.enumType}} {{value.identifier}} = {{binding.enumType}}::{{value.identifier}}; // reuse {{value.groups[0].identifier}}
+// {{binding.constexpr}} static const {{binding.enumType}} {{value.identifier}} = {{binding.enumType}}::{{value.identifier}}; // reuse {{sorted_groups[0].identifier}}
 {% endif -%}
 {% endfor %}
 {% endfor %}

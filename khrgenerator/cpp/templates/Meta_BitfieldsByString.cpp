@@ -17,7 +17,8 @@ const std::unordered_map<std::string, {{binding.bitfieldType}}> Meta_BitfieldsBy
 const std::unordered_map<std::string, {{binding.bitfieldType}}> Meta_BitfieldsByString_{{groupname}} =
 {
 {%- for constant in constants|sort(attribute='identifier') %}
-    { "{{constant.identifier}}", static_cast<{{binding.bitfieldType}}>({{constant.groups[0].identifier}}::{{constant.identifier}}) }{% if not loop.last %},{% endif %}
+    {%- set sorted_groups = constant.groups|sort(attribute='identifier') %}
+    { "{{constant.identifier}}", static_cast<{{binding.bitfieldType}}>({{sorted_groups[0].identifier}}::{{constant.identifier}}) }{% if not loop.last %},{% endif %}
 {%- endfor %}
 };
 {%- endif %}

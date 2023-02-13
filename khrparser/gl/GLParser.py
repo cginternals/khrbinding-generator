@@ -148,7 +148,7 @@ class GLParser(XMLParser):
                     if isinstance(group, TypeAlias):
                         continue
                     
-                    print("Group name", group.identifier)
+                    # print("Group name", group.identifier)
                     if constant in group.values:
                         continue
                     group.values.append(constant)

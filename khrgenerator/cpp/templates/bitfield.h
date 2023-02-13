@@ -17,7 +17,8 @@ namespace {{api.identifier}}
 enum class {{group.identifier}} : unsigned int
 {
 {%- for value in group.values|sort(attribute="decimalValue") %}
-    {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}}{{ "," if not loop.last }}{% if value.generic %} // Generic {{ value.identifier }}{% else %}{% if group.identifier != value.groups[0].identifier %} // reuse from {{ value.groups[0].identifier }}{% endif %}{% endif %}
+    {%- set sorted_groups = value.groups|sort(attribute='identifier') %}
+    {{ ("{:"+max_constant_length+"}").format(value.identifier) }} = {{value.value}}{{ "," if not loop.last }}{% if value.generic %} // Generic {{ value.identifier }}{% else %}{% if group.identifier != sorted_groups[0].identifier %} // reuse from {{ sorted_groups[0].identifier }}{% endif %}{% endif %}
 {%- endfor %}
 };
 
@@ -27,10 +28,11 @@ enum class {{group.identifier}} : unsigned int
 // import bitfields to namespace
 
 {% for constant in constants|sort(attribute="identifier") -%}
-{% if constant.groups|length > 1 -%}
-{{binding.constexpr}} static const {{binding.identifier}}::SharedBitfield<{% for group in constant.groups|sort(attribute='identifier') %}{{group.identifier}}{{ ", " if not loop.last }}{% endfor %}> {{constant.identifier}} = {{constant.groups[0].identifier}}::{{constant.identifier}};
+{%- set sorted_groups = constant.groups|sort(attribute='identifier') -%}
+{% if sorted_groups|length > 1 -%}
+{{binding.constexpr}} static const {{binding.identifier}}::SharedBitfield<{% for group in sorted_groups %}{{group.identifier}}{{ ", " if not loop.last }}{% endfor %}> {{constant.identifier}} = {{sorted_groups[0].identifier}}::{{constant.identifier}};
 {%- else -%}
-{{binding.constexpr}} static const {{constant.groups[0].identifier}} {{constant.identifier}} = {{constant.groups[0].identifier}}::{{constant.identifier}};
+{{binding.constexpr}} static const {{sorted_groups[0].identifier}} {{constant.identifier}} = {{sorted_groups[0].identifier}}::{{constant.identifier}};
 {%- endif %}
 {% endfor %}
 

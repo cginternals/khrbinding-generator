@@ -76,7 +76,12 @@ class CPPGenerator:
         )
         cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             platform_includes=[ type.moduleName for type in api.dependencies if not type.hideDeclaration ],
-            declarations=[ Template(declaration).render(binding=binding) for declaration in [ cls.getDeclaration(type) for type in api.types ] if len(declaration) > 0 ]
+            types= [
+                { 'identifier': type.identifier,
+                  'declaration': Template(declaration).render(binding=binding),
+                  'relevance': cls.getTypeRelevance(type)
+                } for type, declaration in [ (type, cls.getDeclaration(type)) for type in api.types ] if len(declaration) > 0
+            ]
         )
         cls.render(template_engine, "types.inl", includedir_api+"types.inl", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             basic_enumerators=[ type for type in [ api.typeByIdentifier(binding.extensionType) ] if type is not None ],
@@ -327,6 +332,29 @@ class CPPGenerator:
         for key, values in dictionary.items():
             result[key.identifier[lookupOffset].upper() if key.identifier[lookupOffset].isalpha() else '0'][key] = values
         return result
+
+    @classmethod
+    def getTypeRelevance(cls, type, resolveAliases=True):
+        if type.hideDeclaration:
+            return -1
+
+        if isinstance(type, NativeType):
+            return 0
+        if isinstance(type, TypeAlias):
+            if type.identifier.isupper():
+                return 3
+            else:
+                return 2
+        if isinstance(type, Enumerator):
+            return 1
+        if isinstance(type, BitfieldGroup):
+            return 1
+        if isinstance(type, NativeCode):
+            return 3
+        if isinstance(type, CompoundType):
+            return 3
+        
+        return 4
 
     @classmethod
     def getDeclaration(cls, type, resolveAliases=True):

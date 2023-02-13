@@ -25,8 +25,8 @@
 namespace {{api.identifier}}
 {
 
-{% for declaration in declarations %}
-{{declaration}}
+{% for type in types|sort(attribute='identifier')|sort(attribute='relevance') %}
+{{type.declaration}}
 {%- endfor %}
 
 
