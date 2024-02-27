@@ -18,6 +18,7 @@ from khrapi.SpecialValues import SpecialValues
 from khrapi.Constant import Constant
 from khrapi.Function import Function
 from khrapi.Parameter import Parameter
+from khrapi.NativeCode import NativeCode
 
 class EGLParser(XMLParser):
 
@@ -465,6 +466,7 @@ class EGLParser(XMLParser):
         binding.noneBitfieldValue = profile.noneBitfieldValue
         binding.cStringOutputTypes = profile.cStringOutputTypes
         binding.cPointerTypes = [ type.identifier for type in api.types if type.identifier == "GLvoid" ]
+        binding.undefs = profile.undefs
 
         return binding
 

@@ -76,6 +76,7 @@ class CPPGenerator:
         )
         cls.render(template_engine, "types.h", includedir_api+"types.h", api=api, profile=profile, binding=binding, apiString=binding.baseNamespace,
             platform_includes=[ type.moduleName for type in api.dependencies if not type.hideDeclaration ],
+            undefs=binding.undefs,
             types= [
                 { 'identifier': type.identifier,
                   'declaration': Template(declaration).render(binding=binding),
@@ -338,23 +339,30 @@ class CPPGenerator:
         if type.hideDeclaration:
             return -1
 
-        if isinstance(type, NativeType):
+        if isinstance(type, NativeCode):
             return 0
+        if isinstance(type, NativeType):
+            if type.declaration.startswith("struct"):
+                return 5
+            else:
+                return 0
         if isinstance(type, TypeAlias):
             if type.identifier.isupper():
-                return 3
+                return 4
+            if isinstance(type.aliasedType, NativeType):
+                return 1
             else:
                 return 2
         if isinstance(type, Enumerator):
-            return 1
+            return 3
         if isinstance(type, BitfieldGroup):
-            return 1
+            return 3
         if isinstance(type, NativeCode):
-            return 3
+            return 5
         if isinstance(type, CompoundType):
-            return 3
+            return 5
         
-        return 4
+        return 6
 
     @classmethod
     def getDeclaration(cls, type, resolveAliases=True):

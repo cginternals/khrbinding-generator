@@ -287,6 +287,7 @@ class VKParser(XMLParser):
         binding.noneBitfieldValue = profile.noneBitfieldValue
         binding.cStringOutputTypes = profile.cStringOutputTypes
         binding.cPointerTypes = [ type.identifier for type in api.types if type.identifier == "CAMetalLayer" ]
+        binding.undefs = profile.undefs
 
         return binding
 

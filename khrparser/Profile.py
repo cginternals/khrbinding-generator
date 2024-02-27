@@ -31,3 +31,4 @@ class Profile:
         self.headerReplacement = jsonObject["headerReplacement"]
         self.cStringOutputTypes = jsonObject["cStringOutputTypes"]
         self.generateNoneBits = jsonObject["generateNoneBits"]
+        self.undefs = jsonObject["undefs"] if "undefs" in jsonObject else []

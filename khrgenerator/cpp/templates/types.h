@@ -10,6 +10,9 @@
 {% for include in platform_includes -%}
 #include <{{include}}>
 {% endfor %}
+{% for undef in undefs -%}
+#undef {{undef}}
+{% endfor %}
 #ifdef _MSC_VER
 #define {{binding.apientry}} __stdcall
 #else

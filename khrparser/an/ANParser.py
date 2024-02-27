@@ -204,6 +204,7 @@ class ANParser(XMLParser):
         binding.cStringOutputTypes = profile.cStringOutputTypes
         binding.useEnumGroups = profile.useEnumGroups
         binding.cPointerTypes = [ type.identifier for type in api.types if False ]
+        binding.undefs = profile.undefs
 
         return binding
 
