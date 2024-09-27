@@ -6,7 +6,7 @@
 #include <{{api.identifier}}binding/{{api.identifier}}/types.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 
@@ -15,4 +15,4 @@ using {{api.identifier}}::{{type.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}

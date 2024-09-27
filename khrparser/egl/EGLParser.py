@@ -101,7 +101,7 @@ class EGLParser(XMLParser):
                 try:
                     constant.decimalValue = int(enum.attrib["value"], 0)
                 except:
-                    castResult = re.search('EGL_CAST\(%s[A-Za-z0-9_]+\,([\-0-9]+)\)', enum.attrib["value"])
+                    castResult = re.search(r'EGL_CAST\(%s[A-Za-z0-9_]+\,([\-0-9]+)\)', enum.attrib["value"])
                     if castResult is not None:
                         constant.decimalValue = castResult.group(1).strip()
                     else:
@@ -477,7 +477,7 @@ class EGLParser(XMLParser):
                 return api.typeByIdentifier("EGLuint64KHR")
         
         if "value" in enum.attrib:
-            castResult = re.search('%s([A-Za-z0-9_]+)' % ("EGL_CAST\("), enum.attrib["value"])
+            castResult = re.search(r'%s([A-Za-z0-9_]+)' % (r'EGL_CAST\('), enum.attrib["value"])
             if castResult is not None:
                 typeName = castResult.group(1).strip()
                 return next((t for t in api.types if t.identifier.endswith(typeName)), api.typeByIdentifier("EGLint"))

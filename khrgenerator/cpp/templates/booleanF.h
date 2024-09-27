@@ -7,7 +7,7 @@
 #include <{{api.identifier}}binding/{{api.identifier}}/boolean.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 
@@ -21,4 +21,4 @@ using {{api.identifier}}::{{constant.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}

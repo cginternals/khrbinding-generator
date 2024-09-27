@@ -19,6 +19,8 @@ from khrapi.Constant import Constant
 from khrapi.Function import Function
 from khrapi.Parameter import Parameter
 
+import collections.abc
+
 class GLParser(XMLParser):
 
     @classmethod
@@ -273,10 +275,15 @@ class GLParser(XMLParser):
 
         featureSets = []
 
-        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+        mixedAPIs = not isinstance(profile.apiIdentifier, str) and isinstance(profile.apiIdentifier, collections.abc.Sequence)
+        if mixedAPIs:
+            api.versions = [ version for version in api.versions if any([apiIdentifier in version.supportedAPIs for apiIdentifier in profile.apiIdentifier]) ]
+            api.extensions = [ extension for extension in api.extensions if any([apiIdentifier in extension.supportedAPIs for apiIdentifier in profile.apiIdentifier]) ]
+        else:
+            api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+            api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
+            
         featureSets += api.versions
-
-        api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
         featureSets += api.extensions
 
         api.constants = [ constant for constant in api.constants if

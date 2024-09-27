@@ -7,7 +7,7 @@
 #include <{{binding.identifier}}/{{api.identifier}}/bitfield.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 
@@ -17,4 +17,4 @@ using {{api.identifier}}::{{constant.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}

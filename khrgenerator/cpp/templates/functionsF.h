@@ -6,7 +6,7 @@
 #include <{{binding.identifier}}/{{api.identifier}}/functions.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 // import functions
@@ -14,4 +14,4 @@ namespace {{api.identifier}}{{memberSet}}
 using {{api.identifier}}::{{function.identifier}};
 {%- endfor %}
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}

@@ -7,7 +7,7 @@
 #include <{{api.identifier}}binding/{{api.identifier}}/values.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 
@@ -17,4 +17,4 @@ using {{api.identifier}}::{{value.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}
