@@ -20,7 +20,7 @@ class Profile:
         self.multiContextBinding = jsonObject["multiContext"]
         self.booleanWidth = jsonObject["booleanWidth"]
         self.bindingNamespace = jsonObject["bindingNamespace"]
-        self.minCoreVersion = [ int(number) for number in jsonObject["coreProfileSince"].split(".") ] if jsonObject["coreProfileSince"] is not None else None
+        self.minCoreVersion = jsonObject["coreProfileSince"]
         self.extensionType = jsonObject["extensionType"]
         self.noneBitfieldValue = jsonObject["noneBitfieldValue"]
         self.useEnumGroups = jsonObject["useEnumGroups"]

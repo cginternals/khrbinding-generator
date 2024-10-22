@@ -1,4 +1,5 @@
 
+import collections
 import os, sys
 from os.path import join as pjoin
 import time
@@ -14,6 +15,19 @@ from khrapi.NativeType import NativeType
 from khrapi.TypeAlias import TypeAlias
 from khrapi.NativeCode import NativeCode
 from khrapi.CompoundType import CompoundType
+
+def getMinCoreVersionLookup(profile):
+    if not profile.minCoreVersion:
+        return None
+
+    if isinstance(profile.apiIdentifier, str) and isinstance(profile.minCoreVersion, str):
+        (major, minor, *_rest) = tuple(profile.minCoreVersion.split("."))
+        return { profile.apiIdentifier: { "major": int(major), "minor": int(minor) }}
+    
+    if isinstance(profile.apiIdentifier, collections.abc.Sequence):
+        return { api: { "major": int(profile.minCoreVersion[api].split(".")[0]), "minor": int(profile.minCoreVersion[api].split(".")[1]) } for api in profile.apiIdentifier if api in profile.minCoreVersion and isinstance(profile.minCoreVersion[api], str) }
+                
+    return None
 
 class CPPGenerator:
 
@@ -391,11 +405,14 @@ class CPPGenerator:
 
     @classmethod
     def apiMemberSets(cls, api, profile, versions):
+        minCoreVersion = getMinCoreVersionLookup(profile)
+
+        apis = profile.apiIdentifier if not isinstance(profile.apiIdentifier, str) and isinstance(profile.apiIdentifier, collections.abc.Sequence) else [profile.apiIdentifier]
         for version in versions:
-            if profile.minCoreVersion is None or version.majorVersion < profile.minCoreVersion[0] or (version.majorVersion == profile.minCoreVersion[0] and version.minorVersion < profile.minCoreVersion[1]):
+            if minCoreVersion and version.apiString in minCoreVersion and (minCoreVersion[version.apiString]["major"] < version.majorVersion or minCoreVersion[version.apiString]["major"] <= version.majorVersion and minCoreVersion[version.apiString]["minor"] <= version.minorVersion):
                 yield version, False, False
+                yield version, True, False
                 yield version, False, True
             else:
                 yield version, False, False
-                yield version, True, False
                 yield version, False, True
