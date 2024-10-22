@@ -22,9 +22,9 @@ namespace {{binding.namespace}}
 *
 *  Example code:
 *  @code{.cpp}
-*  const glbinding::Version currentVersion = glbinding::aux::ContextInfo::version();
+*  const {{binding.namespace}}::Version currentVersion = {{binding.namespace}}::aux::ContextInfo::version();
 *
-*  if (currentVersion >= glbinding::Version(3, 2))
+*  if (currentVersion >= {{binding.namespace}}::Version(3, 2))
 *  {
 *      // do something
 *  }
