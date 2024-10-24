@@ -16,6 +16,16 @@ from khrapi.TypeAlias import TypeAlias
 from khrapi.NativeCode import NativeCode
 from khrapi.CompoundType import CompoundType
 
+def performTypeNameNormalization(typeName):
+    typeName = typeName.strip()
+    while typeName.startswith("const "):
+        typeName = typeName[6:].strip()
+    while typeName.endswith("*"):
+        typeName = typeName[:-1].strip()
+    while typeName.endswith("&"):
+        typeName = typeName[:-1].strip()
+    return typeName
+
 def getMinCoreVersionsLookup(profile):
     splitMajorMinor = lambda version: { "major": int(version.split(".")[0]), "minor": int(version.split(".")[1]) }
     return { identifier: splitMajorMinor(api["coreProfileSince"]) for identifier, api in profile.apis.items() if "coreProfileSince" in api }
@@ -300,9 +310,22 @@ class CPPGenerator:
             else: # normal
                 constants = currentConstants | deprecatedConstants
                 functions = currentFunctions | deprecatedFunctions
-            
+
+            # Determine used types based on required functions and enums
+            neededTypes = set(booleanTypes)
+            for function in functions:
+                if function.returnType:
+                    type = api.typeByIdentifier(performTypeNameNormalization(function.returnType.identifier))
+                    if type and not type.hideDeclaration and not isinstance(type, NativeCode):
+                        neededTypes.add(type)
+
+                for parameter in function.parameters:
+                    type = api.typeByIdentifier(performTypeNameNormalization(parameter.type.identifier))
+                    if type and not type.hideDeclaration and not isinstance(type, NativeCode):
+                        neededTypes.add(type)
+
             cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                types=[ type for type in api.types if (not type.hideDeclaration or type in booleanTypes) and not isinstance(type, NativeCode) ]
+                types=[ type for type in neededTypes ]
             )
             cls.render(template_engine, "booleanF.h", includedir_api+"boolean.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 constants=booleanValues,
