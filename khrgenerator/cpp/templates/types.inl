@@ -2,7 +2,7 @@
 #pragma once
 
 
-#include <{{binding.identifier}}/{{api.identifier}}/types.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/types.h>
 
 
 {% for group in basic_enumerators|sort(attribute='identifier') -%}
@@ -11,11 +11,11 @@ namespace std
 
 
 template<>
-struct hash<{{api.identifier}}::{{group.identifier}}>
+struct hash<{{binding.baseNamespace}}::{{group.identifier}}>
 {
-    std::size_t operator()(const {{api.identifier}}::{{group.identifier}} & t) const
+    std::size_t operator()(const {{binding.baseNamespace}}::{{group.identifier}} & t) const
     {
-        return hash<std::underlying_type<{{api.identifier}}::{{group.identifier}}>::type>()(static_cast<std::underlying_type<{{api.identifier}}::{{group.identifier}}>::type>(t));
+        return hash<std::underlying_type<{{binding.baseNamespace}}::{{group.identifier}}>::type>()(static_cast<std::underlying_type<{{binding.baseNamespace}}::{{group.identifier}}>::type>(t));
     }
 };
 
@@ -30,11 +30,11 @@ namespace std
 
 
 template<>
-struct hash<{{api.identifier}}::{{group.identifier}}>
+struct hash<{{binding.baseNamespace}}::{{group.identifier}}>
 {
-    std::size_t operator()(const {{api.identifier}}::{{group.identifier}} & t) const
+    std::size_t operator()(const {{binding.baseNamespace}}::{{group.identifier}} & t) const
     {
-        return hash<std::underlying_type<{{api.identifier}}::{{group.identifier}}>::type>()(static_cast<std::underlying_type<{{api.identifier}}::{{group.identifier}}>::type>(t));
+        return hash<std::underlying_type<{{binding.baseNamespace}}::{{group.identifier}}>::type>()(static_cast<std::underlying_type<{{binding.baseNamespace}}::{{group.identifier}}>::type>(t));
     }
 };
 
@@ -42,7 +42,7 @@ struct hash<{{api.identifier}}::{{group.identifier}}>
 } // namespace std
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
@@ -117,7 +117,7 @@ namespace {{api.identifier}}
 }
 
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}
 {%- endfor %}
 
 
@@ -129,11 +129,11 @@ namespace std
 
 
 template<>
-struct hash<{{api.identifier}}::{{group.identifier}}>
+struct hash<{{binding.baseNamespace}}::{{group.identifier}}>
 {
-    std::size_t operator()(const {{api.identifier}}::{{group.identifier}} & t) const
+    std::size_t operator()(const {{binding.baseNamespace}}::{{group.identifier}} & t) const
     {
-        return hash<std::underlying_type<{{api.identifier}}::{{group.identifier}}>::type>()(static_cast<std::underlying_type<{{api.identifier}}::{{group.identifier}}>::type>(t));
+        return hash<std::underlying_type<{{binding.baseNamespace}}::{{group.identifier}}>::type>()(static_cast<std::underlying_type<{{binding.baseNamespace}}::{{group.identifier}}>::type>(t));
     }
 };
 
@@ -141,7 +141,7 @@ struct hash<{{api.identifier}}::{{group.identifier}}>
 } // namespace std
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
@@ -182,5 +182,5 @@ inline {{group.identifier}} & operator^=({{group.identifier}} & a, const {{group
 }
 
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}
 {%- endfor %}

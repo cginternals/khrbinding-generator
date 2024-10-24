@@ -19,8 +19,6 @@ from khrapi.Constant import Constant
 from khrapi.Function import Function
 from khrapi.Parameter import Parameter
 
-import collections.abc
-
 class GLParser(XMLParser):
 
     @classmethod
@@ -275,13 +273,9 @@ class GLParser(XMLParser):
 
         featureSets = []
 
-        mixedAPIs = not isinstance(profile.apiIdentifier, str) and isinstance(profile.apiIdentifier, collections.abc.Sequence)
-        if mixedAPIs:
-            api.versions = [ version for version in api.versions if any([apiIdentifier in version.supportedAPIs for apiIdentifier in profile.apiIdentifier]) ]
-            api.extensions = [ extension for extension in api.extensions if any([apiIdentifier in extension.supportedAPIs for apiIdentifier in profile.apiIdentifier]) ]
-        else:
-            api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
-            api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
+        identifiers = set(profile.apis.keys())
+        api.versions = [ version for version in api.versions if any([api in version.supportedAPIs for api in identifiers]) ]
+        api.extensions = [ extension for extension in api.extensions if any([api in extension.supportedAPIs for api in identifiers]) ]
             
         featureSets += api.versions
         featureSets += api.extensions
@@ -411,7 +405,6 @@ class GLParser(XMLParser):
         binding.baseNamespace = profile.baseNamespace
         
         binding.multiContextBinding = profile.multiContextBinding
-        binding.minCoreVersion = profile.minCoreVersion
         
         binding.identifier = profile.bindingNamespace
         binding.namespace = profile.bindingNamespace
@@ -426,7 +419,7 @@ class GLParser(XMLParser):
         binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
         binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
-        binding.apientry = api.identifier.upper()+"_APIENTRY"
+        binding.apientry = profile.baseNamespace.upper()+"_APIENTRY"
 
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement
@@ -505,7 +498,7 @@ class GLParser(XMLParser):
     @classmethod
     def ensureGLES2Types(cls, api, profile):
         # Add missing types
-        if profile.apiIdentifier == "gles2":
+        if "gles2" in profile.apis.keys():
             intType = api.typeByIdentifier('int')
             if intType is None:
                 intType = NativeType(api, "int", "int")

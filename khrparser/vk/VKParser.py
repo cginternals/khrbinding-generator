@@ -258,7 +258,6 @@ class VKParser(XMLParser):
         binding.baseNamespace = profile.baseNamespace
         
         binding.multiContextBinding = profile.multiContextBinding
-        binding.minCoreVersion = profile.minCoreVersion
         
         binding.identifier = profile.bindingNamespace
         binding.namespace = profile.bindingNamespace
@@ -273,7 +272,7 @@ class VKParser(XMLParser):
         binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
         binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
-        binding.apientry = api.identifier.upper()+"_APIENTRY"
+        binding.apientry = binding.baseNamespace.upper()+"_APIENTRY"
 
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement

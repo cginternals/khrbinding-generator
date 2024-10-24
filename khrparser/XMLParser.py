@@ -15,13 +15,12 @@ class XMLParser:
 
         revision_date = datetime.datetime.fromtimestamp(os.path.getmtime(xmlFile))
         revision_string = revision_date.strftime('%Y%m%d')
-        
-        api = API(profile.api, revision_string)
+
+        api = API(profile.baseNamespace, revision_string)
         
         tree = xml.etree.ElementTree.parse(xmlFile)
 
         cls.parseXML(api, profile, tree.getroot())
-
         return api
 
     @classmethod

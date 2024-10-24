@@ -6,10 +6,10 @@
 
 #include <{{binding.identifier}}/{{binding.identifier}}_api.h>
 #include <{{binding.identifier}}/{{binding.identifier}}_features.h>
-#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/no{{binding.baseNamespace}}.h>
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
@@ -22,4 +22,4 @@ using {{binding.booleanType}} = {{binding.identifier}}::{{nativeType}};
 {{binding.constexpr}} static const {{binding.booleanType}} {{constant.identifier}} = {{binding.booleanType}}({{constant.value}});
 {% endfor %}
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}

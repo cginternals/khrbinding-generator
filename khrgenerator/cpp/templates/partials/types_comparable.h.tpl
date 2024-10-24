@@ -1,4 +1,4 @@
-{{api.identifier}}{{api.identifier}}
+{{binding.baseNamespace}}{{binding.baseNamespace}}
 namespace {{api}}
 {
 

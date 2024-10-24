@@ -16,18 +16,9 @@ from khrapi.TypeAlias import TypeAlias
 from khrapi.NativeCode import NativeCode
 from khrapi.CompoundType import CompoundType
 
-def getMinCoreVersionLookup(profile):
-    if not profile.minCoreVersion:
-        return None
-
-    if isinstance(profile.apiIdentifier, str) and isinstance(profile.minCoreVersion, str):
-        (major, minor, *_rest) = tuple(profile.minCoreVersion.split("."))
-        return { profile.apiIdentifier: { "major": int(major), "minor": int(minor) }}
-    
-    if isinstance(profile.apiIdentifier, collections.abc.Sequence):
-        return { api: { "major": int(profile.minCoreVersion[api].split(".")[0]), "minor": int(profile.minCoreVersion[api].split(".")[1]) } for api in profile.apiIdentifier if api in profile.minCoreVersion and isinstance(profile.minCoreVersion[api], str) }
-                
-    return None
+def getMinCoreVersionsLookup(profile):
+    splitMajorMinor = lambda version: { "major": int(version.split(".")[0]), "minor": int(version.split(".")[1]) }
+    return { identifier: splitMajorMinor(api["coreProfileSince"]) for identifier, api in profile.apis.items() if "coreProfileSince" in api }
 
 class CPPGenerator:
 
@@ -328,7 +319,8 @@ class CPPGenerator:
             cls.render(template_engine, "functionsF.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 functions=[ function for function in functions ]
             )
-            cls.render(template_engine, "entrypointF.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString)
+            entryPointHeader = profile.apis[feature.apiString]["entryPointHeader"] if feature.apiString in profile.apis.keys() else f"{feature.apiString}.h"
+            cls.render(template_engine, "entrypointF.h", includedir_api+"{{entryPointHeader}}", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,entryPointHeader=entryPointHeader)
 
     @classmethod
     def prefixes(cls, api):
@@ -405,11 +397,10 @@ class CPPGenerator:
 
     @classmethod
     def apiMemberSets(cls, api, profile, versions):
-        minCoreVersion = getMinCoreVersionLookup(profile)
+        minCoreVersions = getMinCoreVersionsLookup(profile)
 
-        apis = profile.apiIdentifier if not isinstance(profile.apiIdentifier, str) and isinstance(profile.apiIdentifier, collections.abc.Sequence) else [profile.apiIdentifier]
         for version in versions:
-            if minCoreVersion and version.apiString in minCoreVersion and (minCoreVersion[version.apiString]["major"] < version.majorVersion or minCoreVersion[version.apiString]["major"] <= version.majorVersion and minCoreVersion[version.apiString]["minor"] <= version.minorVersion):
+            if minCoreVersions and version.apiString in minCoreVersions and (minCoreVersions[version.apiString]["major"] < version.majorVersion or minCoreVersions[version.apiString]["major"] <= version.majorVersion and minCoreVersions[version.apiString]["minor"] <= version.minorVersion):
                 yield version, False, False
                 yield version, True, False
                 yield version, False, True

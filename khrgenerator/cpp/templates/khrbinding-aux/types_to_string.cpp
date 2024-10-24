@@ -11,7 +11,7 @@
 #include "types_to_string_private.h"
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 {% for group in enumerators|sort(attribute='identifier') %}
@@ -48,7 +48,7 @@ std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & va
 }
 {% endfor %}
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}
 
 
 namespace {{binding.namespace}}
@@ -56,7 +56,7 @@ namespace {{binding.namespace}}
 
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.enumType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{binding.baseNamespace}}::{{binding.enumType}}> & value)
 {
     stream << value.value();
 
@@ -64,7 +64,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}:
 }
 
 /*template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.bitfieldType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{binding.baseNamespace}}::{{binding.bitfieldType}}> & value)
 {
     std::stringstream ss;
     ss << "0x" << std::hex << static_cast<unsigned>(value.value());
@@ -74,7 +74,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}:
 }*/
 
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.booleanType}}> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{binding.baseNamespace}}::{{binding.booleanType}}> & value)
 {
     const auto & name = {{binding.auxNamespace}}::Meta::getString(value.value());
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
@@ -93,7 +93,7 @@ std::ostream & operator<<(std::ostream & stream, const Value<const char *> & val
 
 {% for cStringType in cStringTypes|sort %}
 template <>
-std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{cStringType}} *> & value)
+std::ostream & operator<<(std::ostream & stream, const Value<{{binding.baseNamespace}}::{{cStringType}} *> & value)
 {
     auto s = {{binding.auxNamespace}}::wrapString(reinterpret_cast<const char*>(value.value()));
     stream.write(s.c_str(), static_cast<std::streamsize>(s.size()));
@@ -122,9 +122,9 @@ std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
     }
 {% endfor -%}
 {% for cPointerType in cPointerTypes|sort %}
-    if (typeid(*value) == typeid(Value<{{api.identifier}}::{{cPointerType}} *>))
+    if (typeid(*value) == typeid(Value<{{binding.baseNamespace}}::{{cPointerType}} *>))
     {
-        return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{cPointerType}} *>*>(value);
+        return stream << *reinterpret_cast<const Value<{{binding.baseNamespace}}::{{cPointerType}} *>*>(value);
     }
 {% endfor -%}
     if (typeid(*value) == typeid(Value<const char *>))
@@ -132,22 +132,22 @@ std::ostream & operator<<(std::ostream & stream, const AbstractValue * value)
         return stream << *reinterpret_cast<const Value<const char *>*>(value);
     }
 {% for cStringType in cStringTypes|sort %}
-    if (typeid(*value) == typeid(Value<{{api.identifier}}::{{cStringType}} *>))
+    if (typeid(*value) == typeid(Value<{{binding.baseNamespace}}::{{cStringType}} *>))
     {
-        return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{cStringType}} *>*>(value);
+        return stream << *reinterpret_cast<const Value<{{binding.baseNamespace}}::{{cStringType}} *>*>(value);
     }
 {% endfor -%}
 {% for type in types|sort(attribute='identifier') %}
     {{ "/*" if type.identifier.endswith("void") or type.identifier.startswith("_") }}
-    if (typeid(*value) == typeid(Value<{{api.identifier}}::{{type.identifier}}>))
+    if (typeid(*value) == typeid(Value<{{binding.baseNamespace}}::{{type.identifier}}>))
     {
-        return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{type.identifier}}>*>(value);
+        return stream << *reinterpret_cast<const Value<{{binding.baseNamespace}}::{{type.identifier}}>*>(value);
     }
     {{ "*/" if type.identifier.endswith("void") or type.identifier.startswith("_") }}
     
-    if (typeid(*value) == typeid(Value<{{api.identifier}}::{{type.identifier}} *>))
+    if (typeid(*value) == typeid(Value<{{binding.baseNamespace}}::{{type.identifier}} *>))
     {
-        return stream << *reinterpret_cast<const Value<{{api.identifier}}::{{type.identifier}} *>*>(value);
+        return stream << *reinterpret_cast<const Value<{{binding.baseNamespace}}::{{type.identifier}} *>*>(value);
     }
 {% endfor %}
     // expect an AbstractValue with a pointer in first member

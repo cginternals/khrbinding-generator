@@ -27,7 +27,7 @@ namespace std_boost = std;
 #include <{{binding.identifier}}/FunctionCall.h>
 #include <{{binding.identifier}}/ProcAddress.h>
 
-#include <{{binding.identifier}}/{{api.identifier}}/types.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/types.h>
 
 
 namespace {{binding.namespace}}

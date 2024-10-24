@@ -1,11 +1,11 @@
 
 #include "Meta_Maps.h"
 
-#include <{{binding.identifier}}/{{api.identifier}}/extension.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/extension.h>
 #include <{{binding.identifier}}/Version.h>
 
 
-using namespace {{api.identifier}};
+using namespace {{binding.baseNamespace}};
 
 
 namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}

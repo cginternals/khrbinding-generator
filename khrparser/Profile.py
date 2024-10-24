@@ -11,16 +11,12 @@ class Profile:
 
         self.lowercasePrefix = jsonObject["lowercasePrefix"]
         self.uppercasePrefix = jsonObject["uppercasePrefix"]
-
-        self.api = jsonObject["baseNamespace"]
         self.baseNamespace = jsonObject["baseNamespace"]
         self.inputfilepath = jsonObject["sourceFile"]
         self.inputfile = os.path.basename(self.inputfilepath)
-        self.apiIdentifier = jsonObject["apiIdentifier"]
         self.multiContextBinding = jsonObject["multiContext"]
         self.booleanWidth = jsonObject["booleanWidth"]
         self.bindingNamespace = jsonObject["bindingNamespace"]
-        self.minCoreVersion = jsonObject["coreProfileSince"]
         self.extensionType = jsonObject["extensionType"]
         self.noneBitfieldValue = jsonObject["noneBitfieldValue"]
         self.useEnumGroups = jsonObject["useEnumGroups"]
@@ -32,3 +28,19 @@ class Profile:
         self.cStringOutputTypes = jsonObject["cStringOutputTypes"]
         self.generateNoneBits = jsonObject["generateNoneBits"]
         self.undefs = jsonObject["undefs"] if "undefs" in jsonObject else []
+
+        if "apis" in jsonObject and isinstance(jsonObject["apis"], list):
+            self.apis = { api["identifier"]: { "entryPointHeader": api["entryPointHeader"] } for api in jsonObject["apis"] }
+            for api in jsonObject["apis"]:
+                if "coreProfileSince" in api:
+                    self.apis[api["identifier"]]["coreProfileSince"] = api["coreProfileSince"]
+
+        # Compatibility with old profile JSON format:
+        elif jsonObject["apiIdentifier"]:
+            api = {
+                "identifier": jsonObject["apiIdentifier"],
+                "entryPointHeader": self.baseNamespace
+            }
+            if jsonObject["coreProfileSince"]:
+                api["coreProfileSince"] = jsonObject["coreProfileSince"]
+            self.apis = [api]

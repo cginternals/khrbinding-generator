@@ -3,10 +3,9 @@ from .Version import Version;
 from .Extension import Extension;
 
 class API(object):
-    def __init__(self, identifier, revision):
-        self.identifier = identifier
+    def __init__(self, name, revision):
+        self.name = name
         self.revision = revision
-        self.apis = []
         self.versions = []
         self.extensions = []
         self.types = []

@@ -2,9 +2,9 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{binding.baseNamespace}}binding/no{{binding.baseNamespace}}.h>
 
-#include <{{api.identifier}}binding/{{api.identifier}}/values.h>
+#include <{{binding.baseNamespace}}binding/{{binding.baseNamespace}}/values.h>
 
 
 namespace {{apiString}}{{memberSet}}
@@ -13,7 +13,7 @@ namespace {{apiString}}{{memberSet}}
 
 // import values to namespace
 {%- for value in values|sort(attribute='identifier') %}
-using {{api.identifier}}::{{value.identifier}};
+using {{binding.baseNamespace}}::{{value.identifier}};
 {%- endfor %}
 
 

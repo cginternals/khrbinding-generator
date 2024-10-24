@@ -2,9 +2,9 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{binding.baseNamespace}}binding/no{{binding.baseNamespace}}.h>
 
-#include <{{api.identifier}}binding/{{api.identifier}}/enum.h>
+#include <{{binding.baseNamespace}}binding/{{binding.baseNamespace}}/enum.h>
 
 
 namespace {{apiString}}{{memberSet}}
@@ -12,12 +12,12 @@ namespace {{apiString}}{{memberSet}}
 
 
 // use enum type
-using {{api.identifier}}::{{binding.enumType}};
+using {{binding.baseNamespace}}::{{binding.enumType}};
 
 
 // import enums to namespace
 {%- for constant in constants|sort(attribute='identifier') %}
-using {{api.identifier}}::{{constant.identifier}};
+using {{binding.baseNamespace}}::{{constant.identifier}};
 {%- endfor %}
 
 

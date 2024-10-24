@@ -1,10 +1,10 @@
 
 #include "Meta_Maps.h"
 
-#include <{{binding.identifier}}/{{api.identifier}}/enum.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/enum.h>
 
 
-using namespace {{api.identifier}};
+using namespace {{binding.baseNamespace}};
 
 
 namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
@@ -22,7 +22,7 @@ const std::unordered_map<std::string, {{binding.enumType}}> Meta_EnumsByString_{
 };
 {%- endif %}
 {% endfor %}
-const std::array<std::unordered_map<std::string, {{api.identifier}}::{{binding.enumType}}>, {{groups|length}}> Meta_EnumsByStringMaps =
+const std::array<std::unordered_map<std::string, {{binding.baseNamespace}}::{{binding.enumType}}>, {{groups|length}}> Meta_EnumsByStringMaps =
 { {
 {%- for groupname, constants in groups|dictsort %}
     Meta_EnumsByString_{{groupname}}{% if not loop.last %},{% endif %}
