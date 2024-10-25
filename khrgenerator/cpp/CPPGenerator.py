@@ -273,8 +273,8 @@ class CPPGenerator:
             )
 
         # Generate files with ApiMemberSet-specific contexts
-        availableConstants = set(api.constants)
-        availableFunctions = set(api.functions)
+        # availableConstants = set(api.constants)
+        # availableFunctions = set(api.functions)
         currentConstants = set()
         currentFunctions = set()
         deprecatedConstants = set()
@@ -283,7 +283,17 @@ class CPPGenerator:
         removedFunctions = set()
         currentFeature = None
         specialValueType = api.typeByIdentifier("SpecialValues")
+        apiString = ""
         for feature, core, ext in cls.apiMemberSets(api, profile, api.versions):
+            if apiString != feature.apiString:
+                currentConstants = set()
+                currentFunctions = set()
+                deprecatedConstants = set()
+                deprecatedFunctions = set()
+                removedConstants = set()
+                removedFunctions = set()
+                apiString = feature.apiString
+                
             if currentFeature != feature: # apply changes
                 currentConstants |= set(feature.requiredConstants)
                 currentFunctions |= set(feature.requiredFunctions)
@@ -298,15 +308,29 @@ class CPPGenerator:
                 removedConstants |= set(feature.removedConstants)
                 removedFunctions |= set(feature.removedFunctions)
                 currentFeature = feature
-            
+
             memberSet = "%i%i%s%s" % (feature.majorVersion, feature.minorVersion, "core" if core else "", "ext" if ext else "")
 
             if core:
                 constants = currentConstants
                 functions = currentFunctions
             elif ext:
-                constants = availableConstants - currentConstants - deprecatedConstants - removedConstants
-                functions = availableFunctions - currentFunctions - deprecatedFunctions - removedFunctions
+                # Filter away functions and constants from the main specification and from extensions not supported by the current API.
+                # TODO: This filters away extensions not supported by the API, but the versioned headers can still contain bindings for extension not supported by current version.
+                # Unfortunately, the API version required by the different extensions is only detailed in the different extension specifications and not the API specification XML.
+                # To further scope down the extensions to only the supported ones the extension specification XML files should be downloaded and parsed from the Khronos registry
+                # as well (https://registry.khronos.org/OpenGL/extensions).
+                supportedExtensions = [ extension for extension in api.extensions if len(extension.supportedAPIs) == 0 or (hasattr(feature, 'apiString') and feature.apiString in extension.supportedAPIs) ]
+                constants = set()
+                functions = set()
+                for extension in supportedExtensions:
+                    constants |= set(extension.requiredConstants)
+                    functions |= set(extension.requiredFunctions)
+
+                # Some extensions add functions that are present in the main specification (before they are added to the main specification). Remove these ones
+                # as well as they should already be present in the normal or core set.
+                constants -= currentConstants
+                functions -= currentFunctions
             else: # normal
                 constants = currentConstants | deprecatedConstants
                 functions = currentFunctions | deprecatedFunctions
