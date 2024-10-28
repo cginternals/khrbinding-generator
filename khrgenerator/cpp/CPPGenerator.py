@@ -18,12 +18,12 @@ from khrapi.CompoundType import CompoundType
 
 def performTypeNameNormalization(typeName):
     typeName = typeName.strip()
-    while typeName.startswith("const "):
-        typeName = typeName[6:].strip()
-    while typeName.endswith("*"):
-        typeName = typeName[:-1].strip()
-    while typeName.endswith("&"):
-        typeName = typeName[:-1].strip()
+    if typeName.startswith("const "):
+        return performTypeNameNormalization(typeName[6:])
+    if typeName.endswith("*"):
+        return performTypeNameNormalization(typeName[:-1])
+    if typeName.endswith("&"):
+        return performTypeNameNormalization(typeName[:-1])
     return typeName
 
 def getMinCoreVersionsLookup(profile):
