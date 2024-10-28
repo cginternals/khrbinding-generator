@@ -283,16 +283,16 @@ class CPPGenerator:
         removedFunctions = set()
         currentFeature = None
         specialValueType = api.typeByIdentifier("SpecialValues")
-        apiString = ""
+        apiIdentifier = ""
         for feature, core, ext in cls.apiMemberSets(api, profile, api.versions):
-            if apiString != feature.apiString:
+            if apiIdentifier != feature.nativeIdentifier:
                 currentConstants = set()
                 currentFunctions = set()
                 deprecatedConstants = set()
                 deprecatedFunctions = set()
                 removedConstants = set()
                 removedFunctions = set()
-                apiString = feature.apiString
+                apiIdentifier = feature.nativeIdentifier
                 
             if currentFeature != feature: # apply changes
                 currentConstants |= set(feature.requiredConstants)
@@ -320,7 +320,7 @@ class CPPGenerator:
                 # Unfortunately, the API version required by the different extensions is only detailed in the different extension specifications and not the API specification XML.
                 # To further scope down the extensions to only the supported ones the extension specification XML files should be downloaded and parsed from the Khronos registry
                 # as well (https://registry.khronos.org/OpenGL/extensions).
-                supportedExtensions = [ extension for extension in api.extensions if len(extension.supportedAPIs) == 0 or (hasattr(feature, 'apiString') and feature.apiString in extension.supportedAPIs) ]
+                supportedExtensions = [ extension for extension in api.extensions if len(extension.supportedAPIs) == 0 or (apiIdentifier and apiIdentifier in extension.supportedAPIs) ]
                 constants = set()
                 functions = set()
                 for extension in supportedExtensions:
