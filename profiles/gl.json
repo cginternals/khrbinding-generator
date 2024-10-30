@@ -22,9 +22,10 @@
 	"generateStringConversion": true,
 	"generateCallbacks": true,
 	"generateLogging": true,
+	"stripFeatureHeaders": true,
 	"generateHeaderGuard": true,
-	"headerGuardMacro": [ "__gl_h_" ],
-	"headerReplacement": [ "gl.h" ],
+	"headerGuardMacro": [ "__gl_h_", "__gles_h_", "__gles1_h_", "__gles2_h_", "__gles3_h_" ],
+	"headerReplacement": [ "gl.h", "gles.h", "gles1.h", "gles2.h", "gles3.h" ],
 
 	"": "Types",
 	"extensionType": "GLextension",
@@ -36,7 +37,21 @@
 	"cStringOutputTypes": [ "GLubyte", "GLchar" ],
 
 	"": "API Feature management",
-	"apiIdentifier": "gl",
+	"apis": [
+		{
+			"identifier": "gl",
+			"coreProfileSince": "3.2",
+			"entryPointHeader": "gl.h"
+		},
+		{
+			"identifier": "gles1",
+			"entryPointHeader": "gles.h"
+		},
+		{
+			"identifier": "gles2",
+			"entryPointHeader": "gles.h"
+		}
+	],
 	"versions": [],
 	"featureBlacklist": [],
 	"extensionBlacklist": [],
