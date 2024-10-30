@@ -622,7 +622,7 @@ class ANParser(XMLParser):
         """
 
         identifier = "an"+"".join([ c for c in feature.attrib["number"] if c.isdigit() ])
-        version = Version(api, identifier, feature.attrib["name"], feature.attrib["number"], "an")
+        version = Version(api, identifier, feature.attrib["api"], feature.attrib["number"], "an")
 
         for require in feature.findall("require"):
             cls.handleVersionRequire(api, version, require)

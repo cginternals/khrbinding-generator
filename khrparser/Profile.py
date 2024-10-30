@@ -27,6 +27,7 @@ class Profile:
         self.headerReplacement = jsonObject["headerReplacement"]
         self.cStringOutputTypes = jsonObject["cStringOutputTypes"]
         self.generateNoneBits = jsonObject["generateNoneBits"]
+        self.stripFeatureHeaders = jsonObject["stripFeatureHeaders"] if "stripFeatureHeaders" in jsonObject else False
         self.undefs = jsonObject["undefs"] if "undefs" in jsonObject else []
 
         if "apis" in jsonObject and isinstance(jsonObject["apis"], list):
@@ -37,10 +38,7 @@ class Profile:
 
         # Compatibility with old profile JSON format:
         elif jsonObject["apiIdentifier"]:
-            api = {
-                "identifier": jsonObject["apiIdentifier"],
-                "entryPointHeader": self.baseNamespace
-            }
+            self.apis = { jsonObject["apiIdentifier"]: { "entryPointHeader": self.baseNamespace } }
             if jsonObject["coreProfileSince"]:
-                api["coreProfileSince"] = jsonObject["coreProfileSince"]
-            self.apis = [api]
+                self.apis[jsonObject["apiIdentifier"]]["coreProfileSince"] = jsonObject["coreProfileSince"]
+                

@@ -85,7 +85,8 @@ class VKParser(XMLParser):
 
         featureSets = []
 
-        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+        identifiers = set(profile.apis.keys())
+        api.versions = [ version for version in api.versions if any([api in version.supportedAPIs for api in identifiers]) ]
         featureSets += api.versions
 
         # filter extensions
@@ -93,7 +94,7 @@ class VKParser(XMLParser):
             extension.platform == "" and
             not extension.identifier.startswith('RESERVED_DO_NOT_USE') and
             not "_extension_" in extension.identifier and
-            profile.apiIdentifier in extension.supportedAPIs
+            any([api in extension.supportedAPIs for api in identifiers])
         ]
         featureSets += api.extensions
 
@@ -569,7 +570,7 @@ class VKParser(XMLParser):
     @classmethod
     def handleVersion(cls, api, profile, feature):
         identifier = "vk"+"".join([ c for c in feature.attrib["number"] if c.isdigit() ])
-        version = Version(api, identifier, feature.attrib["name"], feature.attrib["number"], "vk")
+        version = Version(api, identifier, feature.attrib["api"], feature.attrib["number"], "vk")
 
         for require in feature.findall("require"):
             cls.handleVersionRequire(api, version, require)

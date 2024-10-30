@@ -303,10 +303,11 @@ class EGLParser(XMLParser):
 
         featureSets = []
 
-        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+        identifiers = set(profile.apis.keys())
+        api.versions = [ version for version in api.versions if any([api in version.supportedAPIs for api in identifiers]) ]
         featureSets += api.versions
 
-        api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
+        api.extensions = [ extension for extension in api.extensions if any([api in extension.supportedAPIs for api in identifiers]) ]
         featureSets += api.extensions
 
         api.constants = [ constant for constant in api.constants if

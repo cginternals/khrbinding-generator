@@ -273,8 +273,8 @@ class CPPGenerator:
             )
 
         # Generate files with ApiMemberSet-specific contexts
-        # availableConstants = set(api.constants)
-        # availableFunctions = set(api.functions)
+        availableConstants = set(api.constants)
+        availableFunctions = set(api.functions)
         currentConstants = set()
         currentFunctions = set()
         deprecatedConstants = set()
@@ -285,14 +285,14 @@ class CPPGenerator:
         specialValueType = api.typeByIdentifier("SpecialValues")
         apiIdentifier = ""
         for feature, core, ext in cls.apiMemberSets(api, profile, api.versions):
-            if apiIdentifier != feature.nativeIdentifier:
+            if apiIdentifier != feature.apiIdentifier:
                 currentConstants = set()
                 currentFunctions = set()
                 deprecatedConstants = set()
                 deprecatedFunctions = set()
                 removedConstants = set()
                 removedFunctions = set()
-                apiIdentifier = feature.nativeIdentifier
+                apiIdentifier = feature.apiIdentifier
                 
             if currentFeature != feature: # apply changes
                 currentConstants |= set(feature.requiredConstants)
@@ -314,7 +314,7 @@ class CPPGenerator:
             if core:
                 constants = currentConstants
                 functions = currentFunctions
-            elif ext:
+            elif ext and profile.stripFeatureHeaders:
                 # Filter away functions and constants from the main specification and from extensions not supported by the current API.
                 # TODO: This filters away extensions not supported by the API, but the versioned headers can still contain bindings for extension not supported by current version.
                 # Unfortunately, the API version required by the different extensions is only detailed in the different extension specifications and not the API specification XML.
@@ -331,25 +331,33 @@ class CPPGenerator:
                 # as well as they should already be present in the normal or core set.
                 constants -= currentConstants
                 functions -= currentFunctions
+            elif ext:
+                constants = availableConstants - currentConstants - deprecatedConstants - removedConstants
+                functions = availableFunctions - currentFunctions - deprecatedFunctions - removedFunctions
             else: # normal
                 constants = currentConstants | deprecatedConstants
                 functions = currentFunctions | deprecatedFunctions
 
-            # Determine used types based on required functions and enums
-            neededTypes = set(booleanTypes)
-            for function in functions:
-                if function.returnType:
-                    type = api.typeByIdentifier(performTypeNameNormalization(function.returnType.identifier))
-                    if type and not type.hideDeclaration and not isinstance(type, NativeCode):
-                        neededTypes.add(type)
+            if profile.stripFeatureHeaders:
+                # Determine used types based on required functions and enums
+                neededTypes = set(booleanTypes)
+                for function in functions:
+                    if function.returnType:
+                        type = api.typeByIdentifier(performTypeNameNormalization(function.returnType.identifier))
+                        if type and not type.hideDeclaration and not isinstance(type, NativeCode):
+                            neededTypes.add(type)
 
-                for parameter in function.parameters:
-                    type = api.typeByIdentifier(performTypeNameNormalization(parameter.type.identifier))
-                    if type and not type.hideDeclaration and not isinstance(type, NativeCode):
-                        neededTypes.add(type)
+                    for parameter in function.parameters:
+                        type = api.typeByIdentifier(performTypeNameNormalization(parameter.type.identifier))
+                        if type and not type.hideDeclaration and not isinstance(type, NativeCode):
+                            neededTypes.add(type)
+
+                neededTypes = list(neededTypes)
+            else:
+                neededTypes = [ type for type in api.types if (not type.hideDeclaration or type in booleanTypes) and not isinstance(type, NativeCode) ]
 
             cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                types=[ type for type in neededTypes ]
+                types=neededTypes
             )
             cls.render(template_engine, "booleanF.h", includedir_api+"boolean.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 constants=booleanValues,
