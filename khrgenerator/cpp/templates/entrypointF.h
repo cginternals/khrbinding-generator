@@ -2,13 +2,13 @@
 #pragma once
 
 
-#include <{{binding.baseNamespace}}binding/no{{binding.baseNamespace}}.h>
+#include <{{profile.bindingNamespace}}/no{{binding.baseNamespace}}.h>
 
-#include <{{binding.baseNamespace}}binding/{{apiString}}{{memberSet}}/types.h>
-#include <{{binding.baseNamespace}}binding/{{apiString}}{{memberSet}}/values.h>
-#include <{{binding.baseNamespace}}binding/{{apiString}}{{memberSet}}/boolean.h>
-#include <{{binding.baseNamespace}}binding/{{apiString}}{{memberSet}}/bitfield.h>
-#include <{{binding.baseNamespace}}binding/{{apiString}}{{memberSet}}/enum.h>
-#include <{{binding.baseNamespace}}binding/{{apiString}}{{memberSet}}/functions.h>
+#include <{{profile.bindingNamespace}}/{{apiString}}{{memberSet}}/types.h>
+#include <{{profile.bindingNamespace}}/{{apiString}}{{memberSet}}/values.h>
+#include <{{profile.bindingNamespace}}/{{apiString}}{{memberSet}}/boolean.h>
+#include <{{profile.bindingNamespace}}/{{apiString}}{{memberSet}}/bitfield.h>
+#include <{{profile.bindingNamespace}}/{{apiString}}{{memberSet}}/enum.h>
+#include <{{profile.bindingNamespace}}/{{apiString}}{{memberSet}}/functions.h>
 
-#include <{{binding.baseNamespace}}binding/{{binding.baseNamespace}}/extension.h>
+#include <{{profile.bindingNamespace}}/{{binding.baseNamespace}}/extension.h>

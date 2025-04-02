@@ -38,7 +38,7 @@ class Profile:
 
         # Compatibility with old profile JSON format:
         elif jsonObject["apiIdentifier"]:
-            self.apis = { jsonObject["apiIdentifier"]: { "entryPointHeader": self.baseNamespace } }
+            self.apis = { jsonObject["apiIdentifier"]: { "entryPointHeader": f"{self.baseNamespace}.h" } }
             if jsonObject["coreProfileSince"]:
                 self.apis[jsonObject["apiIdentifier"]]["coreProfileSince"] = jsonObject["coreProfileSince"]
                 

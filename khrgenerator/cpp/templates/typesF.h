@@ -2,8 +2,8 @@
 #pragma once
 
 
-#include <{{binding.baseNamespace}}binding/no{{binding.baseNamespace}}.h>
-#include <{{binding.baseNamespace}}binding/{{binding.baseNamespace}}/types.h>
+#include <{{profile.bindingNamespace}}/no{{binding.baseNamespace}}.h>
+#include <{{profile.bindingNamespace}}/{{binding.baseNamespace}}/types.h>
 
 
 namespace {{apiString}}{{memberSet}}

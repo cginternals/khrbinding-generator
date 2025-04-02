@@ -2,9 +2,9 @@
 #pragma once
 
 
-#include <{{binding.baseNamespace}}binding/no{{binding.baseNamespace}}.h>
+#include <{{profile.bindingNamespace}}/no{{binding.baseNamespace}}.h>
 
-#include <{{binding.baseNamespace}}binding/{{binding.baseNamespace}}/values.h>
+#include <{{profile.bindingNamespace}}/{{binding.baseNamespace}}/values.h>
 
 
 namespace {{apiString}}{{memberSet}}
