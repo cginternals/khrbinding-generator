@@ -76,7 +76,8 @@ std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}:
 template <>
 std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.booleanType}}> & value)
 {
-    const auto & name = {{binding.auxNamespace}}::Meta::getString(value.value());
+    const auto booleanValue = value.value();
+    const auto & name = {{binding.auxNamespace}}::Meta::getString(booleanValue);
     stream.write(name.c_str(), static_cast<std::streamsize>(name.size()));
 
     return stream;
