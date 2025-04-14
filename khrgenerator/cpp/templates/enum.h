@@ -6,6 +6,8 @@
 
 #include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
+#include <type_traits>
+
 
 namespace {{api.identifier}}
 {

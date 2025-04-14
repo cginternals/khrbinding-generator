@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <{{binding.identifier}}/SharedBitfield.h>
+
 
 namespace {{binding.namespace}}
 {

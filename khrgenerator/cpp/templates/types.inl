@@ -4,6 +4,8 @@
 
 #include <{{binding.identifier}}/{{api.identifier}}/types.h>
 
+#include <type_traits>
+
 
 {% for group in basic_enumerators|sort(attribute='identifier') -%}
 namespace std
