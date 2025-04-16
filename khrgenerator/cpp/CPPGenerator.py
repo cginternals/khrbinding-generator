@@ -1,4 +1,5 @@
 
+import collections
 import os, sys
 from os.path import join as pjoin
 import time
@@ -14,6 +15,20 @@ from khrapi.NativeType import NativeType
 from khrapi.TypeAlias import TypeAlias
 from khrapi.NativeCode import NativeCode
 from khrapi.CompoundType import CompoundType
+
+def performTypeNameNormalization(typeName):
+    typeName = typeName.strip()
+    if typeName.startswith("const "):
+        return performTypeNameNormalization(typeName[6:])
+    if typeName.endswith("*"):
+        return performTypeNameNormalization(typeName[:-1])
+    if typeName.endswith("&"):
+        return performTypeNameNormalization(typeName[:-1])
+    return typeName
+
+def getMinCoreVersionsLookup(profile):
+    splitMajorMinor = lambda version: { "major": int(version.split(".")[0]), "minor": int(version.split(".")[1]) }
+    return { identifier: splitMajorMinor(api["coreProfileSince"]) for identifier, api in profile.apis.items() if "coreProfileSince" in api }
 
 class CPPGenerator:
 
@@ -268,7 +283,17 @@ class CPPGenerator:
         removedFunctions = set()
         currentFeature = None
         specialValueType = api.typeByIdentifier("SpecialValues")
+        apiIdentifier = ""
         for feature, core, ext in cls.apiMemberSets(api, profile, api.versions):
+            if apiIdentifier != feature.apiIdentifier:
+                currentConstants = set()
+                currentFunctions = set()
+                deprecatedConstants = set()
+                deprecatedFunctions = set()
+                removedConstants = set()
+                removedFunctions = set()
+                apiIdentifier = feature.apiIdentifier
+                
             if currentFeature != feature: # apply changes
                 currentConstants |= set(feature.requiredConstants)
                 currentFunctions |= set(feature.requiredFunctions)
@@ -283,21 +308,56 @@ class CPPGenerator:
                 removedConstants |= set(feature.removedConstants)
                 removedFunctions |= set(feature.removedFunctions)
                 currentFeature = feature
-            
+
             memberSet = "%i%i%s%s" % (feature.majorVersion, feature.minorVersion, "core" if core else "", "ext" if ext else "")
 
             if core:
                 constants = currentConstants
                 functions = currentFunctions
+            elif ext and profile.stripFeatureHeaders:
+                # Filter away functions and constants from the main specification and from extensions not supported by the current API.
+                # TODO: This filters away extensions not supported by the API, but the versioned headers can still contain bindings for extension not supported by current version.
+                # Unfortunately, the API version required by the different extensions is only detailed in the different extension specifications and not the API specification XML.
+                # To further scope down the extensions to only the supported ones the extension specification XML files should be downloaded and parsed from the Khronos registry
+                # as well (https://registry.khronos.org/OpenGL/extensions).
+                supportedExtensions = [ extension for extension in api.extensions if len(extension.supportedAPIs) == 0 or (apiIdentifier and apiIdentifier in extension.supportedAPIs) ]
+                constants = set()
+                functions = set()
+                for extension in supportedExtensions:
+                    constants |= set(extension.requiredConstants)
+                    functions |= set(extension.requiredFunctions)
+
+                # Some extensions add functions that are present in the main specification (before they are added to the main specification). Remove these ones
+                # as well as they should already be present in the normal or core set.
+                constants -= currentConstants
+                functions -= currentFunctions
             elif ext:
                 constants = availableConstants - currentConstants - deprecatedConstants - removedConstants
                 functions = availableFunctions - currentFunctions - deprecatedFunctions - removedFunctions
             else: # normal
                 constants = currentConstants | deprecatedConstants
                 functions = currentFunctions | deprecatedFunctions
-            
+
+            if profile.stripFeatureHeaders:
+                # Determine used types based on required functions and enums
+                neededTypes = set(booleanTypes)
+                for function in functions:
+                    if function.returnType:
+                        type = api.typeByIdentifier(performTypeNameNormalization(function.returnType.identifier))
+                        if type and not type.hideDeclaration and not isinstance(type, NativeCode):
+                            neededTypes.add(type)
+
+                    for parameter in function.parameters:
+                        type = api.typeByIdentifier(performTypeNameNormalization(parameter.type.identifier))
+                        if type and not type.hideDeclaration and not isinstance(type, NativeCode):
+                            neededTypes.add(type)
+
+                neededTypes = list(neededTypes)
+            else:
+                neededTypes = [ type for type in api.types if (not type.hideDeclaration or type in booleanTypes) and not isinstance(type, NativeCode) ]
+
             cls.render(template_engine, "typesF.h", includedir_api+"types.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
-                types=[ type for type in api.types if (not type.hideDeclaration or type in booleanTypes) and not isinstance(type, NativeCode) ]
+                types=neededTypes
             )
             cls.render(template_engine, "booleanF.h", includedir_api+"boolean.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 constants=booleanValues,
@@ -314,7 +374,8 @@ class CPPGenerator:
             cls.render(template_engine, "functionsF.h", includedir_api+"functions.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,
                 functions=[ function for function in functions ]
             )
-            cls.render(template_engine, "entrypointF.h", includedir_api+"{{binding.baseNamespace}}.h", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString)
+            entryPointHeader = profile.apis[feature.apiString]["entryPointHeader"] if feature.apiString in profile.apis.keys() else f"{feature.apiString}.h"
+            cls.render(template_engine, "entrypointF.h", includedir_api+"{{entryPointHeader}}", api=api, profile=profile, binding=binding,memberSet=memberSet,apiString=feature.apiString,entryPointHeader=entryPointHeader)
 
     @classmethod
     def prefixes(cls, api):
@@ -391,11 +452,13 @@ class CPPGenerator:
 
     @classmethod
     def apiMemberSets(cls, api, profile, versions):
+        minCoreVersions = getMinCoreVersionsLookup(profile)
+
         for version in versions:
-            if profile.minCoreVersion is None or version.majorVersion < profile.minCoreVersion[0] or (version.majorVersion == profile.minCoreVersion[0] and version.minorVersion < profile.minCoreVersion[1]):
+            if minCoreVersions and version.apiString in minCoreVersions and (minCoreVersions[version.apiString]["major"] < version.majorVersion or minCoreVersions[version.apiString]["major"] <= version.majorVersion and minCoreVersions[version.apiString]["minor"] <= version.minorVersion):
                 yield version, False, False
+                yield version, True, False
                 yield version, False, True
             else:
                 yield version, False, False
-                yield version, True, False
                 yield version, False, True

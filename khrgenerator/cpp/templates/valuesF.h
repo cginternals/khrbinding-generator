@@ -2,19 +2,19 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{profile.bindingNamespace}}/no{{binding.baseNamespace}}.h>
 
-#include <{{api.identifier}}binding/{{api.identifier}}/values.h>
+#include <{{profile.bindingNamespace}}/{{binding.baseNamespace}}/values.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 
 // import values to namespace
 {%- for value in values|sort(attribute='identifier') %}
-using {{api.identifier}}::{{value.identifier}};
+using {{binding.baseNamespace}}::{{value.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}

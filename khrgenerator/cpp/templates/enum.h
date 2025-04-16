@@ -2,14 +2,14 @@
 #pragma once
 
 
-#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/no{{binding.baseNamespace}}.h>
 
 #include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 #include <type_traits>
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
@@ -44,4 +44,4 @@ enum class {{binding.enumType}} : unsigned int
 {% endfor %}
 {% endfor %}
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}

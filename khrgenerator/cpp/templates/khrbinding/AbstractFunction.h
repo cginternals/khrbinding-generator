@@ -35,7 +35,7 @@ public:
     *    Constructor
     *
     *  @param[in] name
-    *    The actual exported OpenGL API function name, including the '{{api.identifier}}' prefix
+    *    The actual exported OpenGL API function name, including the '{{binding.baseNamespace}}' prefix
     */
     AbstractFunction(const char * name);
 
@@ -258,7 +258,7 @@ protected:
 
 
 protected:
-    const char * m_name; ///< The function name, including the '{{api.identifier}}' prefix
+    const char * m_name; ///< The function name, including the '{{binding.baseNamespace}}' prefix
 };
 
 

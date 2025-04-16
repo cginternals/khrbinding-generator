@@ -2,14 +2,14 @@
 #pragma once
 
 
-#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/no{{binding.baseNamespace}}.h>
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
-enum class {{binding.extensionType}} : int // {{binding.extensionType}} is not a type introduced by {{api.identifier | upper}} API so far
+enum class {{binding.extensionType}} : int // {{binding.extensionType}} is not a type introduced by {{binding.baseNamespace | upper}} API so far
 {
     UNKNOWN = -1,
     {% for extension in api.extensions|sort(attribute='identifier') -%}
@@ -18,4 +18,4 @@ enum class {{binding.extensionType}} : int // {{binding.extensionType}} is not a
 };
 
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}

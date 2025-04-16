@@ -11,16 +11,12 @@ class Profile:
 
         self.lowercasePrefix = jsonObject["lowercasePrefix"]
         self.uppercasePrefix = jsonObject["uppercasePrefix"]
-
-        self.api = jsonObject["baseNamespace"]
         self.baseNamespace = jsonObject["baseNamespace"]
         self.inputfilepath = jsonObject["sourceFile"]
         self.inputfile = os.path.basename(self.inputfilepath)
-        self.apiIdentifier = jsonObject["apiIdentifier"]
         self.multiContextBinding = jsonObject["multiContext"]
         self.booleanWidth = jsonObject["booleanWidth"]
         self.bindingNamespace = jsonObject["bindingNamespace"]
-        self.minCoreVersion = [ int(number) for number in jsonObject["coreProfileSince"].split(".") ] if jsonObject["coreProfileSince"] is not None else None
         self.extensionType = jsonObject["extensionType"]
         self.noneBitfieldValue = jsonObject["noneBitfieldValue"]
         self.useEnumGroups = jsonObject["useEnumGroups"]
@@ -31,4 +27,18 @@ class Profile:
         self.headerReplacement = jsonObject["headerReplacement"]
         self.cStringOutputTypes = jsonObject["cStringOutputTypes"]
         self.generateNoneBits = jsonObject["generateNoneBits"]
+        self.stripFeatureHeaders = jsonObject["stripFeatureHeaders"] if "stripFeatureHeaders" in jsonObject else False
         self.undefs = jsonObject["undefs"] if "undefs" in jsonObject else []
+
+        if "apis" in jsonObject and isinstance(jsonObject["apis"], list):
+            self.apis = { api["identifier"]: { "entryPointHeader": api["entryPointHeader"] } for api in jsonObject["apis"] }
+            for api in jsonObject["apis"]:
+                if "coreProfileSince" in api:
+                    self.apis[api["identifier"]]["coreProfileSince"] = api["coreProfileSince"]
+
+        # Compatibility with old profile JSON format:
+        elif jsonObject["apiIdentifier"]:
+            self.apis = { jsonObject["apiIdentifier"]: { "entryPointHeader": f"{self.baseNamespace}.h" } }
+            if jsonObject["coreProfileSince"]:
+                self.apis[jsonObject["apiIdentifier"]]["coreProfileSince"] = jsonObject["coreProfileSince"]
+                

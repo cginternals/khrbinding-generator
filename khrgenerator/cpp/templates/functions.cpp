@@ -1,10 +1,10 @@
 
 #include "../Binding_pch.h"
 
-#include <{{binding.identifier}}/{{api.identifier}}/functions.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/functions.h>
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 {% for function in functions|sort(attribute='identifier') %}
@@ -14,4 +14,4 @@ namespace {{api.identifier}}
 }
 {% endfor %}
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}

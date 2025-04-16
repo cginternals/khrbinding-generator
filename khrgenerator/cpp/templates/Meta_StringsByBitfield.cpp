@@ -1,10 +1,10 @@
 
 #include "Meta_Maps.h"
 
-#include <{{binding.identifier}}/{{api.identifier}}/bitfield.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/bitfield.h>
 
 
-using namespace {{api.identifier}};
+using namespace {{binding.baseNamespace}};
 
 
 namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}

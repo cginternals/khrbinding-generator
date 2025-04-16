@@ -101,7 +101,7 @@ class EGLParser(XMLParser):
                 try:
                     constant.decimalValue = int(enum.attrib["value"], 0)
                 except:
-                    castResult = re.search('EGL_CAST\(%s[A-Za-z0-9_]+\,([\-0-9]+)\)', enum.attrib["value"])
+                    castResult = re.search(r'EGL_CAST\(%s[A-Za-z0-9_]+\,([\-0-9]+)\)', enum.attrib["value"])
                     if castResult is not None:
                         constant.decimalValue = castResult.group(1).strip()
                     else:
@@ -303,10 +303,11 @@ class EGLParser(XMLParser):
 
         featureSets = []
 
-        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+        identifiers = set(profile.apis.keys())
+        api.versions = [ version for version in api.versions if any([api in version.supportedAPIs for api in identifiers]) ]
         featureSets += api.versions
 
-        api.extensions = [ extension for extension in api.extensions if profile.apiIdentifier in extension.supportedAPIs ]
+        api.extensions = [ extension for extension in api.extensions if any([api in extension.supportedAPIs for api in identifiers]) ]
         featureSets += api.extensions
 
         api.constants = [ constant for constant in api.constants if
@@ -435,7 +436,6 @@ class EGLParser(XMLParser):
         binding.baseNamespace = profile.baseNamespace
         
         binding.multiContextBinding = profile.multiContextBinding
-        binding.minCoreVersion = profile.minCoreVersion
         
         binding.identifier = profile.bindingNamespace
         binding.namespace = profile.bindingNamespace
@@ -450,7 +450,7 @@ class EGLParser(XMLParser):
         binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
         binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
-        binding.apientry = api.identifier.upper()+"_APIENTRY"
+        binding.apientry = binding.baseNamespace.upper()+"_APIENTRY"
 
         binding.additionalTypes = ""
         
@@ -477,7 +477,7 @@ class EGLParser(XMLParser):
                 return api.typeByIdentifier("EGLuint64KHR")
         
         if "value" in enum.attrib:
-            castResult = re.search('%s([A-Za-z0-9_]+)' % ("EGL_CAST\("), enum.attrib["value"])
+            castResult = re.search(r'%s([A-Za-z0-9_]+)' % (r'EGL_CAST\('), enum.attrib["value"])
             if castResult is not None:
                 typeName = castResult.group(1).strip()
                 return next((t for t in api.types if t.identifier.endswith(typeName)), api.typeByIdentifier("EGLint"))

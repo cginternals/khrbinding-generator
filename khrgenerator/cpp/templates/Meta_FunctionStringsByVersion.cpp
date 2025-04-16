@@ -4,7 +4,7 @@
 #include <{{binding.identifier}}/Version.h>
 
 
-using namespace {{api.identifier}};
+using namespace {{binding.baseNamespace}};
 
 
 namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}

@@ -209,7 +209,7 @@ protected:
 };
 
 
-} // namespace glbinding
+} // namespace {{binding.namespace}}
 
 
 #include <{{binding.identifier}}/Function.inl>

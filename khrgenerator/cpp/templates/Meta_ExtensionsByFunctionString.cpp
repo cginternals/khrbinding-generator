@@ -1,10 +1,10 @@
 
 #include "Meta_Maps.h"
 
-#include <{{binding.identifier}}/{{api.identifier}}/extension.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/extension.h>
 
 
-using namespace {{api.identifier}};
+using namespace {{binding.baseNamespace}};
 
 
 namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
@@ -21,7 +21,7 @@ const std::unordered_map<std::string, std::set<{{binding.extensionType}}>> Meta_
 {%- endif %}{% endfor %}
 };
 {% endif %}{% endfor %}
-const std::array<std::unordered_map<std::string, std::set<{{api.identifier}}::{{binding.extensionType}}>>, {{extensionsByFunction|length}}> Meta_ExtensionsByFunctionStringMaps =
+const std::array<std::unordered_map<std::string, std::set<{{binding.baseNamespace}}::{{binding.extensionType}}>>, {{extensionsByFunction|length}}> Meta_ExtensionsByFunctionStringMaps =
 { {
 {%- for groupname, function in extensionsByFunction|dictsort %}
     Meta_ExtensionsByFunctionString_{{groupname}}{{ "," if not loop.last }}

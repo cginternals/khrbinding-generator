@@ -1,5 +1,5 @@
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
@@ -40,4 +40,4 @@ inline {{identifier}} & operator^=({{identifier}} & a, const {{identifier}} & b)
 }
 
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}

@@ -1,10 +1,10 @@
 
 #include "Meta_Maps.h"
 
-#include <{{binding.identifier}}/{{api.identifier}}/boolean.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/boolean.h>
 
 
-using namespace {{api.identifier}};
+using namespace {{binding.baseNamespace}};
 
 
 namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
@@ -14,7 +14,7 @@ namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
 const std::unordered_map<std::string, {{binding.booleanType}}> Meta_BooleansByString =
 {
 {%- for boolean in booleans|sort(attribute='identifier') %}
-    { "{{boolean.identifier}}", {{api.identifier}}::{{boolean.identifier}} }{% if not loop.last %},{% endif %}
+    { "{{boolean.identifier}}", {{binding.baseNamespace}}::{{boolean.identifier}} }{% if not loop.last %},{% endif %}
 {%- endfor %}
 };
 

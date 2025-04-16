@@ -85,7 +85,8 @@ class VKParser(XMLParser):
 
         featureSets = []
 
-        api.versions = [ version for version in api.versions if profile.apiIdentifier in version.supportedAPIs ]
+        identifiers = set(profile.apis.keys())
+        api.versions = [ version for version in api.versions if any([api in version.supportedAPIs for api in identifiers]) ]
         featureSets += api.versions
 
         # filter extensions
@@ -93,7 +94,7 @@ class VKParser(XMLParser):
             extension.platform == "" and
             not extension.identifier.startswith('RESERVED_DO_NOT_USE') and
             not "_extension_" in extension.identifier and
-            profile.apiIdentifier in extension.supportedAPIs
+            any([api in extension.supportedAPIs for api in identifiers])
         ]
         featureSets += api.extensions
 
@@ -258,7 +259,6 @@ class VKParser(XMLParser):
         binding.baseNamespace = profile.baseNamespace
         
         binding.multiContextBinding = profile.multiContextBinding
-        binding.minCoreVersion = profile.minCoreVersion
         
         binding.identifier = profile.bindingNamespace
         binding.namespace = profile.bindingNamespace
@@ -273,7 +273,7 @@ class VKParser(XMLParser):
         binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
         binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
-        binding.apientry = api.identifier.upper()+"_APIENTRY"
+        binding.apientry = binding.baseNamespace.upper()+"_APIENTRY"
 
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement
@@ -570,7 +570,7 @@ class VKParser(XMLParser):
     @classmethod
     def handleVersion(cls, api, profile, feature):
         identifier = "vk"+"".join([ c for c in feature.attrib["number"] if c.isdigit() ])
-        version = Version(api, identifier, feature.attrib["name"], feature.attrib["number"], "vk")
+        version = Version(api, identifier, feature.attrib["api"], feature.attrib["number"], "vk")
 
         for require in feature.findall("require"):
             cls.handleVersionRequire(api, version, require)

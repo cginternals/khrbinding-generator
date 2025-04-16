@@ -11,7 +11,7 @@
 #include <{{binding.bindingAuxIdentifier}}/{{binding.bindingAuxIdentifier}}_api.h>
 #include <{{binding.bindingAuxIdentifier}}/{{binding.bindingAuxIdentifier}}_features.h>
 
-#include <{{binding.identifier}}/{{api.identifier}}/types.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/types.h>
 #include <{{binding.identifier}}/AbstractFunction.h>
 
 
@@ -46,7 +46,7 @@ public:
     *  @return
     *    The revision of the parsed {{profile.inputfile}} file
     */
-    static int {{api.identifier}}Revision();
+    static int {{binding.baseNamespace}}Revision();
 
     /**
     *  @brief
@@ -58,7 +58,7 @@ public:
     *  @return
     *    The symbol identified through the bitfield string, 0 if failed
     */
-    static {{api.identifier}}::{{binding.bitfieldType}} getBitfield(const std::string & bitfield);
+    static {{binding.baseNamespace}}::{{binding.bitfieldType}} getBitfield(const std::string & bitfield);
     
     /**
     *  @brief
@@ -67,13 +67,13 @@ public:
     *  @return
     *    The list of all bitfields known by the {{profile.inputfile}}
     */
-    static std::vector<{{api.identifier}}::{{binding.bitfieldType}}> bitfields();
+    static std::vector<{{binding.baseNamespace}}::{{binding.bitfieldType}}> bitfields();
 
     /**
     *  @brief
     *    Converts a {{binding.enumType}} to a string
     *
-    *  @param[in] {{api.identifier}}enum
+    *  @param[in] {{binding.baseNamespace}}enum
     *    The enum to convert
     *
     *  @return
@@ -82,19 +82,19 @@ public:
     *  @remark
     *    Beware, that some enums in the OpenGL API have different symbol names but identical enum values and that this function cannot differentiate between them
     */
-    // static const std::string & getString({{api.identifier}}::{{binding.enumType}} {{api.identifier}}enum);
+    // static const std::string & getString({{binding.baseNamespace}}::{{binding.enumType}} {{binding.baseNamespace}}enum);
     
     /**
     *  @brief
     *    Converts a string to an enum symbol
     *
-    *  @param[in] {{api.identifier}}enum
+    *  @param[in] {{binding.baseNamespace}}enum
     *    The string representation of the enum
     *
     *  @return
     *    The symbol identified through the enum string, 0 if failed
     */
-    static {{api.identifier}}::{{binding.enumType}} getEnum(const std::string & {{api.identifier}}enum);
+    static {{binding.baseNamespace}}::{{binding.enumType}} getEnum(const std::string & {{binding.baseNamespace}}enum);
     
     /**
     *  @brief
@@ -103,22 +103,22 @@ public:
     *  @return
     *    The list of all enums known by the {{profile.inputfile}}
     */
-    static std::set<{{api.identifier}}::{{binding.enumType}}> enums();
+    static std::set<{{binding.baseNamespace}}::{{binding.enumType}}> enums();
 
     /**
     *  @brief
     *    Converts a {{binding.booleanType}} to a string
     *
-    *  @param[in] {{api.identifier}}boolean
+    *  @param[in] {{binding.baseNamespace}}boolean
     *    The boolean to convert
     *
     *  @return
     *    A string representation of the {{binding.booleanType}} symbol name
     *
     *  @remark
-    *    Can either be `{{api.identifier|upper}}_TRUE` or `{{api.identifier|upper}}_FALSE`
+    *    Can either be `{{binding.baseNamespace|upper}}_TRUE` or `{{binding.baseNamespace|upper}}_FALSE`
     */
-    static const std::string & getString(const {{api.identifier}}::{{binding.booleanType}} & {{api.identifier}}boolean);
+    static const std::string & getString(const {{binding.baseNamespace}}::{{binding.booleanType}} & {{binding.baseNamespace}}boolean);
     
     /**
     *  @brief
@@ -128,21 +128,21 @@ public:
     *    The string representation of the {{binding.booleanType}}
     *
     *  @return
-    *    The symbol identified through the boolean string, `{{api.identifier|upper}}_FALSE` if failed
+    *    The symbol identified through the boolean string, `{{binding.baseNamespace|upper}}_FALSE` if failed
     */
-    static {{api.identifier}}::{{binding.booleanType}} getBoolean(const std::string & boolean);
+    static {{binding.baseNamespace}}::{{binding.booleanType}} getBoolean(const std::string & boolean);
 
     /**
     *  @brief
     *    Converts a {{binding.extensionType}} to its string representation
     *
-    *  @param[in] {{api.identifier}}extension
+    *  @param[in] {{binding.baseNamespace}}extension
     *    The extension to convert
     *
     *  @return
     *    The string representation of the extension
     */
-    static const std::string & getString({{api.identifier}}::{{binding.extensionType}} {{api.identifier}}extension);
+    static const std::string & getString({{binding.baseNamespace}}::{{binding.extensionType}} {{binding.baseNamespace}}extension);
     
     /**
     *  @brief
@@ -154,7 +154,7 @@ public:
     *  @return
     *    The symbol identified through the extension string, 'UNKNOWN' if failed
     */
-    static {{api.identifier}}::{{binding.extensionType}} getExtension(const std::string & extension);
+    static {{binding.baseNamespace}}::{{binding.extensionType}} getExtension(const std::string & extension);
 
     /**
     *  @brief
@@ -163,7 +163,7 @@ public:
     *  @return
     *    The set of all extensions known by the {{profile.inputfile}}
     */
-    static std::set<{{api.identifier}}::{{binding.extensionType}}> extensions();
+    static std::set<{{binding.baseNamespace}}::{{binding.extensionType}}> extensions();
     
     /**
     *  @brief
@@ -178,31 +178,31 @@ public:
     *    The set of extensions that should be supported for the given version.
     *    All non-versioned extensions can be queried by providing the null version
     */
-    static const std::set<{{api.identifier}}::{{binding.extensionType}}> extensions(const Version & version);
+    static const std::set<{{binding.baseNamespace}}::{{binding.extensionType}}> extensions(const Version & version);
 
     /**
     *  @brief
     *    Returns the list of extensions that are requiring a function
     *
     *  @param[in] function
-    *    The name of the function, including the '{{api.identifier}}' prefix
+    *    The name of the function, including the '{{binding.baseNamespace}}' prefix
     *
     *  @return
     *    The set of extensions that are requiring a function
     */
-    static const std::set<{{api.identifier}}::{{binding.extensionType}}> extensions(const std::string & {{api.identifier}}function);
+    static const std::set<{{binding.baseNamespace}}::{{binding.extensionType}}> extensions(const std::string & {{binding.baseNamespace}}function);
 
     /**
     *  @brief
     *    Returns the list of features that are requiring a function
     *
     *  @param[in] function
-    *    The name of the function, including the '{{api.identifier}}' prefix
+    *    The name of the function, including the '{{binding.baseNamespace}}' prefix
     *
     *  @return
     *    The set of features that are requiring a function
     */
-    static const std::set<Version> versions(const std::string & {{api.identifier}}function);
+    static const std::set<Version> versions(const std::string & {{binding.baseNamespace}}function);
     
     /**
     *  @brief
@@ -229,19 +229,19 @@ public:
     *  @return
     *    The set of functions that are required for the extension
     */
-    static const std::set<AbstractFunction *> functions({{api.identifier}}::{{binding.extensionType}} extension);
+    static const std::set<AbstractFunction *> functions({{binding.baseNamespace}}::{{binding.extensionType}} extension);
 
     /**
     *  @brief
     *    Returns the first Version (Feature) that required the extension
     *
-    *  @param[in] {{api.identifier}}extension
+    *  @param[in] {{binding.baseNamespace}}extension
     *    The extension
     *
     *  @return
     *    The first Version (Feature) that required the extension
     */
-    static const Version & version({{api.identifier}}::{{binding.extensionType}} {{api.identifier}}extension);
+    static const Version & version({{binding.baseNamespace}}::{{binding.extensionType}} {{binding.baseNamespace}}extension);
     
     /**
     *  @brief
@@ -256,20 +256,20 @@ public:
     *  @brief
     *    Convert bitfield to symbol name string representation
     *
-    *  @param[in] {{api.identifierl}}bitfield
+    *  @param[in] {{binding.baseNamespacel}}bitfield
     *    The bitfield value
     *
     *  @return
     *    The string representation of the value
     */
-    static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}bitfield);
+    static const std::string & getString({{binding.baseNamespace}}::{{group.identifier}} {{binding.baseNamespace}}bitfield);
 {% endfor %}
 {% for group in enumGroups|sort(attribute='identifier') %}
     /**
     *  @brief
     *    Convert enum to symbol name string representation
     *
-    *  @param[in] {{api.identifierl}}enum
+    *  @param[in] {{binding.baseNamespacel}}enum
     *    The enum value
     *
     *  @return
@@ -278,19 +278,19 @@ public:
     *  @remark
     *    Beware, that some enums in the API have different symbol names but identical enum values and that this function cannot differentiate between them
     */
-    static const std::string & getString({{api.identifier}}::{{group.identifier}} {{api.identifier}}enum);
+    static const std::string & getString({{binding.baseNamespace}}::{{group.identifier}} {{binding.baseNamespace}}enum);
 
     /**
     *  @brief
     *    Convert enum to symbol name string representation
     *
-    *  @param[in] {{api.identifierl}}enum
+    *  @param[in] {{binding.baseNamespacel}}enum
     *    The enum value
     *
     *  @return
     *    All string representations of the value
     */
-    static std::vector<std::string> getStrings({{api.identifier}}::{{group.identifier}} {{api.identifier}}enum);
+    static std::vector<std::string> getStrings({{binding.baseNamespace}}::{{group.identifier}} {{binding.baseNamespace}}enum);
 {% endfor %}
 
 private:
@@ -302,7 +302,7 @@ private:
     *    The identifier for the bucket lookup
     *
     *  @param[in] prefixLength
-    *    The length of the prefix (e.g., '{{api.identifier}}' or '{{api.identifier|upper}}_') to omit to get the actual first character of the identifier
+    *    The length of the prefix (e.g., '{{binding.baseNamespace}}' or '{{binding.baseNamespace|upper}}_') to omit to get the actual first character of the identifier
     *
     *  @return
     *    The bucket index of an identifier

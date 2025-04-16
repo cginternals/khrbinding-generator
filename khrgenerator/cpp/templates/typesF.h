@@ -2,17 +2,17 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/no{{api.identifier}}.h>
-#include <{{api.identifier}}binding/{{api.identifier}}/types.h>
+#include <{{profile.bindingNamespace}}/no{{binding.baseNamespace}}.h>
+#include <{{profile.bindingNamespace}}/{{binding.baseNamespace}}/types.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 
 {% for type in types|sort(attribute='identifier') %}
-using {{api.identifier}}::{{type.identifier}};
+using {{binding.baseNamespace}}::{{type.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}

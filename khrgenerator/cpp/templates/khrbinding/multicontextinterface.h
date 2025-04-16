@@ -41,7 +41,7 @@ using ContextSwitchCallback = std::function<void(ContextHandle)>;             //
 *  @remark
 *    This function is a convenience interface for applications that use only one OpenGL context.
 *    If you want to use more than one context, use explicit context identifiers and the dedicated
-*    Initialization interface initialize(ContextHandle, glbinding::GetProcAddress, bool, bool).
+*    Initialization interface initialize(ContextHandle, {{binding.namespace}}::GetProcAddress, bool, bool).
 *
 *  @remark
 *    After this call, the initialized context is already set active for the current thread.

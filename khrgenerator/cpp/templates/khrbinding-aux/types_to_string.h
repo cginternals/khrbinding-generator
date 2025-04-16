@@ -8,11 +8,11 @@
 #include <{{binding.bindingAuxIdentifier}}/{{binding.bindingAuxIdentifier}}_api.h>
 #include <{{binding.bindingAuxIdentifier}}/{{binding.bindingAuxIdentifier}}_features.h>
 
-#include <{{binding.identifier}}/{{api.identifier}}/types.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/types.h>
 #include <{{binding.identifier}}/Value.h>
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
@@ -26,7 +26,7 @@ namespace {{api.identifier}}
 {{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const {{group.identifier}} & value);
 {% endfor %}
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}
 
 
 namespace {{binding.namespace}}
@@ -52,24 +52,24 @@ template <typename T>
 
 /**
 *  @brief
-*    A specialized ostream operator for the gl::GLenum Value template
+*    A specialized ostream operator for the {{binding.baseNamespace}}::GLenum Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.enumType}}> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{binding.baseNamespace}}::{{binding.enumType}}> & value);
 
 /* <- ToDo: Add back second * when implementing this function again
 *  @brief
-*    A specialized ostream operator for the gl::GLbitfield Value template
+*    A specialized ostream operator for the {{binding.baseNamespace}}::GLbitfield Value template
 */
 /*template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.bitfieldType}}> & value);*/
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{binding.baseNamespace}}::{{binding.bitfieldType}}> & value);*/
 
 /**
 *  @brief
-*    A specialized ostream operator for the gl::GLenum Value template
+*    A specialized ostream operator for the {{binding.baseNamespace}}::GLenum Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{binding.booleanType}}> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{binding.baseNamespace}}::{{binding.booleanType}}> & value);
 
 /**
 *  @brief
@@ -85,7 +85,7 @@ template <>
 *    A specialized ostream operator for the {{cStringTypeName}} * Value template
 */
 template <>
-{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{api.identifier}}::{{cStringTypeName}} *> & value);
+{{binding.auxApiExport}} std::ostream & operator<<(std::ostream & stream, const Value<{{binding.baseNamespace}}::{{cStringTypeName}} *> & value);
 {%- endfor %}
 
 /**

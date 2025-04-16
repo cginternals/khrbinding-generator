@@ -2,19 +2,19 @@
 #pragma once
 
 
-#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/no{{binding.baseNamespace}}.h>
 
-#include <{{binding.identifier}}/{{api.identifier}}/bitfield.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/bitfield.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 
 // import bitfields to namespace
 {%- for constant in constants|sort(attribute='identifier') %}
-using {{api.identifier}}::{{constant.identifier}};
+using {{binding.baseNamespace}}::{{constant.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}

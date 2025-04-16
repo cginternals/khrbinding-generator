@@ -1,0 +1,65 @@
+{
+	"": "API specification",
+	"sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/master/xml/gl.xml",
+	"sourceFile": "gl.xml",
+
+    "": "Parser configuration",
+    "parser": "gl",
+
+	"": "Identifier parsing",
+	"lowercasePrefix": "gl",
+	"uppercasePrefix": "GL_",
+
+	"": "Meta Feature management",
+    "generator": "cpp",
+	"bindingNamespace": "glbinding",
+	"baseNamespace": "gl",
+	"generateFeatures": true,
+	"generateProfiles": true,
+	"coreProfileSince": "3.2",
+	"multiContext": true,
+	"generateStringLookup": true,
+	"generateStringConversion": true,
+	"generateCallbacks": true,
+	"generateLogging": true,
+	"stripFeatureHeaders": true,
+	"generateHeaderGuard": true,
+	"headerGuardMacro": [ "__gl_h_", "__gles_h_", "__gles1_h_", "__gles2_h_", "__gles3_h_" ],
+	"headerReplacement": [ "gl.h", "gles.h", "gles1.h", "gles2.h", "gles3.h" ],
+
+	"": "Types",
+	"extensionType": "GLextension",
+	"booleanType": "GLboolean",
+	"booleanWidth": 8,
+	"enumType": "GLenum",
+	"bitfieldType": "GLbitfield",
+	"noneBitfieldValue": "GL_NONE_BIT",
+	"cStringOutputTypes": [ "GLubyte", "GLchar" ],
+
+	"": "API Feature management",
+	"apis": [
+		{
+			"identifier": "gl",
+			"coreProfileSince": "3.2",
+			"entryPointHeader": "gl.h"
+		},
+		{
+			"identifier": "gles1",
+			"entryPointHeader": "gles.h"
+		},
+		{
+			"identifier": "gles2",
+			"entryPointHeader": "gles.h"
+		}
+	],
+	"versions": [],
+	"featureBlacklist": [],
+	"extensionBlacklist": [],
+	"useBitfieldGroups": true,
+	"useEnumGroups": false,
+	"generateNoneBits": true,
+	"generateBitfieldTypeIntegrations": true,
+	"generateEnumTypeIntegrations": true,
+
+	"": "File patterns"
+}

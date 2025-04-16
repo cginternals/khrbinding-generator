@@ -1,5 +1,5 @@
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
@@ -14,4 +14,4 @@ namespace {{api.identifier}}
 }
 
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}

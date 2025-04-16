@@ -2,16 +2,16 @@
 #pragma once
 
 
-#include <{{binding.identifier}}/no{{api.identifier}}.h>
-#include <{{binding.identifier}}/{{api.identifier}}/functions.h>
+#include <{{binding.identifier}}/no{{binding.baseNamespace}}.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/functions.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 // import functions
 {%- for function in functions|sort(attribute='identifier') %}
-using {{api.identifier}}::{{function.identifier}};
+using {{binding.baseNamespace}}::{{function.identifier}};
 {%- endfor %}
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}

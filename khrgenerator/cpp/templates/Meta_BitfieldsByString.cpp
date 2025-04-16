@@ -1,10 +1,10 @@
 
 #include "Meta_Maps.h"
 
-#include <{{binding.identifier}}/{{api.identifier}}/bitfield.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/bitfield.h>
 
 
-using namespace {{api.identifier}};
+using namespace {{binding.baseNamespace}};
 
 
 namespace {{binding.namespace}} { namespace {{binding.auxNamespace}}
@@ -23,7 +23,7 @@ const std::unordered_map<std::string, {{binding.bitfieldType}}> Meta_BitfieldsBy
 };
 {%- endif %}
 {% endfor %}
-const std::array<std::unordered_map<std::string, {{api.identifier}}::{{binding.bitfieldType}}>, {{groups|length}}> Meta_BitfieldsByStringMaps =
+const std::array<std::unordered_map<std::string, {{binding.baseNamespace}}::{{binding.bitfieldType}}>, {{groups|length}}> Meta_BitfieldsByStringMaps =
 { {
 {%- for groupname, constants in groups|dictsort %}
     Meta_BitfieldsByString_{{groupname}}{% if not loop.last %},{% endif %}

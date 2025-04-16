@@ -2,14 +2,14 @@
 #pragma once
 
 
-#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/no{{binding.baseNamespace}}.h>
 
 #include <{{binding.identifier}}/{{binding.identifier}}_features.h>
 
 #include <{{binding.identifier}}/SharedBitfield.h>
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
@@ -36,4 +36,4 @@ enum class {{group.identifier}} : unsigned int
 {%- endif %}
 {% endfor %}
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}

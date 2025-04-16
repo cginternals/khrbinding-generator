@@ -175,7 +175,6 @@ class ANParser(XMLParser):
         binding.baseNamespace = profile.baseNamespace
         
         binding.multiContextBinding = profile.multiContextBinding
-        binding.minCoreVersion = profile.minCoreVersion
         
         binding.identifier = profile.bindingNamespace
         binding.namespace = profile.bindingNamespace
@@ -190,7 +189,7 @@ class ANParser(XMLParser):
         binding.constexpr = binding.identifier.upper() + "_CONSTEXPR"
         binding.threadlocal = binding.identifier.upper() + "_THREAD_LOCAL"
         binding.useboostthread = binding.identifier.upper() + "_USE_BOOST_THREAD"
-        binding.apientry = api.identifier.upper()+"_APIENTRY"
+        binding.apientry = binding.baseNamespace.upper()+"_APIENTRY"
 
         binding.headerGuardMacro = profile.headerGuardMacro
         binding.headerReplacement = profile.headerReplacement
@@ -623,7 +622,7 @@ class ANParser(XMLParser):
         """
 
         identifier = "an"+"".join([ c for c in feature.attrib["number"] if c.isdigit() ])
-        version = Version(api, identifier, feature.attrib["name"], feature.attrib["number"], "an")
+        version = Version(api, identifier, feature.attrib["api"], feature.attrib["number"], "an")
 
         for require in feature.findall("require"):
             cls.handleVersionRequire(api, version, require)

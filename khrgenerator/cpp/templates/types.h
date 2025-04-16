@@ -19,13 +19,13 @@
 #define {{binding.apientry}}
 #endif
 
-#include <{{binding.identifier}}/no{{api.identifier}}.h>
+#include <{{binding.identifier}}/no{{binding.baseNamespace}}.h>
 #include <{{binding.identifier}}/{{binding.identifier}}_api.h>
 #include <{{binding.identifier}}/{{binding.identifier}}_features.h>
-#include <{{binding.identifier}}/{{api.identifier}}/boolean.h>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/boolean.h>
 
 
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 {% for type in types|sort(attribute='identifier')|sort(attribute='relevance') %}
@@ -33,7 +33,7 @@ namespace {{api.identifier}}
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}
 
 
-#include <{{binding.identifier}}/{{api.identifier}}/types.inl>
+#include <{{binding.identifier}}/{{binding.baseNamespace}}/types.inl>

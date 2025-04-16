@@ -1,12 +1,12 @@
-namespace {{api.identifier}}
+namespace {{binding.baseNamespace}}
 {
 
 
 std::ostream & operator<<(std::ostream & stream, const {{identifier}} & value)
 {
-    stream << {{api.identifier}}binding::aux::bitfieldString<{{identifier}}>(value);
+    stream << {{profile.bindingNamespace}}::aux::bitfieldString<{{identifier}}>(value);
     return stream;
 }
 
 
-} // namespace {{api.identifier}}
+} // namespace {{binding.baseNamespace}}

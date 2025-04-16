@@ -2,23 +2,23 @@
 #pragma once
 
 
-#include <{{api.identifier}}binding/no{{api.identifier}}.h>
+#include <{{profile.bindingNamespace}}/no{{binding.baseNamespace}}.h>
 
-#include <{{api.identifier}}binding/{{api.identifier}}/boolean.h>
+#include <{{profile.bindingNamespace}}/{{binding.baseNamespace}}/boolean.h>
 
 
-namespace {{api.identifier}}{{memberSet}}
+namespace {{apiString}}{{memberSet}}
 {
 
 
 // use boolean type
-using {{api.identifier}}::{{binding.booleanType}};
+using {{binding.baseNamespace}}::{{binding.booleanType}};
 
 
 // import booleans to namespace
 {%- for constant in constants|sort(attribute='identifier') %}
-using {{api.identifier}}::{{constant.identifier}};
+using {{binding.baseNamespace}}::{{constant.identifier}};
 {%- endfor %}
 
 
-} // namespace {{api.identifier}}{{memberSet}}
+} // namespace {{apiString}}{{memberSet}}
